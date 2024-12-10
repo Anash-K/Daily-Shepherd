@@ -40,7 +40,7 @@ function App(): React.JSX.Element {
       />
       <View>
         <Text>Home</Text>   
-      </View>
+      </View>  
     </SafeAreaView>
   );
 };
