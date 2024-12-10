@@ -39,7 +39,7 @@ function App(): React.JSX.Element {
         backgroundColor={backgroundStyle.backgroundColor}
       />
       <View>
-        <Text>Home</Text>
+        <Text>Home</Text>   
       </View>
     </SafeAreaView>
   );
