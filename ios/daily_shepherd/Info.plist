@@ -31,8 +31,13 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>The app requires access to your location for better service functionality.</string>
+<key>NSCameraUsageDescription</key>
+<string>The app requires access to the camera to capture photos or videos.</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>The app requires access to your photo library to select images or videos.</string>
+
 	<key>UILaunchStoryboardName</key>
 	<string>BootSplash</string>
 	<key>UIRequiredDeviceCapabilities</key>

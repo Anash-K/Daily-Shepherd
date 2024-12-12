@@ -15,8 +15,8 @@ import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {useDispatch} from 'react-redux';
-import {loginSuccess} from '../store/reducers/AuthReducer';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../store/reducers/AuthReducer';
 type RootStackParamList = {
   Login: undefined;
   CreateAccount: undefined;
@@ -24,19 +24,19 @@ type RootStackParamList = {
 
 type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
-const Login: React.FC<LoginProps> = ({navigation}) => {
+const CreateAccount: React.FC<LoginProps> = ({navigation}) => {
   const {top, bottom} = useSafeAreaInsets();
   const dispatch = useDispatch();
 
-  const handlePress = () => {};
   const handleNav = () => {
-    console.log("test")
-    navigation.navigate('CreateAccount'); // This will work as expected now
+    navigation.navigate('Login');
   };
+
   const handleLogin = () => {
     dispatch(loginSuccess('login'));
   };
-  
+
+  const handlePress = () => {};
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView
@@ -50,8 +50,13 @@ const Login: React.FC<LoginProps> = ({navigation}) => {
             resizeMode="contain"
             style={styles.logo}
           />
-          <Text style={styles.title}>Welcome back!</Text>
+          <Text style={styles.title}>Let’s get you in!</Text>
           <View style={styles.inputs}>
+            <CustomInput
+              onChange={handlePress}
+              placeholderText="Name"
+              inputBoxStyle={styles.inputBox}
+            />
             <CustomInput
               onChange={handlePress}
               placeholderText="Email"
@@ -62,34 +67,30 @@ const Login: React.FC<LoginProps> = ({navigation}) => {
               placeholderText="Password"
               inputBoxStyle={styles.inputBox}
               isPassword={true}
+              //   iconStyle={}
             />
           </View>
           <CustomButton
-            text="Login"
+            text="Create account"
             onPress={handleLogin}
             buttonStyle={{marginBottom: 24}}
           />
-          <TouchableOpacity>
-            <Text style={styles.forgotText}>Forgot password?</Text>
-          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
 
       <View style={styles.bottomBox}>
-        <Text style={styles.bottomText}>Don’t have an account?</Text>
+        <Text style={styles.bottomText}>Already have an account? </Text>
         <TouchableOpacity
           style={{alignItems: 'center', justifyContent: 'center'}}
-          onPress={() => handleNav()}>
-          <Text style={[styles.bottomText, styles.innerBottomText]}>
-            Create Account
-          </Text>
+          onPress={handleNav}>
+          <Text style={[styles.bottomText, styles.innerBottomText]}>Login</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
 
-export default Login;
+export default CreateAccount;
 
 const styles = StyleSheet.create({
   container: {

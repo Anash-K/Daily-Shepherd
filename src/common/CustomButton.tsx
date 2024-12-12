@@ -1,24 +1,25 @@
 import React from 'react';
 import {
   Text,
-  TouchableOpacity,
   View,
   StyleSheet,
   Image,
   ViewStyle,
   TextStyle,
   ImageSourcePropType,
+  ImageStyle,
+  TouchableOpacity,
 } from 'react-native';
 import CustomFont from '../assets/customFonts';
 
 interface CustomButtonProps {
-  text: string;
+  text?: string;
   onPress: () => void;
   icon?: ImageSourcePropType; // For handling images (local or remote)
   iconPosition?: 'left' | 'right'; // Icon position
   buttonStyle?: ViewStyle; // Custom button style
   textStyle?: TextStyle; // Custom text style
-  iconStyle?: ViewStyle | ''; // Custom icon style
+  iconStyle?: ImageStyle | ''; // Custom icon style
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -35,7 +36,8 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       {icon && iconPosition === 'left' && (
         <Image source={icon} style={[styles.icon, iconStyle]} />
       )}
-      <Text style={[styles.text, textStyle]}>{text}</Text>
+      {text && <Text style={[styles.text, textStyle]}>{text}</Text>}
+
       {icon && iconPosition === 'right' && (
         <Image source={icon} style={[styles.icon, iconStyle]} />
       )}
