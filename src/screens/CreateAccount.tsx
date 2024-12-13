@@ -13,27 +13,19 @@ import CustomFont from '../assets/customFonts';
 import CustomInput from '../common/CustomInput';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import { useDispatch } from 'react-redux';
-import { loginSuccess } from '../store/reducers/AuthReducer';
-type RootStackParamList = {
-  Login: undefined;
-  CreateAccount: undefined;
-};
+import {AuthStackProps} from '../navigation/AuthStack';
 
-type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
-
-const CreateAccount: React.FC<LoginProps> = ({navigation}) => {
+const CreateAccount: React.FC<AuthStackProps<'CreateAccount'>> = ({
+  navigation,
+}) => {
   const {top, bottom} = useSafeAreaInsets();
-  const dispatch = useDispatch();
 
   const handleNav = () => {
     navigation.navigate('Login');
   };
 
   const handleLogin = () => {
-    dispatch(loginSuccess('login'));
+    navigation.navigate('ProfilePicture');
   };
 
   const handlePress = () => {};

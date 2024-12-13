@@ -13,30 +13,23 @@ import CustomFont from '../assets/customFonts';
 import CustomInput from '../common/CustomInput';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {useDispatch} from 'react-redux';
-import {loginSuccess} from '../store/reducers/AuthReducer';
-type RootStackParamList = {
-  Login: undefined;
-  CreateAccount: undefined;
-};
+import {AuthStackProps} from '../navigation/AuthStack';
 
-type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
-
-const Login: React.FC<LoginProps> = ({navigation}) => {
+const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
   const {top, bottom} = useSafeAreaInsets();
-  const dispatch = useDispatch();
 
   const handlePress = () => {};
   const handleNav = () => {
-    console.log("test")
     navigation.navigate('CreateAccount'); // This will work as expected now
   };
   const handleLogin = () => {
-    dispatch(loginSuccess('login'));
+    navigation.navigate('ProfilePicture');
   };
-  
+
+  const handleForgotPassword = () => {
+    navigation.navigate('ForgotPassword');
+  };
+
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView
@@ -69,7 +62,7 @@ const Login: React.FC<LoginProps> = ({navigation}) => {
             onPress={handleLogin}
             buttonStyle={{marginBottom: 24}}
           />
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleForgotPassword}>
             <Text style={styles.forgotText}>Forgot password?</Text>
           </TouchableOpacity>
         </ScrollView>

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   Button,
   Image,
@@ -15,16 +15,25 @@ import CustomButton from '../common/CustomButton';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import {Menu, MenuItem} from 'react-native-material-menu';
+import {AuthStackProps} from '../navigation/AuthStack';
 
-const ProfilePicture: React.FC = () => {
+const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
+  navigation,
+}) => {
   const [isModalVisible, setModalVisible] = useState(false);
+  console.log(isModalVisible);
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
+  const toggleModal = useCallback(() => {
+    setModalVisible(prev => !prev);
+  }, []);
+
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
   const handleConfirm = () => {};
+
+  const handleNextNav = useCallback(() => {
+    navigation.navigate('NotificationPreferences');
+  }, [navigation]);
 
   // Request and check for camera permission when the component mounts
   useEffect(() => {
@@ -60,77 +69,85 @@ const ProfilePicture: React.FC = () => {
     includeBase64: true,
   };
 
-  const handleCamera = async () => {
-    toggleModal();
-    try {
-      launchCamera(
-        {
-          mediaType: 'photo',
-          maxWidth: 300,
-          maxHeight: 550,
-          quality: 1,
-          includeBase64: true,
-        },
-        response => {
-          if (response.didCancel) {
-            console.log('User cancelled camera picker');
-          } else if (response.errorCode) {
-            console.log(
-              'Camera Error: ',
-              response.errorCode,
-              response.errorMessage,
-            );
-          } else if (response.assets && response.assets.length > 0) {
-            const uri = response.assets[0]?.uri;
-            if (uri) {
-              setProfileImage(uri);
-            } else {
-              console.error('Photo URI is undefined');
+  const handleCamera = useCallback(
+    async (isClose: Boolean) => {
+      if (isClose) {
+        toggleModal();
+      }
+      try {
+        launchCamera(
+          {
+            mediaType: 'photo',
+            maxWidth: 300,
+            maxHeight: 550,
+            quality: 1,
+            includeBase64: true,
+          },
+          response => {
+            if (response.didCancel) {
+              console.log('User cancelled camera picker');
+            } else if (response.errorCode) {
+              console.log(
+                'Camera Error: ',
+                response.errorCode,
+                response.errorMessage,
+              );
+            } else if (response.assets && response.assets.length > 0) {
+              const uri = response.assets[0]?.uri;
+              if (uri) {
+                setProfileImage(uri);
+              } else {
+                console.error('Photo URI is undefined');
+              }
             }
-          }
-        },
-      );
-    } catch (error) {
-      console.error('Camera error:', error);
-    }
-  };
+          },
+        );
+      } catch (error) {
+        console.error('Camera error:', error);
+      }
+    },
+    [toggleModal],
+  );
 
-  const handleGallery = async () => {
-    toggleModal();
-    try {
-      launchImageLibrary(
-        {
-          mediaType: 'photo',
-          maxWidth: 300,
-          maxHeight: 550,
-          quality: 1,
-          includeBase64: true,
-        },
-        response => {
-          if (response.didCancel) {
-            console.log('User cancelled image picker');
-          } else if (response.errorCode) {
-            console.log(
-              'Gallery Error: ',
-              response.errorCode,
-              response.errorMessage,
-            );
-          } else if (response.assets && response.assets.length > 0) {
-            const uri = response.assets[0]?.uri;
-            if (uri) {
-              setProfileImage(uri);
-            } else {
-              console.error('Photo URI is undefined');
+  const handleGallery = useCallback(
+    async (isClose: Boolean) => {
+      if (isClose) {
+        toggleModal();
+      }
+      try {
+        launchImageLibrary(
+          {
+            mediaType: 'photo',
+            maxWidth: 300,
+            maxHeight: 550,
+            quality: 1,
+            includeBase64: true,
+          },
+          response => {
+            if (response.didCancel) {
+              console.log('User cancelled image picker');
+            } else if (response.errorCode) {
+              console.log(
+                'Gallery Error: ',
+                response.errorCode,
+                response.errorMessage,
+              );
+            } else if (response.assets && response.assets.length > 0) {
+              const uri = response.assets[0]?.uri;
+              if (uri) {
+                setProfileImage(uri);
+              } else {
+                console.error('Photo URI is undefined');
+              }
             }
-          }
-        },
-      );
-    } catch (error) {
-      console.error('Gallery error:', error);
-    }
-  };
-
-  console.log(profileImage);
+          },
+        );
+      } catch (error) {
+        console.error('Gallery error:', error);
+      }
+    },
+    [toggleModal],
+  );
 
   return (
     <View style={styles.container}>
@@ -150,7 +167,20 @@ const ProfilePicture: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <CustomButton text="Upload photo" onPress={toggleModal} />
+      {profileImage ? (
+        <View>
+          <CustomButton
+            text="Try again"
+            onPress={handleCamera.bind(this, false)}
+            buttonStyle={styles.tryAgainButton}
+            textStyle={styles.tryAgainText}
+          />
+          <CustomButton text="Look’s perfect" onPress={handleNextNav} />
+        </View>
+      ) : (
+        <CustomButton text="Upload Photo" onPress={toggleModal} />
+      )}
+
       {/* Modal for photo selection */}
       {isModalVisible && (
         <Modal
@@ -162,8 +192,7 @@ const ProfilePicture: React.FC = () => {
             <View style={styles.modalContent}>
               <TouchableOpacity
                 onPress={() => {
-                  console.log('TouchableOpacity pressed');
-                  toggleModal(); // Assuming toggleModal is the function to open the modal
+                  toggleModal();
                 }}
                 style={styles.closeButton}>
                 <Image
@@ -175,15 +204,18 @@ const ProfilePicture: React.FC = () => {
               <View style={{backgroundColor: '#18171C', borderRadius: 15}}>
                 <CustomButton
                   text="Choose from Gallery"
-                  onPress={handleGallery}
+                  onPress={handleGallery.bind(this, true)}
                   textStyle={styles.menuItemText}
                   buttonStyle={styles.menuItemStyle}
+                  icon={CustomImages.photoGallery}
+                  iconStyle={{backgroundColor: '#3a393d', borderRadius: 4}}
                 />
                 <CustomButton
                   text="Use Camera"
-                  onPress={handleCamera}
+                  onPress={handleCamera.bind(this, true)}
                   textStyle={styles.menuItemText}
                   buttonStyle={styles.menuItemStyle}
+                  icon={CustomImages.cameraIcon}
                 />
               </View>
             </View>
@@ -197,6 +229,15 @@ const ProfilePicture: React.FC = () => {
 export default ProfilePicture;
 
 const styles = StyleSheet.create({
+  tryAgainButton: {
+    backgroundColor: 'transparent',
+    borderColor: 'rgba(56, 57, 62, 1)',
+    borderWidth: 1,
+    marginBottom: 12,
+  },
+  tryAgainText: {
+    color: 'rgba(250, 250, 250, 1)',
+  },
   container: {
     flex: 1,
     padding: 16,
@@ -246,6 +287,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     marginHorizontal: 0,
     marginVertical: 0,
+    marginLeft: 10,
   },
   modalOverlay: {
     flex: 1,

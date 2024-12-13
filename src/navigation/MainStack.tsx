@@ -5,8 +5,13 @@ import CustomButton from '../common/CustomButton';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import CustomImages from '../assets/customImages';
 import {Platform, StyleSheet} from 'react-native';
+import BottomStack from './BottomStack';
 
-const Stack = createNativeStackNavigator();
+export type StackParams = {
+  BottomStack: undefined;
+};
+
+const Stack = createNativeStackNavigator<StackParams>();
 
 const MainStack = () => {
   return (
@@ -24,20 +29,7 @@ const MainStack = () => {
         headerShadowVisible: false,
         contentStyle: {backgroundColor: 'rgba(24, 23, 28, 1)'},
       })}>
-      <Stack.Screen
-        name="ProfilePicture"
-        component={ProfilePicture}
-        options={({navigation}) => ({
-          headerRight: () => (
-            <CustomButton
-              onPress={() => navigation.navigate('')}
-              text="Skip"
-              textStyle={styles.skipButtonText}
-              buttonStyle={styles.backButton}
-            />
-          ),
-        })}
-      />
+      <Stack.Screen name="BottomStack" component={BottomStack} />
     </Stack.Navigator>
   );
 };

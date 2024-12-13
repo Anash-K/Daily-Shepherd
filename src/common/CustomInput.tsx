@@ -12,6 +12,7 @@ import {
   ImageStyle,
   TextInputProps,
   Animated,
+  Platform,
 } from 'react-native';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
@@ -175,7 +176,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: 'rgba(56, 57, 62, 1)',
-    padding: 17,
+    padding: Platform.select({ios:17,android:13}),
     backgroundColor: '#18171C',
     borderRadius: 10,
     fontSize: 18,
