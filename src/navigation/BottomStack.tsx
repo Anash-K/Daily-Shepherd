@@ -1,11 +1,17 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import VerseOfTheDay from '../screens/VerseOfTheDay';
 import {ScreenProps} from './Stack';
-import {Image} from 'react-native';
+import {Image, Platform, StyleSheet} from 'react-native';
 import CustomImages from '../assets/customImages';
+import Podcast from '../screens/Podcast';
+import History from '../screens/History';
+import Profile from '../screens/Profile';
 
 export type BottomParams = {
   VerseOfTheDay: undefined;
+  Podcast: undefined;
+  History: undefined;
+  Profile: undefined;
 };
 
 const BottomTab = createBottomTabNavigator<BottomParams>();
@@ -16,17 +22,85 @@ const BottomStack = () => {
       screenOptions={() => ({
         tabBarStyle: {
           backgroundColor: 'rgba(24, 23, 28, 1)',
+          height: Platform.select({android: 90, ios: 60}),
+          borderColor: 'rgba(38, 37, 42, 1)',
         },
         tabBarLabel: () => null,
+        tabBarIconStyle: styles.tabBarIconStyle,
+        tabBarActiveTintColor: 'rgba(32, 201, 151, 1)',
+        tabBarInactiveTintColor: 'rgba(250, 250, 250, 0.5)',
+        sceneStyle: {backgroundColor: 'rgba(24, 23, 28, 1)'},
       })}>
       <BottomTab.Screen
         name="VerseOfTheDay"
         component={VerseOfTheDay}
-        options={{
-          tabBarIcon: () => (
+        options={({}) => ({
+          headerShown: false,
+          tabBarIcon: ({color, focused}) => (
             <Image
-              source={CustomImages.homeTab}
+              source={
+                focused ? CustomImages.activeHomeTab : CustomImages.homeTab
+              }
+              style={[
+                {width: 24, height: 24},
+                focused && {tintColor: 'rgba(32, 201, 151, 1)'},
+              ]}
+              tintColor={color}
+              resizeMode="contain"
+            />
+          ),
+        })}
+      />
+
+      <BottomTab.Screen
+        name="Podcast"
+        component={Podcast}
+        options={{
+          tabBarIcon: ({color, focused}) => (
+            <Image
+              source={
+                focused
+                  ? CustomImages.activePodcastTab
+                  : CustomImages.podcastTab
+              }
               style={{width: 24, height: 24}}
+              tintColor={color}
+              resizeMode="contain"
+            />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="History"
+        component={History}
+        options={{
+          tabBarIcon: ({color, focused}) => (
+            <Image
+              source={
+                focused
+                  ? CustomImages.activeHistoryTab
+                  : CustomImages.historyTab
+              }
+              style={{width: 24, height: 24}}
+              tintColor={color}
+              resizeMode="contain"
+            />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          tabBarIcon: ({color, focused}) => (
+            <Image
+              source={
+                focused
+                  ? CustomImages.activeProfileTab
+                  : CustomImages.profileTab
+              }
+              style={{width: 24, height: 24}}
+              tintColor={color}
               resizeMode="contain"
             />
           ),
@@ -37,3 +111,9 @@ const BottomStack = () => {
 };
 
 export default BottomStack;
+
+const styles = StyleSheet.create({
+  tabBarIconStyle: {
+    marginTop: 14,
+  },
+});

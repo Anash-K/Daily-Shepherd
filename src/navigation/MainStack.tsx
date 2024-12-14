@@ -29,7 +29,11 @@ const MainStack = () => {
         headerShadowVisible: false,
         contentStyle: {backgroundColor: 'rgba(24, 23, 28, 1)'},
       })}>
-      <Stack.Screen name="BottomStack" component={BottomStack} />
+      <Stack.Screen
+        name="BottomStack"
+        component={BottomStack}
+        options={{headerShown: false}}
+      />
     </Stack.Navigator>
   );
 };
