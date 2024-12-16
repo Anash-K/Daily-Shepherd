@@ -17,7 +17,7 @@ const CustomImages = {
   afternoonIcon: require('./images/afternoonIcon.png'),
   eveningIcon: require('./images/eveningIcon.png'),
   nightIcon: require('./images/nightIcon.png'),
-  homeTab: require('./images/homeTab.png'),
+  homeTab: require('./images/Home.png'),
   podcastTab: require('./images/podcastTab.png'),
   historyTab: require('./images/historyTab.png'),
   profileTab: require('./images/profileTab.png'),
@@ -31,6 +31,19 @@ const CustomImages = {
   shareIcon: require('./images/Share.png'),
   commentIcon: require('./images/commentsIcon.png'),
   videoImage: require('./images/videoImage.png'),
+  crossArrow: require('./images/crosssrrow.png'),
+  searchIcon: require('./images/searchIcon.png'),
+  moreIcon: require('./images/more.png'),
+  warningIcon: require('./images/warning.png'),
+  demoComment: require('./images/democomment.png'),
+  crossIcon: require('./images/Icon-X.png'),
+  podcast1: require('./images/podcast1.png'),
+  podcast2: require('./images/podcast2.png'),
+  podcast3: require('./images/podcast3.png'),
+  podcast4: require('./images/podcast4.png'),
+  podcast5: require('./images/podcast5.png'),
+  podcast6: require('./images/podcast6.png'),
+  podcast7: require('./images/podcast7.png'),
 };
 
 export default CustomImages;

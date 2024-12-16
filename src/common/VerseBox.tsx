@@ -1,10 +1,23 @@
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
+import {memo} from 'react';
+import {useNavigation} from '@react-navigation/native';
+import {ScreenProps} from '../navigation/Stack';
 
-const VerseBox = (data: any) => {
+
+const VerseBox = memo((data: any, OnPressDetails?) => {
+  const navigation =
+    useNavigation<ScreenProps<'VerseOfTheDay'>['navigation']>();
+
+  const handleComments = () => {
+    navigation.navigate('Comments');
+  };
+
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={() => OnPressDetails(data)}>
       <View style={styles.verseHeader}>
         <View style={styles.titleBox}>
           <Text style={styles.title}>{data.title}</Text>
@@ -16,13 +29,15 @@ const VerseBox = (data: any) => {
           <Text style={styles.listenText}>Listen</Text>
         </TouchableOpacity>
       </View>
+
       <Text style={styles.verse}>{data.verse}</Text>
+
       <View style={styles.actionsBox}>
         <View style={styles.likeAndCommentBox}>
           <TouchableOpacity style={styles.like}>
             <Image source={CustomImages.likedIcon} style={styles.likedIcon} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.comment}>
+          <TouchableOpacity style={styles.comment} onPress={handleComments}>
             <Image
               source={CustomImages.commentIcon}
               style={styles.commentIcon}
@@ -34,9 +49,10 @@ const VerseBox = (data: any) => {
           <Image source={CustomImages.shareIcon} style={styles.likedIcon} />
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
-};
+});
+
 
 export default VerseBox;
 

@@ -1,6 +1,6 @@
 export const ContextChapterData = [
     {
-      date: 'Dec 14, 2024',
+      date: 'Dec 16, 2024',
       title: "Context Chapter",
       content: "What does John 1:1 KJV mean?",
     },

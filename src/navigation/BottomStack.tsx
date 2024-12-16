@@ -6,6 +6,7 @@ import CustomImages from '../assets/customImages';
 import Podcast from '../screens/Podcast';
 import History from '../screens/History';
 import Profile from '../screens/Profile';
+import CustomFont from '../assets/customFonts';
 
 export type BottomParams = {
   VerseOfTheDay: undefined;
@@ -30,6 +31,10 @@ const BottomStack = () => {
         tabBarActiveTintColor: 'rgba(32, 201, 151, 1)',
         tabBarInactiveTintColor: 'rgba(250, 250, 250, 0.5)',
         sceneStyle: {backgroundColor: 'rgba(24, 23, 28, 1)'},
+        headerStyle: styles.headerLook,
+        headerTitleStyle: styles.title,
+        headerTitleAlign:'center',
+        headerShadowVisible:false
       })}>
       <BottomTab.Screen
         name="VerseOfTheDay"
@@ -115,5 +120,15 @@ export default BottomStack;
 const styles = StyleSheet.create({
   tabBarIconStyle: {
     marginTop: 14,
+  },
+  headerLook: {
+    backgroundColor: 'rgba(24, 23, 28, 1)', // Header background
+  },
+  title: {
+    fontFamily: CustomFont.Urbanist600,
+    fontSize: 24,
+    lineHeight: 28.8,
+    textAlign: 'center',
+    color: 'rgba(250, 250, 250, 1)',
   },
 });

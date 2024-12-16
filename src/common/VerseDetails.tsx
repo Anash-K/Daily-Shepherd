@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import {
-  FlatList,
   Image,
   Platform,
   ScrollView,
@@ -18,7 +17,7 @@ import {verseReflectionData} from '../utils/verReflectionDemoData';
 import VerseReflectionBox from '../common/VerseReflectionBox';
 import {ContextChapterData} from '../utils/contextChapterDemoData';
 
-const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
+const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({route,navigation}) => {
   const currentDate = new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
@@ -43,7 +42,17 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
     title: 'Context Chapter',
   }));
 
-  const handlePress = (data: any) => {};
+  const { verseData } = route.params;
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: verseData?.title,
+    });
+  }, [verseData, navigation]);
+
+  const handleDetails = () =>{
+
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -71,8 +80,8 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
         </View>
       </View>
 
-      {todaysVerse.map(item => (
-        <VerseBox key={item.title} {...item} OnPressDetails={handlePress} />
+      {verseData.map((item:any) => (
+        <VerseBox key={item.title} {...item} OnPressDetails={handleDetails} />
       ))}
 
       {todaysReflection.map(item => (
@@ -93,7 +102,7 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
   );
 };
 
-export default VerseOfTheDay;
+export default VerseDetails;
 
 const styles = StyleSheet.create({
   videoBox: {
@@ -109,7 +118,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19.2,
     color: 'rgba(250, 250, 250, 0.75)',
-    marginBottom: Platform.select({ios: 12}),
+    marginBottom:Platform.select({ios:12,})
   },
   videoStyle: {
     width: '100%',

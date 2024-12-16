@@ -19,6 +19,10 @@ const DailyInsPiration: React.FC<AuthStackProps<'DailyInsPiration'>> = ({
     navigation.navigate('InspiringPodcast');
   }, [navigation]);
 
+  const handleLogin = useCallback(() => {
+    navigation.navigate('Login');
+  }, [navigation]);
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -49,7 +53,7 @@ const DailyInsPiration: React.FC<AuthStackProps<'DailyInsPiration'>> = ({
         }}>
         <CustomButton
           text="Skip"
-          onPress={handlePress}
+          onPress={handleLogin}
           buttonStyle={{
             flex: 1,
             backgroundColor: 'rgba(24, 23, 28, 1)',

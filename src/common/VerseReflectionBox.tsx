@@ -5,10 +5,14 @@ import CustomFont from '../assets/customFonts';
 const VerseReflectionBox = (data: any) => {
   return (
     <View style={styles.container}>
-      <View>
+      <View style={styles.topHeadingBox}>
         <Text style={styles.title}>{data.title}</Text>
         <TouchableOpacity style={styles.showDetailsButton}>
-          <Image source={CustomImages.rightArrow} />
+          <Image
+            source={CustomImages.crossArrow}
+            style={styles.arrowIcon}
+            resizeMode="contain"
+          />
         </TouchableOpacity>
       </View>
 
@@ -20,15 +24,28 @@ const VerseReflectionBox = (data: any) => {
 export default VerseReflectionBox;
 
 const styles = StyleSheet.create({
+  arrowIcon: {
+    width: 10,
+    height: 12,
+    // transform: [{rotate: '-40deg'}], // Corrected transform property
+  },
+  topHeadingBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   container: {
     backgroundColor: 'rgba(32, 33, 38, 1)',
     borderRadius: 15,
     padding: 16,
+    marginBottom: 16,
   },
   showDetailsButton: {
     backgroundColor: 'rgba(32, 201, 151, 1)',
     borderRadius: 24,
-    padding: 5,
+    padding: 6,
+    paddingHorizontal: 7,
   },
   verseReflection: {
     fontFamily: CustomFont.Urbanist500,
