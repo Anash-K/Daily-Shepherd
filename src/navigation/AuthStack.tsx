@@ -63,7 +63,7 @@ const AuthStack: React.FC = () => {
         name="ProfilePicture"
         component={ProfilePicture}
         options={({navigation}) => ({
-          headerTitle: () => '',
+          headerTitle: 'Profile setup',
           headerLeft: () => (
             <CustomButton
               onPress={() => navigation.goBack()}

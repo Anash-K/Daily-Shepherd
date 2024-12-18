@@ -23,7 +23,7 @@ const BottomStack = () => {
       screenOptions={() => ({
         tabBarStyle: {
           backgroundColor: 'rgba(24, 23, 28, 1)',
-          height: Platform.select({android: 90, ios: 60}),
+          height: Platform.select({android: 80, ios: 60}),
           borderColor: 'rgba(38, 37, 42, 1)',
         },
         tabBarLabel: () => null,
@@ -33,8 +33,9 @@ const BottomStack = () => {
         sceneStyle: {backgroundColor: 'rgba(24, 23, 28, 1)'},
         headerStyle: styles.headerLook,
         headerTitleStyle: styles.title,
-        headerTitleAlign:'center',
-        headerShadowVisible:false
+        headerTitleAlign: 'center',
+        headerShadowVisible: false,
+        tabBarHideOnKeyboard: true,
       })}>
       <BottomTab.Screen
         name="VerseOfTheDay"

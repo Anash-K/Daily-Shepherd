@@ -44,6 +44,22 @@ const CustomImages = {
   podcast5: require('./images/podcast5.png'),
   podcast6: require('./images/podcast6.png'),
   podcast7: require('./images/podcast7.png'),
+  playIcon: require('./images/playIcon.png'),
+  profilePict: require('./images/profilImage.png'),
+  heartIcon: require('./images/heartIcon.png'),
+  fontSizeIcon: require('./images/fontSize.png'),
+  bellIcon: require('./images/bell.png'),
+  contactIcon: require('./images/contact.png'),
+  infoIcon: require('./images/details.png'),
+  termsIcon: require('./images/terms.png'),
+  passwordIcon: require('./images/password.png'),
+  trash: require('./images/trash.png'),
+  powerIcon: require('./images/power.png'),
+  greyLogo: require('./images/bottomIcon.png'),
+  grayTabIcon: require('./images/Icon-Arrow.png'),
+  artIcon: require('./images/art.png'),
+  addIcon: require('./images/add.png'),
+  editIcon: require('./images/edit.png'),
 };
 
 export default CustomImages;

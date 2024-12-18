@@ -14,12 +14,11 @@ import React from 'react';
 import {ScreenProps} from '../navigation/Stack';
 
 const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
-  const handleDetails = () =>{
-    console.log("test")
-    // navigation.navigate('VerseDetails',{
-    //   verseData:data
-    // })
-  }
+  const handleDetails = (id: any) => {
+    navigation.navigate('VerseDetails', {
+      verseId: id, // Pass only the verse ID
+    });
+  };  
   return (
     <View style={styles.container}>
       <View style={styles.searchBox}>
@@ -37,8 +36,17 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
 
       <FlatList
         data={Data}
-        renderItem={({item}) => <VerseBox {...item} OnPressDetails={handleDetails} />}
-        keyExtractor={item => item.title}
+        renderItem={({item}) => (
+          <VerseBox
+            id={item.id}
+            title={item.title}
+            reference={item.reference}
+            verse={item.verse}
+            commentNumber={item.commentNumber}
+            OnPressDetails={handleDetails.bind(null,item.id)}
+          />
+        )}
+        keyExtractor={item => item.id.toString()}
         showsVerticalScrollIndicator={false}
       />
     </View>
@@ -53,13 +61,13 @@ const styles = StyleSheet.create({
     fontFamily: CustomFont.Urbanist400,
     lineHeight: 21.6,
     color: 'rgba(250, 250, 250, 1)',
-
     flex: 1,
   },
   container: {
     padding: 16,
     paddingBottom: 30,
     marginBottom: 60,
+    paddingTop: 0,
   },
   searchBox: {
     flexDirection: 'row',

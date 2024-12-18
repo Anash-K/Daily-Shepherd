@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import ScreenWrapper from '../common/ScreenWrapper';
@@ -13,51 +14,67 @@ import CustomFont from '../assets/customFonts';
 import React from 'react';
 import {ScreenProps} from '../navigation/Stack';
 
-const Data = [
+export const Data = [
   {
+    id: 1,
     imageSrc: CustomImages.podcast1,
     name: 'Ascension Catholic Media',
     details: 'The Bible in a Year (with Fr. Mike Schmitz)',
   },
   {
+    id: 2,
     imageSrc: CustomImages.podcast2,
     name: 'LifeAudio',
     details: 'How to Study the Bible - Bible Study Made Simple',
   },
   {
+    id: 3,
     imageSrc: CustomImages.podcast3,
     name: 'Dr. Melody Stevens',
     details: 'The Bible In A Year Podcast with Dr. Melody...',
   },
   {
+    id: 4,
     imageSrc: CustomImages.podcast4,
     name: 'LifeAudio',
     details: 'Faith Over Fear',
   },
   {
+    id: 5,
     imageSrc: CustomImages.podcast5,
     name: 'Podcast 5',
     details: 'Details for Podcast 5',
   },
   {
+    id: 6,
     imageSrc: CustomImages.podcast6,
     name: 'Podcast 6',
     details: 'Details for Podcast 6',
   },
   {
+    id: 7,
     imageSrc: CustomImages.podcast7,
     name: 'Podcast 7',
     details: 'Details for Podcast 7',
   },
 ];
 
-const Podcast: React.FC<ScreenProps<'Podcast'>> = () => {
+const Podcast: React.FC<ScreenProps<'Podcast'>> = ({navigation}) => {
+  const handleDetails = (id: any) => {
+    console.log(id);
+    navigation.navigate('PodCastDetails',{
+      DataId:id
+    });
+  };
+
   const renderPodcastItem = ({item}: any) => (
-    <View style={styles.podcastItem}>
+    <TouchableOpacity
+      style={styles.podcastItem}
+      onPress={handleDetails.bind(this, item.id)}>
       <Image source={item.imageSrc} style={styles.podcastImage} />
       <Text style={styles.podcastName}>{item.name}</Text>
       <Text style={styles.podcastDetails}>{item.details}</Text>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -79,7 +96,13 @@ const Podcast: React.FC<ScreenProps<'Podcast'>> = () => {
         renderItem={renderPodcastItem}
         keyExtractor={(item, index) => `podcast-${index}`}
         numColumns={2}
-        contentContainerStyle={{justifyContent: 'space-between'}}
+        contentContainerStyle={{
+          justifyContent: 'space-between',
+        }}
+        columnWrapperStyle={{
+          justifyContent: 'space-between', // Adds space between columns
+          marginBottom: 16, // Optional: adds space between rows
+        }}
       />
     </View>
   );
@@ -89,9 +112,10 @@ export default Podcast;
 
 const styles = StyleSheet.create({
   container: {
-    // padding: 16,
-    // paddingBottom: 30,
-    // marginBottom: 60,
+    padding: 16,
+    paddingBottom: 30,
+    marginBottom: 60,
+    paddingTop: 0,
   },
   searchBox: {
     flexDirection: 'row',
@@ -118,27 +142,26 @@ const styles = StyleSheet.create({
   },
   podcastItem: {
     borderRadius: 20,
-    marginBottom: 20,
     width: '48%',
-    // aspectRatio: 0.8,
-    marginHorizontal: 5,
-    backgroundColor: 'red',
   },
   podcastImage: {
-    width: 163,
+    width: '100%',
     height: 170,
     borderRadius: 12,
-    aspectRatio: 1.2,
+    // aspectRatio: 1,
   },
   podcastName: {
-    fontFamily: CustomFont.Urbanist600,
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 1)',
-    marginVertical: 8,
+    fontFamily: CustomFont.Urbanist500,
+    fontSize: 12,
+    color: 'rgba(32, 201, 151, 1)',
+    marginBottom: 4,
+    marginTop: 8,
+    lineHeight: 14.4,
   },
   podcastDetails: {
-    fontFamily: CustomFont.Urbanist400,
+    fontFamily: CustomFont.Urbanist500,
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
+    lineHeight: 16.8,
+    color: 'rgba(250, 250, 250, 1)',
   },
 });

@@ -27,7 +27,7 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
   };
 
   const handleForgotPassword = () => {
-    navigation.navigate('ForgotPassword');
+    navigation.navigate('ForgotPassword'); 
   };
 
   return (

@@ -2,6 +2,10 @@
   "migIndex": 1,
   "data": [
     {
+      "path": "src/fonts/HedvigLettersSerif-Regular.ttf",
+      "sha1": "0b69575ef5f820cffc144ba81c9685809f92bf26"
+    },
+    {
       "path": "src/fonts/Urbanist-Bold.ttf",
       "sha1": "4b1d8478efaf85885d9a28dc7ce3bf284954ad74"
     },

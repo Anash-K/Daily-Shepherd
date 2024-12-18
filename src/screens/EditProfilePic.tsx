@@ -18,7 +18,7 @@ import {Menu, MenuItem} from 'react-native-material-menu';
 import {AuthStackProps} from '../navigation/AuthStack';
 import {ScreenProps} from '../navigation/Stack';
 
-const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
+const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
   navigation,
 }) => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -225,7 +225,7 @@ const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
   );
 };
 
-export default ProfilePicture;
+export default EditProfilePic;
 
 const styles = StyleSheet.create({
   ActionIconBox: {

@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, {useLayoutEffect} from 'react';
 import {
   Image,
   Platform,
@@ -17,7 +17,10 @@ import {verseReflectionData} from '../utils/verReflectionDemoData';
 import VerseReflectionBox from '../common/VerseReflectionBox';
 import {ContextChapterData} from '../utils/contextChapterDemoData';
 
-const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({route,navigation}) => {
+const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
+  route,
+  navigation,
+}) => {
   const currentDate = new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
@@ -42,45 +45,25 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({route,navigation})
     title: 'Context Chapter',
   }));
 
-  const { verseData } = route.params;
+  const {verseId} = route.params;
+
+  const verseData = Data.filter(item => item.id === verseId);
+
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      title: verseData?.title,
-    });
+    if (verseData) {
+      navigation.setOptions({
+        title: verseData[0].title,
+      });
+    }
   }, [verseData, navigation]);
 
-  const handleDetails = () =>{
-
-  }
+  const handleDetails = () => {};
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.headContainer}>
-        <View style={styles.leftBox}>
-          <Image
-            source={image}
-            style={styles.weatherImageStyle}
-            resizeMode="contain"
-          />
-          <View>
-            <Text style={styles.dayTimeText}>{greeting}</Text>
-            <Text style={styles.name}>Christopher</Text>
-          </View>
-        </View>
 
-        <View style={styles.rightBox}>
-          <View
-            style={{
-              borderBottomColor: 'rgba(32, 201, 151, 0.25)',
-              borderBottomWidth: 8,
-            }}>
-            <Text style={styles.dateText}>{currentDate}</Text>
-          </View>
-        </View>
-      </View>
-
-      {verseData.map((item:any) => (
+      {verseData?.map((item: any) => (
         <VerseBox key={item.title} {...item} OnPressDetails={handleDetails} />
       ))}
 
@@ -90,6 +73,7 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({route,navigation})
       {todaysContext.map(item => (
         <VerseReflectionBox key={item.title} {...item} />
       ))}
+
       <View style={styles.videoBox}>
         <Text style={styles.videoHeading}>Watch Video</Text>
         <Image
@@ -118,12 +102,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19.2,
     color: 'rgba(250, 250, 250, 0.75)',
-    marginBottom:Platform.select({ios:12,})
+    marginBottom: Platform.select({ios: 12}),
   },
   videoStyle: {
     width: '100%',
     height: 200,
-    // aspectRatio: 1,
   },
   container: {
     flex: 1,

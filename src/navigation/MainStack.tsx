@@ -8,11 +8,20 @@ import Comments from '../screens/Comments';
 import CustomFont from '../assets/customFonts';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import VerseDetails from '../common/VerseDetails';
+import PodCastDetails from '../screens/PodCastDetails';
+import ProfilePicture from '../screens/ProfilePicture';
+import EditProfilePic from '../screens/EditProfilePic';
 
 export type StackParams = {
   BottomStack: undefined;
   Comments: undefined;
-  VerseDetails: undefined;
+  VerseDetails:  {
+    verseId: string; // The type for `verseId` should match here
+  };
+  PodCastDetails: {
+    DataId: string; // The type for `verseId` should match here
+  };
+  EditProfilePic: undefined;
 };
 
 const Stack = createNativeStackNavigator<StackParams>();
@@ -33,6 +42,7 @@ const MainStack = () => {
         contentStyle: {backgroundColor: 'rgba(24, 23, 28, 1)'},
         headerTitleStyle: styles.title,
         headerTitleAlign: 'center',
+        headerShadowVisible:true,
       })}>
       <Stack.Screen
         name="BottomStack"
@@ -67,6 +77,18 @@ const MainStack = () => {
           ),
         })}
       />
+       <Stack.Screen
+        name='PodCastDetails'
+        component={PodCastDetails}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name='EditProfilePic'
+        component={EditProfilePic}
+        options={{
+          title:'Edit profile'
+        }}
+      />
     </Stack.Navigator>
   );
 };
@@ -87,10 +109,10 @@ const styles = StyleSheet.create({
   },
   headerLook: {
     backgroundColor: 'rgba(24, 23, 28, 1)', // Header background
-    shadowColor: 'rgba(255, 0, 0, 1)', // Shadow color
-    shadowOpacity: 0.5, // Shadow transparency
-    shadowOffset: {width: 0, height: 2}, // Offset for the shadow
-    shadowRadius: 4, // Spread of the shadow
+    shadowColor: '#fff', // Shadow color
+    shadowOpacity: 1, // Shadow transparency
+    shadowOffset: {width: 2, height: 4}, // Offset for the shadow
+    // shadowRadius: 4, // Spread of the shadow
     // height: Platform.select({android: 100}),
   },
   backButton: {backgroundColor: 'rgba(24, 23, 28, 1)', padding: 0, margin: 0},

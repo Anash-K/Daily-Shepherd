@@ -4,55 +4,64 @@ import CustomFont from '../assets/customFonts';
 import {memo} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {ScreenProps} from '../navigation/Stack';
+interface VerseBoxProps {
+  id: number;
+  title: string;
+  reference: string;
+  verse: string;
+  commentNumber: number;
+  OnPressDetails?: () => void;
+}
 
+const VerseBox: React.FC<VerseBoxProps> = memo(
+  ({id, title, reference, verse, commentNumber, OnPressDetails}) => {
+    const navigation =
+      useNavigation<ScreenProps<'VerseOfTheDay'>['navigation']>();
 
-const VerseBox = memo((data: any, OnPressDetails?) => {
-  const navigation =
-    useNavigation<ScreenProps<'VerseOfTheDay'>['navigation']>();
+    const handleComments = () => {
+      navigation.navigate('Comments');
+    };
 
-  const handleComments = () => {
-    navigation.navigate('Comments');
-  };
+    return (
+      <TouchableOpacity style={styles.container} onPress={OnPressDetails}>
+        <View style={styles.verseHeader}>
+          <View style={styles.titleBox}>
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.reference}>{reference}</Text>
+          </View>
 
-  return (
-    <TouchableOpacity
-      style={styles.container}
-      onPress={() => OnPressDetails(data)}>
-      <View style={styles.verseHeader}>
-        <View style={styles.titleBox}>
-          <Text style={styles.title}>{data.title}</Text>
-          <Text style={styles.reference}>{data.reference}</Text>
-        </View>
-
-        <TouchableOpacity style={styles.listenButton}>
-          <Image source={CustomImages.speakerIcon} style={styles.speakerIcon} />
-          <Text style={styles.listenText}>Listen</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.verse}>{data.verse}</Text>
-
-      <View style={styles.actionsBox}>
-        <View style={styles.likeAndCommentBox}>
-          <TouchableOpacity style={styles.like}>
-            <Image source={CustomImages.likedIcon} style={styles.likedIcon} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.comment} onPress={handleComments}>
+          <TouchableOpacity style={styles.listenButton}>
             <Image
-              source={CustomImages.commentIcon}
-              style={styles.commentIcon}
+              source={CustomImages.speakerIcon}
+              style={styles.speakerIcon}
             />
-            <Text style={styles.listenText}>{data.commentNumber}</Text>
+            <Text style={styles.listenText}>Listen</Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.like}>
-          <Image source={CustomImages.shareIcon} style={styles.likedIcon} />
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-  );
-});
 
+        <Text style={styles.verse}>{verse}</Text>
+
+        <View style={styles.actionsBox}>
+          <View style={styles.likeAndCommentBox}>
+            <TouchableOpacity style={styles.like}>
+              <Image source={CustomImages.likedIcon} style={styles.likedIcon} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.comment} onPress={handleComments}>
+              <Image
+                source={CustomImages.commentIcon}
+                style={styles.commentIcon}
+              />
+              <Text style={styles.listenText}>{commentNumber}</Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={styles.like}>
+            <Image source={CustomImages.shareIcon} style={styles.likedIcon} />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    );
+  },
+);
 
 export default VerseBox;
 
@@ -133,7 +142,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 1)',
   },
   verse: {
-    fontFamily: CustomFont.Urbanist400,
+    fontFamily: CustomFont.HLS400,
     fontSize: 24,
     lineHeight: 32.16,
     color: 'rgba(255, 255, 255, 1)',

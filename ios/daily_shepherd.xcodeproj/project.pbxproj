@@ -16,6 +16,7 @@
 		2A47E5D04A6042FD96334B2B /* Urbanist-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 210AB2A23FAF4873A506F458 /* Urbanist-Regular.ttf */; };
 		3C6408AFBD8706530D89AE42 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		4D764A573FA8496A9CD11C4F /* Urbanist-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 295DE0B1C46A444887228E7A /* Urbanist-Bold.ttf */; };
+		4EE0697CD33B470084AA58E8 /* HedvigLettersSerif-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 085344C324D241A0B2A01A57 /* HedvigLettersSerif-Regular.ttf */; };
 		7699B88040F8A987B510C191 /* libPods-daily_shepherd-daily_shepherdTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-daily_shepherd-daily_shepherdTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		85EC18E095C5453C8CDF7665 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E605122BE5FC42A897D1D4EB /* Colors.xcassets */; };
@@ -38,6 +39,7 @@
 		00E356EE1AD99517003FC87E /* daily_shepherdTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = daily_shepherdTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* daily_shepherdTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = daily_shepherdTests.m; sourceTree = "<group>"; };
+		085344C324D241A0B2A01A57 /* HedvigLettersSerif-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "HedvigLettersSerif-Regular.ttf"; path = "../src/fonts/HedvigLettersSerif-Regular.ttf"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* daily_shepherd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = daily_shepherd.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = daily_shepherd/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = daily_shepherd/AppDelegate.mm; sourceTree = "<group>"; };
@@ -176,6 +178,7 @@
 				32CF83F6BB8E4E9BBFA8C455 /* Urbanist-Medium.ttf */,
 				210AB2A23FAF4873A506F458 /* Urbanist-Regular.ttf */,
 				C86321AD006E497E857752EC /* Urbanist-SemiBold.ttf */,
+				085344C324D241A0B2A01A57 /* HedvigLettersSerif-Regular.ttf */,
 			);
 			name = Resources;
 			path = "";
@@ -284,6 +287,7 @@
 				90A99566725C4B679242F0B5 /* Urbanist-Medium.ttf in Resources */,
 				2A47E5D04A6042FD96334B2B /* Urbanist-Regular.ttf in Resources */,
 				1870C6D4F9C8434CB58BE481 /* Urbanist-SemiBold.ttf in Resources */,
+				4EE0697CD33B470084AA58E8 /* HedvigLettersSerif-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
