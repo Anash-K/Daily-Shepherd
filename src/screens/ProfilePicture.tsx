@@ -14,9 +14,7 @@ import CustomImages from '../assets/customImages';
 import CustomButton from '../common/CustomButton';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
-import {Menu, MenuItem} from 'react-native-material-menu';
 import {AuthStackProps} from '../navigation/AuthStack';
-import {ScreenProps} from '../navigation/Stack';
 
 const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
   navigation,
