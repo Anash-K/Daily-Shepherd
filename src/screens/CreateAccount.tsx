@@ -46,17 +46,17 @@ const CreateAccount: React.FC<AuthStackProps<'CreateAccount'>> = ({
           <View style={styles.inputs}>
             <CustomInput
               onChange={handlePress}
-              placeholderText="Name"
+              label="Name"
               inputBoxStyle={styles.inputBox}
             />
             <CustomInput
               onChange={handlePress}
-              placeholderText="Email"
+              label="Email"
               inputBoxStyle={styles.inputBox}
             />
             <CustomInput
               onChange={handlePress}
-              placeholderText="Password"
+              label="Password"
               inputBoxStyle={styles.inputBox}
               isPassword={true}
               //   iconStyle={}

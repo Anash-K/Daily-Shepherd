@@ -14,14 +14,15 @@ import CustomImages from '../assets/customImages';
 import CustomButton from '../common/CustomButton';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
-import {Menu, MenuItem} from 'react-native-material-menu';
-import {AuthStackProps} from '../navigation/AuthStack';
+import CustomInput from '../common/CustomInput';
 import {ScreenProps} from '../navigation/Stack';
 
 const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
   navigation,
 }) => {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [name, setName] = useState('Christopher Bell');
+  const [email, setEmail] = useState('christbell@gmail.com');
 
   const toggleModal = useCallback(() => {
     setModalVisible(prev => !prev);
@@ -29,11 +30,9 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
-  const handleConfirm = () => {};
-
-  const handleNextNav = useCallback(() => {
-    // navigation.navigate('NotificationPreferences');
-  }, [navigation]);
+  const handleConfirm = () => {
+    navigation.goBack();
+  };
 
   // Request and check for camera permission when the component mounts
   useEffect(() => {
@@ -149,36 +148,44 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
     [toggleModal],
   );
 
+  const handleChange = useCallback(() => {}, []);
+
   return (
     <View style={styles.container}>
       <View style={{flexGrow: 1}}>
-        <TouchableOpacity style={styles.imageBox}>
+        <TouchableOpacity style={styles.imageBox} onPress={toggleModal}>
           <Image
             source={
-              profileImage ? {uri: profileImage} : CustomImages.profilePic
+              profileImage ? {uri: profileImage} : CustomImages.profilePict
             }
             style={[styles.profilePicture]}
             resizeMode="cover"
           />
           <View style={styles.ActionIconBox}>
-            <Image source={CustomImages.addIcon} style={styles.picAction} />
+            <Image
+              source={
+                // profileImage ? CustomImages.editIcon : CustomImages.addIcon
+                CustomImages.editIcon
+              }
+              tintColor={'rgba(24, 23, 28, 1)'}
+              style={styles.picAction}
+            />
           </View>
         </TouchableOpacity>
+        <CustomInput
+          label="Name"
+          onChange={value => setName(value)}
+          inputConfigurations={{value: name}}
+        />
+        <CustomInput
+          label="Email"
+          onChange={value => setEmail(value)}
+          inputConfigurations={{value: email}}
+          isDisabled={true}
+        />
       </View>
 
-      {profileImage ? (
-        <View>
-          <CustomButton
-            text="Try again"
-            onPress={handleCamera.bind(this, false)}
-            buttonStyle={styles.tryAgainButton}
-            textStyle={styles.tryAgainText}
-          />
-          <CustomButton text="Look’s perfect" onPress={handleNextNav} />
-        </View>
-      ) : (
-        <CustomButton text="Upload Photo" onPress={toggleModal} />
-      )}
+      <CustomButton text="Update profile" onPress={handleConfirm} />
 
       {/* Modal for photo selection */}
       {isModalVisible && (
@@ -254,6 +261,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    marginBottom: Platform.select({ios: 0, android: 10}),
   },
   title: {
     fontFamily: CustomFont.Urbanist600,
@@ -279,6 +287,7 @@ const styles = StyleSheet.create({
   },
   imageBox: {
     marginTop: 32,
+    marginBottom: 22,
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',

@@ -15,6 +15,7 @@ import CustomButton from '../common/CustomButton';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import {AuthStackProps} from '../navigation/AuthStack';
+import CustomInput from '../common/CustomInput';
 
 const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
   navigation,
@@ -30,7 +31,7 @@ const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
   const handleConfirm = () => {};
 
   const handleNextNav = useCallback(() => {
-    // navigation.navigate('NotificationPreferences');
+    navigation.navigate('NotificationPreferences');
   }, [navigation]);
 
   // Request and check for camera permission when the component mounts
@@ -147,10 +148,12 @@ const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
     [toggleModal],
   );
 
+  const handleChange = useCallback(() => {}, []);
+
   return (
     <View style={styles.container}>
       <View style={{flexGrow: 1}}>
-        <TouchableOpacity style={styles.imageBox}>
+        <TouchableOpacity style={styles.imageBox} onPress={toggleModal}>
           <Image
             source={
               profileImage ? {uri: profileImage} : CustomImages.profilePic
@@ -159,24 +162,19 @@ const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
             resizeMode="cover"
           />
           <View style={styles.ActionIconBox}>
-            <Image source={CustomImages.addIcon} style={styles.picAction} />
+            <Image
+              source={
+                profileImage ? CustomImages.editIcon : CustomImages.addIcon
+              }
+              style={styles.picAction}
+            />
           </View>
         </TouchableOpacity>
+        <CustomInput label="Name" onChange={handleChange} />
+        <CustomInput label="Email" onChange={handleChange} />
       </View>
 
-      {profileImage ? (
-        <View>
-          <CustomButton
-            text="Try again"
-            onPress={handleCamera.bind(this, false)}
-            buttonStyle={styles.tryAgainButton}
-            textStyle={styles.tryAgainText}
-          />
-          <CustomButton text="Look’s perfect" onPress={handleNextNav} />
-        </View>
-      ) : (
-        <CustomButton text="Upload Photo" onPress={toggleModal} />
-      )}
+      <CustomButton text="Continue" onPress={handleNextNav} />
 
       {/* Modal for photo selection */}
       {isModalVisible && (
@@ -252,6 +250,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    marginBottom: Platform.select({ios: 0, android: 10}),
   },
   title: {
     fontFamily: CustomFont.Urbanist600,
@@ -277,6 +276,7 @@ const styles = StyleSheet.create({
   },
   imageBox: {
     marginTop: 32,
+    marginBottom: 22,
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',

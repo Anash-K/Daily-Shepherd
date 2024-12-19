@@ -4,13 +4,86 @@ import CustomButton from '../common/CustomButton';
 import CustomFont from '../assets/customFonts';
 import CustomImages from '../assets/customImages';
 import ProfileTab from '../common/ProfileTabBars';
-import React, {useCallback} from 'react';
+import React, {useCallback, useState} from 'react';
 import {ScreenProps} from '../navigation/Stack';
+import Appearance from '../modals/Appearance';
+import FontSizeModal from '../modals/FontSizeModal';
+import NotificationsModal from '../modals/NotificationModal';
+import PowerModal from '../modals/PowerModal';
+interface Mode {
+  LightTheme: boolean;
+  DarkTheme: boolean;
+  DeviceTheme: boolean;
+}
+
+interface CustomFontSize {
+  Small: boolean;
+  Medium: boolean;
+  Large: boolean;
+}
 
 const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
-  const handleEditProfilePic = useCallback(() => {
-    navigation.navigate('EditProfilePic');
+  const ThemeMode = {
+    LightTheme: false,
+    DarkTheme: false,
+    DeviceTheme: false,
+  };
+
+  const CustomFontSize = {
+    Small: false,
+    Medium: false,
+    Large: false,
+  };
+
+  const [isAppearanceOpen, setIsAppearance] = useState(false);
+  const [isFontResizerOpen, setIsFontResizer] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isLogoutVisible, setIsLogoutVisible] = useState(false);
+  const [mode, setMode] = useState<Mode>(ThemeMode);
+  const [fontResizer, setFontResizer] =
+    useState<CustomFontSize>(CustomFontSize);
+
+  const handleNav = useCallback((title: String) => {
+    navigation.navigate(title);
   }, []);
+
+  const handleAppearanceModal = useCallback((name: keyof Mode) => {
+    setMode(prevState => {
+      const updatedState = Object.keys(prevState).reduce((acc, key) => {
+        acc[key as keyof Mode] = key === name;
+        return acc;
+      }, {} as Mode);
+      return updatedState;
+    });
+  }, []);
+
+  const handleFontResizerModal = useCallback((name: keyof CustomFontSize) => {
+    setFontResizer(prevState => {
+      const updatedState = Object.keys(prevState).reduce((acc, key) => {
+        acc[key as keyof CustomFontSize] = key === name;
+        return acc;
+      }, {} as CustomFontSize);
+      return updatedState;
+    });
+  }, []);
+
+  const toggleAppearanceModal = useCallback(() => {
+    setIsAppearance(prevState => !prevState);
+  }, []);
+
+  const toggleFontResizerModal = useCallback(() => {
+    setIsFontResizer(prevState => !prevState);
+  }, []);
+
+  const toggleNotificationModal = useCallback(() => {
+    setIsNotificationOpen(prevState => !prevState);
+  }, []);
+
+  const toggleLogoutModal = useCallback(() => {
+    setIsLogoutVisible(prevState => !prevState);
+  }, []);
+
+  const handleLogout = useCallback(() => {}, []);
 
   return (
     <ScrollView style={styles.container}>
@@ -20,7 +93,7 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
           <Text style={styles.profileName}>Christopher Bell</Text>
           <CustomButton
             text="Edit profile"
-            onPress={handleEditProfilePic}
+            onPress={handleNav.bind(null, 'EditProfilePic')}
             buttonStyle={styles.editButton}
             textStyle={styles.editText}
           />
@@ -29,6 +102,7 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
       <ProfileTab
         icon={CustomImages.heartIcon}
         title={'Favorites'}
+        OnPressHandler={handleNav.bind(null, 'Favorites')}
         customStyle={{borderRadius: 12, marginLeft: 0, paddingLeft: 12}}
       />
 
@@ -42,16 +116,33 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
           <ProfileTab
             icon={CustomImages.artIcon}
             title={'Appearance'}
-            otherText={'DARK'}
+            OnPressHandler={toggleAppearanceModal}
+            otherText={
+              Object.keys(mode)
+                .find(key => mode[key as keyof Mode])
+                ?.replace(/Theme$/, '')
+                .toUpperCase() || 'LIGHT'
+            }
             wantBottomBorder={true}
           />
+
           <ProfileTab
             icon={CustomImages.fontSizeIcon}
             title={'Font Size'}
-            otherText={'MEDIUM'}
+            OnPressHandler={toggleFontResizerModal}
+            otherText={
+              Object.keys(fontResizer)
+                .find(key => fontResizer[key as keyof CustomFontSize])
+                ?.replace(/Theme$/, '')
+                .toUpperCase() || 'Small'
+            }
             wantBottomBorder={true}
           />
-          <ProfileTab icon={CustomImages.bellIcon} title={'Notifications'} />
+          <ProfileTab
+            icon={CustomImages.bellIcon}
+            title={'Notifications'}
+            OnPressHandler={toggleNotificationModal}
+          />
         </View>
       </View>
 
@@ -87,13 +178,14 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
             icon={CustomImages.passwordIcon}
             title={'Change Password'}
             wantBottomBorder={true}
+            OnPressHandler={() => navigation.navigate('ChangePassword')}
           />
           <ProfileTab
             icon={CustomImages.trash}
             title={'Delete Account'}
             wantBottomBorder={true}
           />
-          <ProfileTab icon={CustomImages.powerIcon} title={'Logout'} />
+          <ProfileTab icon={CustomImages.powerIcon} title={'Logout'} OnPressHandler={toggleLogoutModal} />
         </View>
       </View>
 
@@ -101,6 +193,32 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
         <Image source={CustomImages.greyLogo} style={styles.versionLogo} />
         <Text style={styles.versionText}>Version 1.1.1</Text>
       </View>
+      <Appearance
+        isModalVisible={isAppearanceOpen}
+        toggleModal={toggleAppearanceModal}
+        handleButtons={handleAppearanceModal}
+        mode={mode}
+      />
+      <FontSizeModal
+        isModalVisible={isFontResizerOpen}
+        toggleModal={toggleFontResizerModal}
+        handleButtons={handleFontResizerModal}
+        mode={fontResizer}
+      />
+      <NotificationsModal
+        isModalVisible={isNotificationOpen}
+        toggleModal={toggleNotificationModal}
+      />
+      <PowerModal
+        isModalVisible={isLogoutVisible}
+        toggleModal={toggleLogoutModal}
+        contentText={
+          'Your journey here matters. Are you sure you want to leave?'
+        }
+        handleAction={handleLogout}
+        Logo={CustomImages.logoutIcon}
+        ActionText={'Delete Account'}
+      />
     </ScrollView>
   );
 };

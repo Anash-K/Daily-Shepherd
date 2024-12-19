@@ -11,17 +11,21 @@ import VerseDetails from '../common/VerseDetails';
 import PodCastDetails from '../screens/PodCastDetails';
 import ProfilePicture from '../screens/ProfilePicture';
 import EditProfilePic from '../screens/EditProfilePic';
+import Favorites from '../screens/Favorites';
+import ChangePassword from '../screens/ChangePassword';
 
 export type StackParams = {
   BottomStack: undefined;
   Comments: undefined;
-  VerseDetails:  {
+  VerseDetails: {
     verseId: string; // The type for `verseId` should match here
   };
   PodCastDetails: {
     DataId: string; // The type for `verseId` should match here
   };
   EditProfilePic: undefined;
+  Favorites: undefined;
+  ChangePassword: undefined;
 };
 
 const Stack = createNativeStackNavigator<StackParams>();
@@ -42,7 +46,7 @@ const MainStack = () => {
         contentStyle: {backgroundColor: 'rgba(24, 23, 28, 1)'},
         headerTitleStyle: styles.title,
         headerTitleAlign: 'center',
-        headerShadowVisible:true,
+        headerShadowVisible: true,
       })}>
       <Stack.Screen
         name="BottomStack"
@@ -77,16 +81,30 @@ const MainStack = () => {
           ),
         })}
       />
-       <Stack.Screen
-        name='PodCastDetails'
+      <Stack.Screen
+        name="PodCastDetails"
         component={PodCastDetails}
         options={{headerShown: false}}
       />
       <Stack.Screen
-        name='EditProfilePic'
+        name="EditProfilePic"
         component={EditProfilePic}
         options={{
-          title:'Edit profile'
+          title: 'Edit profile',
+        }}
+      />
+      <Stack.Screen
+        name="Favorites"
+        component={Favorites}
+        options={{
+          title: 'Favorites',
+        }}
+      />
+      <Stack.Screen
+        name="ChangePassword"
+        component={ChangePassword}
+        options={{
+          title: 'Change password',
         }}
       />
     </Stack.Navigator>

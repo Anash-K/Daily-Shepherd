@@ -72,14 +72,14 @@ const AuthStack: React.FC = () => {
               buttonStyle={styles.backButton}
             />
           ),
-          headerRight: () => (
-            <CustomButton
-              onPress={() => navigation.navigate('NotificationPreferences')}
-              text="Skip"
-              textStyle={styles.skipButtonText}
-              buttonStyle={styles.backButton}
-            />
-          ),
+          // headerRight: () => (
+          //   <CustomButton
+          //     onPress={() => navigation.navigate('NotificationPreferences')}
+          //     text="Skip"
+          //     textStyle={styles.skipButtonText}
+          //     buttonStyle={styles.backButton}
+          //   />
+          // ),
         })}
       />
       <Stack.Screen

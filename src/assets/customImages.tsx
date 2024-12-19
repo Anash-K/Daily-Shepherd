@@ -1,6 +1,6 @@
 const CustomImages = {
   logo: require('./images/Logo.png'),
-  closeEyeIcon: require('./images/IconEyeClose.png'),
+  closeEyeIcon: require('./images/closeEyeIcon.png'),
   backIcon: require('./images/backIcon.png'),
   profilePic: require('./images/profilepic.png'),
   openEye: require('./images/openEye.png'),
@@ -60,6 +60,8 @@ const CustomImages = {
   artIcon: require('./images/art.png'),
   addIcon: require('./images/add.png'),
   editIcon: require('./images/edit.png'),
+  trashLogo: require('./images/trashLogo.png'),
+  logoutIcon: require('./images/logout.png'),
 };
 
 export default CustomImages;

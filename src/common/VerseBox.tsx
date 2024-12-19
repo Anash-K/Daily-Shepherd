@@ -1,7 +1,7 @@
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
-import {memo} from 'react';
+import {memo, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {ScreenProps} from '../navigation/Stack';
 interface VerseBoxProps {
@@ -10,16 +10,23 @@ interface VerseBoxProps {
   reference: string;
   verse: string;
   commentNumber: number;
+  liked: boolean;
   OnPressDetails?: () => void;
 }
 
 const VerseBox: React.FC<VerseBoxProps> = memo(
-  ({id, title, reference, verse, commentNumber, OnPressDetails}) => {
+  ({id, title, reference, verse, commentNumber, OnPressDetails, liked}) => {
+    const [isLiked, setIsLiked] = useState(liked);
+
     const navigation =
       useNavigation<ScreenProps<'VerseOfTheDay'>['navigation']>();
 
     const handleComments = () => {
       navigation.navigate('Comments');
+    };
+
+    const handleLike = () => {
+      setIsLiked(prev => !prev);
     };
 
     return (
@@ -43,8 +50,15 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
 
         <View style={styles.actionsBox}>
           <View style={styles.likeAndCommentBox}>
-            <TouchableOpacity style={styles.like}>
-              <Image source={CustomImages.likedIcon} style={styles.likedIcon} />
+            <TouchableOpacity style={styles.like} onPress={handleLike}>
+              <Image
+                source={
+                  isLiked
+                    ? CustomImages.likedIcon // Replace with your "liked" icon
+                    : CustomImages.unLikedIcon // Replace with your "unliked" icon
+                }
+                style={styles.likedIcon}
+              />
             </TouchableOpacity>
             <TouchableOpacity style={styles.comment} onPress={handleComments}>
               <Image

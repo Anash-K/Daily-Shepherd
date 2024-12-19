@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
+import {TextInput as FloatingTextInput} from 'react-native-paper';
 
 interface CustomInputProps {
   value?: string;
@@ -33,6 +34,8 @@ interface CustomInputProps {
   iconSource?: ImageSourcePropType;
   iconStyle?: ImageStyle;
   customPressableStyle?: ViewStyle;
+  customInputContentStyle?: ViewStyle;
+  isDisabled?: boolean;
 }
 
 const CustomInput: React.FC<CustomInputProps> = ({
@@ -51,6 +54,8 @@ const CustomInput: React.FC<CustomInputProps> = ({
   iconSource,
   iconStyle,
   customPressableStyle,
+  customInputContentStyle,
+  isDisabled = false,
 }) => {
   const [isSecure, setIsSecure] = useState(true);
   const animatedLabel = React.useRef(new Animated.Value(0)).current;
@@ -89,7 +94,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
 
   return (
     <View style={[styles.container, inputBoxStyle]}>
-      {label && (
+      {/* {label && (
         <Animated.Text
           style={[
             styles.label,
@@ -101,7 +106,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
           ]}>
           {label}
         </Animated.Text>
-      )}
+      )} */}
       <View style={styles.inputContainer}>
         {/* {isPhoneInput ? (
           <PhoneInput
@@ -118,7 +123,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
         ) : (
           
         )} */}
-        <TextInput
+        {/* <TextInput
           style={[styles.input, inputStyle]}
           onChangeText={onChange}
           {...inputConfigurations}
@@ -128,6 +133,32 @@ const CustomInput: React.FC<CustomInputProps> = ({
           secureTextEntry={isPassword && isSecure}
           placeholder={placeholderText}
           placeholderTextColor={'rgba(250, 250, 250, 0.5)'}
+        /> */}
+        <FloatingTextInput
+          style={[styles.input, inputStyle]}
+          contentStyle={[
+            styles.inputContent,
+            customInputContentStyle,
+            isDisabled && {color: 'rgba(250, 250, 250, 0.5)'},
+          ]}
+          label={label}
+          outlineStyle={styles.outlineInput}
+          mode="outlined"
+          autoCapitalize="none"
+          autoCorrect={false}
+          autoComplete="off"
+          secureTextEntry={isPassword && isSecure}
+          onChangeText={onChange}
+          textColor="rgba(250, 250, 250, 1)"
+          disabled={isDisabled}
+          theme={{
+            colors: {
+              primary: 'rgba(250, 250, 250, 0.5)', // Label color on focus
+              text: 'rgba(250, 250, 250, 1)',
+              placeholder: 'rgba(250, 250, 250, 0.5)',
+            },
+          }}
+          {...inputConfigurations}
         />
 
         {isPassword && (
@@ -141,7 +172,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
               source={
                 isSecure ? CustomImages.closeEyeIcon : CustomImages.openEye
               }
-              style={styles.iconEye}
+              style={[styles.iconEye,!isSecure && styles.openEyeStyle]}
               resizeMode="contain"
             />
           </Pressable>
@@ -170,29 +201,46 @@ const CustomInput: React.FC<CustomInputProps> = ({
 export default CustomInput;
 
 const styles = StyleSheet.create({
+  openEyeStyle:{
+    width:19,
+    marginRight:2
+  },
+  outlineInput: {
+    borderRadius: 10,
+    borderColor: 'rgba(56, 57, 62, 1)',
+    borderWidth: 1,
+    fontFamily: CustomFont.Urbanist400,
+  },
   container: {
     marginVertical: 10,
   },
   input: {
-    borderWidth: 1,
-    borderColor: 'rgba(56, 57, 62, 1)',
-    padding: Platform.select({ios:17,android:13}),
-    backgroundColor: '#18171C',
-    borderRadius: 10,
-    fontSize: 18,
     flex: 1,
+    // borderWidth: 1,
+    // borderColor: 'rgba(56, 57, 62, 1)',
+    backgroundColor: '#18171C',
+    paddingLeft: 2,
+    // borderRadius: 10,
+    // paddingVertical: Platform.select({ios: 3, android: 2}),
+    height: 52,
+  },
+  inputContent: {
+    fontSize: 18,
     lineHeight: 21.6,
     fontFamily: CustomFont.Urbanist400,
     color: 'rgba(250, 250, 250, 1)',
-    paddingLeft: 16,
+    backgroundColor: 'transparent',
+    margin: Platform.select({ios: 3, android: 3}),
+    marginVertical: Platform.select({ios: 3, android: 3}),
+    // paddingVertical: Platform.select({ios: 5, android: 5}),
   },
   label: {
     textTransform: 'capitalize',
     fontSize: 18,
     fontFamily: CustomFont.Urbanist400,
     lineHeight: 21.6,
-    color: '#fff',
-    position: 'absolute',
+    color: 'rgba(250, 250, 250, 0.5)',
+    // position: 'absolute',
   },
   iconEye: {
     width: 24,
@@ -202,7 +250,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '50%',
     right: 12,
-    transform: [{translateY: -12}],
+    transform: [{translateY: -8}],
   },
   pressed: {
     opacity: 0.7,

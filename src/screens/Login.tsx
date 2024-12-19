@@ -47,12 +47,14 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
           <View style={styles.inputs}>
             <CustomInput
               onChange={handlePress}
-              placeholderText="Email"
+              // placeholderText="Email"
+              label="Email"
               inputBoxStyle={styles.inputBox}
             />
             <CustomInput
               onChange={handlePress}
-              placeholderText="Password"
+              // placeholderText="Password"
+              label="Password"
               inputBoxStyle={styles.inputBox}
               isPassword={true}
             />

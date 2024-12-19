@@ -16,12 +16,13 @@ interface ProfileTab {
   customStyle?: ViewStyle;
   otherText?: String;
   wantBottomBorder?: boolean;
+  OnPressHandler?:() => void
 }
 
 const ProfileTab: React.FC<ProfileTab> = memo(
-  ({title, icon, customStyle, otherText, wantBottomBorder}) => {
+  ({title, icon, customStyle, otherText, wantBottomBorder,OnPressHandler}) => {
     return (
-      <TouchableOpacity
+      <TouchableOpacity onPress={OnPressHandler}
         style={[
           styles.container,
           wantBottomBorder && styles.bottomBorderStyle,
