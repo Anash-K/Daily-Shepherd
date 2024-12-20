@@ -11,6 +11,7 @@ import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
 import CustomButton from '../common/CustomButton';
 import {AuthStackProps} from '../navigation/AuthStack';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const DailyInsPiration: React.FC<AuthStackProps<'DailyInsPiration'>> = ({
   navigation,
@@ -23,8 +24,20 @@ const DailyInsPiration: React.FC<AuthStackProps<'DailyInsPiration'>> = ({
     navigation.navigate('Login');
   }, [navigation]);
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top,
+          paddingBottom: Platform.select({
+            ios: insets.bottom + 10,
+            android: insets.bottom + 40,
+          }),
+        },
+      ]}>
       <ScrollView
         style={styles.topContainer}
         showsVerticalScrollIndicator={false}>
@@ -63,7 +76,7 @@ const DailyInsPiration: React.FC<AuthStackProps<'DailyInsPiration'>> = ({
           textStyle={{color: 'rgba(250, 250, 250, 1)'}}
         />
         <CustomButton
-          text="Save"
+          text="Next"
           onPress={handlePress}
           buttonStyle={{flex: 1}}
         />

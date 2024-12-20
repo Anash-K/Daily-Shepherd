@@ -10,6 +10,8 @@ import Appearance from '../modals/Appearance';
 import FontSizeModal from '../modals/FontSizeModal';
 import NotificationsModal from '../modals/NotificationModal';
 import PowerModal from '../modals/PowerModal';
+import {useDispatch} from 'react-redux';
+import {logout} from '../store/reducers/AuthReducer';
 interface Mode {
   LightTheme: boolean;
   DarkTheme: boolean;
@@ -25,20 +27,23 @@ interface CustomFontSize {
 const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
   const ThemeMode = {
     LightTheme: false,
-    DarkTheme: false,
+    DarkTheme: true,
     DeviceTheme: false,
   };
 
   const CustomFontSize = {
     Small: false,
-    Medium: false,
+    Medium: true,
     Large: false,
   };
+
+  const dispatch = useDispatch();
 
   const [isAppearanceOpen, setIsAppearance] = useState(false);
   const [isFontResizerOpen, setIsFontResizer] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isLogoutVisible, setIsLogoutVisible] = useState(false);
+  const [isDeleteModal, setIsDeleteModal] = useState(false);
   const [mode, setMode] = useState<Mode>(ThemeMode);
   const [fontResizer, setFontResizer] =
     useState<CustomFontSize>(CustomFontSize);
@@ -83,7 +88,15 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
     setIsLogoutVisible(prevState => !prevState);
   }, []);
 
-  const handleLogout = useCallback(() => {}, []);
+  const toggleDeleteModal = useCallback(() => {
+    setIsDeleteModal(prevState => !prevState);
+  }, []);
+
+  const handleLogout = useCallback(() => {
+    setIsLogoutVisible(false);
+    dispatch(logout());
+  }, []);
+  const handleDelete = useCallback(() => {}, []);
 
   return (
     <ScrollView style={styles.container}>
@@ -109,6 +122,7 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
       {/* Personalize section  */}
       <View style={styles.profileSection}>
         <View style={styles.titleBox}>
+          <View style={styles.miniTitleIcon} />
           <Text style={styles.boxHeading}>Personalize</Text>
         </View>
 
@@ -149,6 +163,7 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
       {/* General section  */}
       <View style={styles.profileSection}>
         <View style={styles.titleBox}>
+          <View style={styles.miniTitleIcon} />
           <Text style={styles.boxHeading}>General</Text>
         </View>
 
@@ -170,6 +185,7 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
       {/* Account section  */}
       <View style={styles.profileSection}>
         <View style={styles.titleBox}>
+          <View style={styles.miniTitleIcon} />
           <Text style={styles.boxHeading}>Account</Text>
         </View>
 
@@ -184,8 +200,13 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
             icon={CustomImages.trash}
             title={'Delete Account'}
             wantBottomBorder={true}
+            OnPressHandler={toggleDeleteModal}
           />
-          <ProfileTab icon={CustomImages.powerIcon} title={'Logout'} OnPressHandler={toggleLogoutModal} />
+          <ProfileTab
+            icon={CustomImages.powerIcon}
+            title={'Logout'}
+            OnPressHandler={toggleLogoutModal}
+          />
         </View>
       </View>
 
@@ -210,14 +231,24 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
         toggleModal={toggleNotificationModal}
       />
       <PowerModal
-        isModalVisible={isLogoutVisible}
-        toggleModal={toggleLogoutModal}
+        isModalVisible={isDeleteModal}
+        toggleModal={toggleDeleteModal}
         contentText={
           'Your journey here matters. Are you sure you want to leave?'
         }
+        handleAction={handleDelete}
+        Logo={CustomImages.trashLogo}
+        ActionText={'Delete Account'}
+      />
+      <PowerModal
+        isModalVisible={isLogoutVisible}
+        toggleModal={toggleLogoutModal}
+        contentText={
+          'Take a break! We’ll keep your spot warm until you’re back.'
+        }
         handleAction={handleLogout}
         Logo={CustomImages.logoutIcon}
-        ActionText={'Delete Account'}
+        ActionText={'Logout'}
       />
     </ScrollView>
   );
@@ -226,6 +257,13 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
 export default Profile;
 
 const styles = StyleSheet.create({
+  miniTitleIcon: {
+    borderLeftColor: 'rgba(32, 201, 151, 1)',
+    borderLeftWidth: 3,
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
+    width: 3,
+  },
   versionLogo: {
     width: 64,
     height: 46,
@@ -246,6 +284,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(47, 47, 55, 1)',
     borderBottomWidth: 1,
     paddingBottom: 12,
+    flexDirection: 'row',
   },
   profileSection: {
     backgroundColor: 'rgba(32, 33, 38, 1)',
@@ -258,10 +297,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19.2,
     color: 'rgba(250, 250, 250, 1)',
-    borderLeftColor: 'rgba(32, 201, 151, 1)',
-    borderLeftWidth: 3,
-    borderTopRightRadius: 4,
-    borderBottomRightRadius: 4,
     paddingLeft: 12,
   },
   container: {

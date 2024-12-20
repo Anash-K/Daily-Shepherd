@@ -62,6 +62,9 @@ const CustomImages = {
   editIcon: require('./images/edit.png'),
   trashLogo: require('./images/trashLogo.png'),
   logoutIcon: require('./images/logout.png'),
+  loginTopBg: require('./images/loginBackGround.png'),
+  appleLogo: require('./images/AppleLogo.png'),
+  googleLogo: require('./images/GoogleLogo.png'),
 };
 
 export default CustomImages;

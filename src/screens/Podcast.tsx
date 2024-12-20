@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 30,
     marginBottom: 60,
-    paddingTop: 0,
+    paddingTop:0
   },
   searchBox: {
     flexDirection: 'row',

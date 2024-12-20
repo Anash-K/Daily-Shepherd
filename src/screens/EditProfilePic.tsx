@@ -16,6 +16,7 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import CustomInput from '../common/CustomInput';
 import {ScreenProps} from '../navigation/Stack';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
   navigation,
@@ -150,8 +151,19 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
 
   const handleChange = useCallback(() => {}, []);
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          marginBottom: Platform.select({
+            ios: insets.bottom,
+            android: insets.bottom + 30,
+          }),
+        },
+      ]}>
       <View style={{flexGrow: 1}}>
         <TouchableOpacity style={styles.imageBox} onPress={toggleModal}>
           <Image
@@ -180,7 +192,7 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
         <CustomInput
           label="Email"
           onChange={value => setEmail(value)}
-          inputConfigurations={{value: email}}
+          inputConfigurations={{value: email, editable: false}}
           isDisabled={true}
         />
       </View>

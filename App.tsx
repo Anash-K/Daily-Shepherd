@@ -22,7 +22,6 @@ function App(): React.JSX.Element {
 
   return (
     <View style={styles.container}>
-      <SafeAreaView style={styles.container}>
         <StatusBar
           barStyle="light-content"
           backgroundColor="rgba(24, 23, 28, 1)"
@@ -36,7 +35,6 @@ function App(): React.JSX.Element {
             )}
           </Stack.Navigator>
         </NavigationContainer>
-      </SafeAreaView>
     </View>
   );
 }

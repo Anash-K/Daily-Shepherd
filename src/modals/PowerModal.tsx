@@ -46,26 +46,33 @@ const PowerModal: React.FC<PowerModalProps> = memo(
             onRequestClose={toggleModal}>
             <View style={styles.modalOverlay}>
               <View style={styles.modalContent}>
-                <TouchableOpacity
-                  onPress={toggleModal}
-                  style={styles.closeButton}>
-                  <Image
-                    source={Logo}
-                    style={styles.closeIcon}
-                    resizeMode="contain"
-                  />
-                </TouchableOpacity>
-                <View style={{backgroundColor: '#18171C', borderRadius: 15}}>
+                <View
+                  style={{
+                    backgroundColor: '#18171C',
+                    borderRadius: 15,
+                    margin: 24,
+                    paddingHorizontal: 16,
+                    paddingTop: 24,
+                  }}>
+                  <View style={styles.closeButton}>
+                    <Image
+                      source={Logo}
+                      style={styles.closeIcon}
+                      resizeMode="contain"
+                    />
+                  </View>
                   <View
                     style={{borderColor: '#1D1E23', borderBottomWidth: 1.5}}>
                     <Text style={styles.modalTitle}>{contentText}</Text>
                   </View>
-                  <TouchableOpacity style={styles.button}>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={handleAction}>
                     <Text style={[styles.buttonText, {color: '#EF4355'}]}>
                       {ActionText}
                     </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.button}>
+                  <TouchableOpacity style={styles.button} onPress={toggleModal}>
                     <Text style={styles.buttonText}>Cancel</Text>
                   </TouchableOpacity>
                 </View>
@@ -85,7 +92,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderTopColor: '#232329',
     borderTopWidth: 1,
-    marginHorizontal: 16,
   },
   buttonText: {
     fontFamily: CustomFont.Urbanist500,
@@ -102,6 +108,7 @@ const styles = StyleSheet.create({
     margin: 16,
     letterSpacing: 0.5,
     textAlign: 'center',
+    marginTop: 24,
   },
   modalOverlay: {
     flex: 1,
@@ -117,10 +124,12 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     alignSelf: 'center',
-    marginBottom: 16,
+    backgroundColor: '#DD4247',
+    padding: 10,
+    borderRadius: 15,
   },
   closeIcon: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
   },
 });

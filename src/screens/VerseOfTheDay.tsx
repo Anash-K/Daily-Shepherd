@@ -4,6 +4,7 @@ import {
   Image,
   Platform,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   View,
@@ -17,6 +18,7 @@ import {Data} from '../utils/verseBoxDemoData';
 import {verseReflectionData} from '../utils/verReflectionDemoData';
 import VerseReflectionBox from '../common/VerseReflectionBox';
 import {ContextChapterData} from '../utils/contextChapterDemoData';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
   const currentDate = new Intl.DateTimeFormat('en-US', {
@@ -43,10 +45,12 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
     title: 'Context Chapter',
   }));
 
-  const handlePress = (data: any) => {};
+  const handlePress = () => {};
+
+  const insets = useSafeAreaInsets();
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, {marginTop: insets.top}]}>
       <View style={styles.headContainer}>
         <View style={styles.leftBox}>
           <Image
@@ -72,7 +76,16 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
       </View>
 
       {todaysVerse.map(item => (
-        <VerseBox key={item.title} {...item} OnPressDetails={handlePress} />
+        <VerseBox
+          key={item.title}
+          id={item.id}
+          title={item.title}
+          liked={item.liked}
+          commentNumber={item.commentNumber}
+          reference={item.reference}
+          verse={item.verse}
+          OnPressDetails={handlePress}
+        />
       ))}
 
       {todaysReflection.map(item => (
@@ -100,8 +113,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(32, 33, 38, 1)',
     borderRadius: 15,
     padding: 16,
-    paddingBottom: Platform.select({ios: 16, android: 9}),
-    // marginTop: 16,
+    paddingBottom: 16,
     marginBottom: 40,
   },
   videoHeading: {
@@ -109,7 +121,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19.2,
     color: 'rgba(250, 250, 250, 0.75)',
-    marginBottom: Platform.select({ios: 12}),
+    marginBottom: 15,
   },
   videoStyle: {
     width: '100%',

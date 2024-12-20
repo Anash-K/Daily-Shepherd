@@ -16,11 +16,14 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import {AuthStackProps} from '../navigation/AuthStack';
 import CustomInput from '../common/CustomInput';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
   navigation,
 }) => {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
 
   const toggleModal = useCallback(() => {
     setModalVisible(prev => !prev);
@@ -148,10 +151,23 @@ const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
     [toggleModal],
   );
 
-  const handleChange = useCallback(() => {}, []);
+  const handleChangeName = useCallback(() => {
+  }, []);
+  const handleChangeEmail = useCallback(() => {}, []);
+
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingBottom: Platform.select({
+            ios: insets.bottom + 10,
+            android: 35,
+          }),
+        },
+      ]}>
       <View style={{flexGrow: 1}}>
         <TouchableOpacity style={styles.imageBox} onPress={toggleModal}>
           <Image
@@ -170,8 +186,16 @@ const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
             />
           </View>
         </TouchableOpacity>
-        <CustomInput label="Name" onChange={handleChange} />
-        <CustomInput label="Email" onChange={handleChange} />
+        <CustomInput
+          label="Name"
+          onChange={(value) => setName(value)}
+          // inputConfigurations={{value: name}}
+        />
+        <CustomInput
+          label="Email"
+          onChange={(value) => setEmail(value)}
+          inputConfigurations={{value: email}}
+        />
       </View>
 
       <CustomButton text="Continue" onPress={handleNextNav} />
@@ -250,7 +274,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    marginBottom: Platform.select({ios: 0, android: 10}),
   },
   title: {
     fontFamily: CustomFont.Urbanist600,

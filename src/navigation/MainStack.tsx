@@ -13,6 +13,7 @@ import ProfilePicture from '../screens/ProfilePicture';
 import EditProfilePic from '../screens/EditProfilePic';
 import Favorites from '../screens/Favorites';
 import ChangePassword from '../screens/ChangePassword';
+import {createStackNavigator} from '@react-navigation/stack';
 
 export type StackParams = {
   BottomStack: undefined;
@@ -28,7 +29,7 @@ export type StackParams = {
   ChangePassword: undefined;
 };
 
-const Stack = createNativeStackNavigator<StackParams>();
+const Stack = createStackNavigator<StackParams>();
 
 const MainStack = () => {
   return (
@@ -43,7 +44,7 @@ const MainStack = () => {
           />
         ),
         headerStyle: styles.headerLook,
-        contentStyle: {backgroundColor: 'rgba(24, 23, 28, 1)'},
+        cardStyle: {backgroundColor: 'rgba(24, 23, 28, 1)'},
         headerTitleStyle: styles.title,
         headerTitleAlign: 'center',
         headerShadowVisible: true,
@@ -51,14 +52,21 @@ const MainStack = () => {
       <Stack.Screen
         name="BottomStack"
         component={BottomStack}
-        options={{headerShown: false}}
+        options={{
+          headerShown: false,
+        }}
       />
       <Stack.Screen
         name="Comments"
         component={Comments}
         options={({navigation}) => ({
           headerLeft: () => (
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{
+                marginLeft: 20,
+                marginBottom: Platform.select({ios: 10}),
+              }}>
               <Image
                 source={CustomImages.crossIcon}
                 style={styles.crossIconStyle}
@@ -72,7 +80,12 @@ const MainStack = () => {
         component={VerseDetails}
         options={({navigation}) => ({
           headerLeft: () => (
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{
+                marginLeft: 20,
+                marginBottom: Platform.select({ios: 10}),
+              }}>
               <Image
                 source={CustomImages.crossIcon}
                 style={styles.crossIconStyle}
@@ -126,14 +139,18 @@ const styles = StyleSheet.create({
     marginLeft: Platform.select({ios: 7, android: 10}),
   },
   headerLook: {
-    backgroundColor: 'rgba(24, 23, 28, 1)', // Header background
-    shadowColor: '#fff', // Shadow color
-    shadowOpacity: 1, // Shadow transparency
-    shadowOffset: {width: 2, height: 4}, // Offset for the shadow
-    // shadowRadius: 4, // Spread of the shadow
-    // height: Platform.select({android: 100}),
+    backgroundColor: 'rgba(24, 23, 28, 1)',
+    borderBottomColor: '#26252A',
+    borderBottomWidth: 1,
+    height: Platform.select({ios: 100}),
   },
-  backButton: {backgroundColor: 'rgba(24, 23, 28, 1)', padding: 0, margin: 0},
+  backButton: {
+    backgroundColor: 'rgba(24, 23, 28, 1)',
+    padding: 0,
+    margin: 0,
+    marginLeft: 10,
+    marginBottom: Platform.select({ios: 10}),
+  },
   skipButtonText: {
     color: 'rgba(147, 150, 157, 1)',
   },
@@ -143,5 +160,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     textAlign: 'center',
     color: 'rgba(250, 250, 250, 1)',
+    marginBottom: Platform.select({ios: 10}),
   },
 });

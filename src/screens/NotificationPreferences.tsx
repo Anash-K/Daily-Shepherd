@@ -1,5 +1,12 @@
 import React, {useState} from 'react';
-import {Text, View, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
 import CustomFont from '../assets/customFonts';
 import CustomImages from '../assets/customImages';
 import ToggleSwitch from 'toggle-switch-react-native';
@@ -7,6 +14,7 @@ import CustomButton from '../common/CustomButton';
 import {AuthStackProps} from '../navigation/AuthStack';
 import {useDispatch} from 'react-redux';
 import {loginSuccess} from '../store/reducers/AuthReducer';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const NotificationPreferences: React.FC<
   AuthStackProps<'NotificationPreferences'>
@@ -32,8 +40,19 @@ const NotificationPreferences: React.FC<
     dispatcher(loginSuccess('Login'));
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingBottom: Platform.select({
+            ios: insets.bottom + 10,
+            android: insets.bottom + 35,
+          }),
+        },
+      ]}>
       <View style={styles.topContainer}>
         {/* First Toggle */}
         <View style={styles.preference}>

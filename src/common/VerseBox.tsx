@@ -1,4 +1,4 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Image, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
 import {memo, useState} from 'react';
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 1)',
   },
   verse: {
-    fontFamily: CustomFont.HLS400,
+    fontFamily:  Platform.select({ios:'HedvigLettersSerif18pt-Regular',android:CustomFont.HLS400}),
     fontSize: 24,
     lineHeight: 32.16,
     color: 'rgba(255, 255, 255, 1)',

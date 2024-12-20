@@ -18,7 +18,7 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
     navigation.navigate('VerseDetails', {
       verseId: id, // Pass only the verse ID
     });
-  };  
+  };
   return (
     <View style={styles.container}>
       <View style={styles.searchBox}>
@@ -38,12 +38,13 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
         data={Data}
         renderItem={({item}) => (
           <VerseBox
+            liked={item.liked}
             id={item.id}
             title={item.title}
             reference={item.reference}
             verse={item.verse}
             commentNumber={item.commentNumber}
-            OnPressDetails={handleDetails.bind(null,item.id)}
+            OnPressDetails={handleDetails.bind(null, item.id)}
           />
         )}
         keyExtractor={item => item.id.toString()}
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 30,
     marginBottom: 60,
-    paddingTop: 0,
+    paddingTop:0
   },
   searchBox: {
     flexDirection: 'row',

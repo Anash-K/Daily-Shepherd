@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Image,
+  ImageBackground,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -27,58 +28,71 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
   };
 
   const handleForgotPassword = () => {
-    navigation.navigate('ForgotPassword'); 
+    navigation.navigate('ForgotPassword');
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {paddingBottom: Platform.select({ios: bottom, android: 20})},
+      ]}>
       <KeyboardAvoidingView
         behavior="padding"
         style={{flex: 1}}
         contentContainerStyle={{flexGrow: 1}}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 30 : 20}>
-        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false}>
-          <Image
-            source={CustomImages.logo}
-            resizeMode="contain"
-            style={styles.logo}
-          />
-          <Text style={styles.title}>Welcome back!</Text>
-          <View style={styles.inputs}>
-            <CustomInput
-              onChange={handlePress}
-              // placeholderText="Email"
-              label="Email"
-              inputBoxStyle={styles.inputBox}
+        <View style={{flex: 1}}>
+          <ImageBackground
+            source={CustomImages.loginTopBg}
+            style={{height: 300, justifyContent: 'center'}}>
+            <Image
+              source={CustomImages.logo}
+              resizeMode="contain"
+              style={styles.logo}
             />
-            <CustomInput
-              onChange={handlePress}
-              // placeholderText="Password"
-              label="Password"
-              inputBoxStyle={styles.inputBox}
-              isPassword={true}
+          </ImageBackground>
+
+          <View style={{paddingHorizontal: 16}}>
+            <Text style={styles.title}>
+              Your Daily <Text style={{color: '#20C997'}}>Bible</Text> Companion
+            </Text>
+            <Text style={styles.subTitle}>
+              Start your day with meaningful Bible verses and reflections. Sign
+              in to explore.
+            </Text>
+            <CustomButton
+              text="Sign In with Apple"
+              onPress={handleLogin}
+              buttonStyle={styles.appleSign}
+              icon={CustomImages.appleLogo}
+              iconStyle={{width: 24, height: 24}}
+            />
+            <CustomButton
+              text="Sign In with Google"
+              onPress={handleLogin}
+              buttonStyle={styles.googleSign}
+              icon={CustomImages.googleLogo}
+              iconStyle={{width: 24, height: 24}}
+              textStyle={{color: '#FAFAFA'}}
             />
           </View>
-          <CustomButton
-            text="Login"
-            onPress={handleLogin}
-            buttonStyle={{marginBottom: 24}}
-          />
-          <TouchableOpacity onPress={handleForgotPassword}>
-            <Text style={styles.forgotText}>Forgot password?</Text>
-          </TouchableOpacity>
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
 
-      <View style={styles.bottomBox}>
-        <Text style={styles.bottomText}>Don’t have an account?</Text>
-        <TouchableOpacity
-          style={{alignItems: 'center', justifyContent: 'center'}}
-          onPress={() => handleNav()}>
+      <View style={[styles.bottomBox]}>
+        <Text style={styles.bottomText}>
+          By continuing to use CupidCoach application, you acknowledge and agree
+          that you have accepted the{' '}
           <Text style={[styles.bottomText, styles.innerBottomText]}>
-            Create Account
+            Terms of Service
+          </Text>{' '}
+          and have reviewed the{' '}
+          <Text style={[styles.bottomText, styles.innerBottomText]}>
+            Privacy Policy
           </Text>
-        </TouchableOpacity>
+          .
+        </Text>
       </View>
     </View>
   );
@@ -87,23 +101,42 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
 export default Login;
 
 const styles = StyleSheet.create({
+  subTitle: {
+    fontFamily: CustomFont.Urbanist400,
+    fontSize: 16,
+    lineHeight: 19.2,
+    textAlign: 'center',
+    color: '#FAFAFA',
+    marginTop: 20,
+  },
+  googleSign: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#FAFAFA',
+    columnGap: 11,
+  },
+  appleSign: {
+    backgroundColor: '#FAFAFA',
+    columnGap: 11,
+    marginBottom: 16,
+    marginTop: 48,
+  },
   container: {
     backgroundColor: 'rgba(24, 23, 28, 1)',
     flex: 1,
-    padding: 16,
-    paddingTop: 50,
   },
   title: {
-    fontFamily: CustomFont.Urbanist600,
-    lineHeight: 28.8,
-    fontSize: 24,
-    color: '#20C997',
+    fontFamily: CustomFont.Urbanist700,
+    lineHeight: 36,
+    fontSize: 30,
+    color: '#FAFAFA',
     textAlign: 'center',
-    marginTop: 33.5,
+    maxWidth: 239,
+    marginHorizontal: 'auto',
   },
   logo: {
-    width: 125,
-    height: 90,
+    width: 150,
+    height: 191,
     alignSelf: 'center',
   },
   inputBox: {
@@ -121,14 +154,14 @@ const styles = StyleSheet.create({
     rowGap: 24,
   },
   bottomText: {
-    fontSize: 16,
-    lineHeight: 19.2,
+    fontSize: 12,
+    lineHeight: 14.4,
     fontFamily: CustomFont.Urbanist400,
     textAlign: 'center',
-    color: 'rgba(147, 150, 157, 1)',
+    color: '#FAFAFA',
   },
   innerBottomText: {
-    color: 'rgba(250, 250, 250, 1)',
+    color: '#20C997',
     fontFamily: CustomFont.Urbanist600,
   },
   bottomBox: {
@@ -136,5 +169,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     columnGap: 6,
     marginVertical: 15,
+    paddingHorizontal: 16,
   },
 });

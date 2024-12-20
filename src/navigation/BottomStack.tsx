@@ -23,7 +23,7 @@ const BottomStack = () => {
       screenOptions={() => ({
         tabBarStyle: {
           backgroundColor: 'rgba(24, 23, 28, 1)',
-          height: Platform.select({android: 80, ios: 60}),
+          height: Platform.select({android: 80, ios: 100}),
           borderColor: 'rgba(38, 37, 42, 1)',
         },
         tabBarLabel: () => null,
@@ -62,6 +62,7 @@ const BottomStack = () => {
         name="Podcast"
         component={Podcast}
         options={{
+          headerStyle: styles.headerHistoryTab,
           tabBarIcon: ({color, focused}) => (
             <Image
               source={
@@ -80,6 +81,7 @@ const BottomStack = () => {
         name="History"
         component={History}
         options={{
+          headerStyle: styles.headerHistoryTab,
           tabBarIcon: ({color, focused}) => (
             <Image
               source={
@@ -124,6 +126,13 @@ const styles = StyleSheet.create({
   },
   headerLook: {
     backgroundColor: 'rgba(24, 23, 28, 1)', // Header background
+    borderBottomColor: '#26252A',
+    borderBottomWidth: 1,
+    height: Platform.select({ios: 100}),
+  },
+  headerHistoryTab: {
+    backgroundColor: 'rgba(24, 23, 28, 1)', // Header background
+    height: Platform.select({ios: 100}),
   },
   title: {
     fontFamily: CustomFont.Urbanist600,
@@ -131,5 +140,6 @@ const styles = StyleSheet.create({
     lineHeight: 28.8,
     textAlign: 'center',
     color: 'rgba(250, 250, 250, 1)',
+    marginBottom: Platform.select({ios: 10}),
   },
 });

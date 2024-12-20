@@ -13,6 +13,7 @@ import CustomImages from '../assets/customImages';
 import {Data} from './Podcast';
 import CustomFont from '../assets/customFonts';
 import {ScrollView} from 'react-native-gesture-handler';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const PodCastDetails: React.FC<ScreenProps<'PodCastDetails'>> = ({
   navigation,
@@ -24,9 +25,16 @@ const PodCastDetails: React.FC<ScreenProps<'PodCastDetails'>> = ({
 
   const handlePress = () => {};
 
+  const insets = useSafeAreaInsets();
+
   return (
     <ScrollView
-      style={styles.container}
+      style={[
+        styles.container,
+        {
+          paddingTop: Platform.select({ios: insets.top}),
+        },
+      ]}
       contentContainerStyle={{paddingBottom: 30}}
       showsVerticalScrollIndicator={false}>
       <View style={styles.topHeader}>
@@ -102,6 +110,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     alignSelf: 'flex-start',
     marginBottom: 16,
+    marginTop:24
   },
   TabText: {
     fontFamily: CustomFont.Urbanist500,

@@ -73,19 +73,22 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(32, 33, 38, 1)',
     shadowColor: 'rgba(0, 0, 0, 0.5)',
     shadowOffset: {width: 4, height: 2},
-    maxWidth: 117,
+    // maxWidth: ,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 10,
     backgroundColor: 'rgba(32, 33, 38, 1)',
+    borderRadius: 8,
+    borderWidth: 0.5,
+    borderColor: 'rgba(250, 250, 250, 0.15)',
   },
   menuItemText: {
     fontFamily: CustomFont.Urbanist400,
-    fontSize: 14,
-    color: 'rgba(250, 250, 250, 0.8)',
-    marginLeft: 8,
+    fontSize: 16,
+    lineHeight: 19.2,
+    color: 'rgba(250, 250, 250, 1)',
   },
   container: {
     borderBottomWidth: 1,
@@ -115,7 +118,9 @@ const styles = StyleSheet.create({
     lineHeight: 19.2,
     maxWidth: 265,
   },
-  detailButton: {},
+  detailButton: {
+    paddingLeft:10
+  },
   moreIcon: {
     width: 15,
     height: 3,
@@ -123,6 +128,7 @@ const styles = StyleSheet.create({
   warningIcon: {
     width: 14,
     height: 15,
+    tintColor: 'rgba(250, 250, 250, 1)',
   },
   profilePic: {
     width: 28,

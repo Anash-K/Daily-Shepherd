@@ -11,6 +11,7 @@ import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
 import CustomButton from '../common/CustomButton';
 import {AuthStackProps} from '../navigation/AuthStack';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const InspiringPodcast: React.FC<AuthStackProps<'InspiringPodcast'>> = ({
   navigation,
@@ -19,8 +20,20 @@ const InspiringPodcast: React.FC<AuthStackProps<'InspiringPodcast'>> = ({
     navigation.navigate('Login');
   }, [navigation]);
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top,
+          paddingBottom: Platform.select({
+            ios: insets.bottom + 0,
+            android: insets.bottom + 20,
+          }),
+        },
+      ]}>
       <ScrollView
         style={styles.topContainer}
         showsVerticalScrollIndicator={false}>

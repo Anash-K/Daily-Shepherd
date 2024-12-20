@@ -12,6 +12,8 @@ import ForgotPassword from '../screens/ForgotPassword';
 import CustomFont from '../assets/customFonts';
 import DailyInsPiration from '../screens/DailyInspiration';
 import InspiringPodcast from '../screens/InspiringPodcast';
+import CustomHeader from '../common/CustomHeader';
+import {createStackNavigator} from '@react-navigation/stack';
 
 type AuthScreenParams = {
   Login: undefined;
@@ -28,16 +30,16 @@ export type AuthStackProps<T extends keyof AuthScreenParams> = {
   route: RouteProp<AuthScreenParams, T>;
 };
 
-const Stack = createNativeStackNavigator<AuthScreenParams>();
+const Stack = createStackNavigator<AuthScreenParams>();
 
 const AuthStack: React.FC = () => {
   return (
     <Stack.Navigator
       screenOptions={{
-        contentStyle: {backgroundColor: 'rgba(24, 23, 28, 1)'},
         headerStyle: styles.headerLook,
         headerTitleStyle: styles.headerTitle,
         headerTitleAlign: 'center',
+        cardStyle: {backgroundColor: 'rgba(24, 23, 28, 1)'},
       }}>
       <Stack.Screen
         name="DailyInsPiration"
@@ -72,14 +74,6 @@ const AuthStack: React.FC = () => {
               buttonStyle={styles.backButton}
             />
           ),
-          // headerRight: () => (
-          //   <CustomButton
-          //     onPress={() => navigation.navigate('NotificationPreferences')}
-          //     text="Skip"
-          //     textStyle={styles.skipButtonText}
-          //     buttonStyle={styles.backButton}
-          //   />
-          // ),
         })}
       />
       <Stack.Screen
@@ -121,8 +115,16 @@ const styles = StyleSheet.create({
   },
   headerLook: {
     backgroundColor: 'rgba(24, 23, 28, 1)',
+    borderBottomColor: '#26252A',
+    borderBottomWidth: 1,
+    height: Platform.select({ios: 100}),
   },
-  backButton: {backgroundColor: 'rgba(24, 23, 28, 1)', padding: 0, margin: 0},
+  backButton: {
+    backgroundColor: 'rgba(24, 23, 28, 1)',
+    padding: 0,
+    margin: 0,
+    marginBottom: Platform.select({ios: 10}),
+  },
   skipButtonText: {
     color: 'rgba(147, 150, 157, 1)',
   },
@@ -131,5 +133,6 @@ const styles = StyleSheet.create({
     fontFamily: CustomFont.Urbanist600,
     fontSize: 24,
     lineHeight: 28.8,
+    marginBottom: Platform.select({ios: 10}),
   },
 });
