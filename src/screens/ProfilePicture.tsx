@@ -189,7 +189,7 @@ const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
         <CustomInput
           label="Name"
           onChange={(value) => setName(value)}
-          // inputConfigurations={{value: name}}
+          inputConfigurations={{value: name}}
         />
         <CustomInput
           label="Email"

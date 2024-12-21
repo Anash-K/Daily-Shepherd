@@ -49,7 +49,6 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
 
   const verseData = Data.filter(item => item.id === verseId);
 
-
   useLayoutEffect(() => {
     if (verseData) {
       navigation.setOptions({
@@ -62,7 +61,6 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
 
   return (
     <ScrollView style={styles.container}>
-
       {verseData?.map((item: any) => (
         <VerseBox key={item.title} {...item} OnPressDetails={handleDetails} />
       ))}
@@ -93,7 +91,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(32, 33, 38, 1)',
     borderRadius: 15,
     padding: 16,
-    paddingBottom: Platform.select({ios: 16, android: 9}),
+    paddingBottom: 16,
     // marginTop: 16,
     marginBottom: 40,
   },
@@ -102,7 +100,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19.2,
     color: 'rgba(250, 250, 250, 0.75)',
-    marginBottom: Platform.select({ios: 12}),
+    marginBottom: 12,
   },
   videoStyle: {
     width: '100%',

@@ -16,9 +16,7 @@ import {
 } from 'react-native';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
-import {TextInput as FloatingTextInput} from 'react-native-paper';
 import {FloatingLabelInput} from 'react-native-floating-label-input';
-import {opacity} from 'react-native-reanimated/lib/typescript/Colors';
 
 interface CustomInputProps {
   value?: string;
@@ -99,18 +97,11 @@ const CustomInput: React.FC<CustomInputProps> = ({
           togglePassword={isSecure}
           onChangeText={onChange}
           customShowPasswordComponent={
-            // <Pressable
-            //   onPress={toggleSecurity}
-            //   style={({pressed}) => [
-            //     styles.passwordButton,
-            //     pressed && styles.pressed,
-            //   ]}>
             <Image
               source={CustomImages.closeEyeIcon}
               style={[styles.iconEye]}
               resizeMode="contain"
             />
-            // </Pressable>
           }
           customHidePasswordComponent={
             <Image
@@ -121,23 +112,6 @@ const CustomInput: React.FC<CustomInputProps> = ({
           }
           {...inputConfigurations}
         />
-
-        {/* {isPassword && (
-          <Pressable
-            onPress={toggleSecurity}
-            style={({pressed}) => [
-              styles.pressableButton,
-              pressed && styles.pressed,
-            ]}>
-            <Image
-              source={
-                isSecure ? CustomImages.closeEyeIcon : CustomImages.openEye
-              }
-              style={[styles.iconEye, !isSecure && styles.openEyeStyle]}
-              resizeMode="contain"
-            />
-          </Pressable>
-        )} */}
 
         {showIcon && (
           <Pressable

@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>daily_shepherd</string>
+	<string>Daily Shepherd</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -31,12 +31,21 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>The app requires access to your location for better service functionality.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>The app requires access to the camera to capture photos or videos.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>The app requires access to your location for better service functionality.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>The app requires access to your photo library to select images or videos.</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Urbanist-Bold.ttf</string>
+		<string>Urbanist-Light.ttf</string>
+		<string>Urbanist-Medium.ttf</string>
+		<string>Urbanist-Regular.ttf</string>
+		<string>Urbanist-SemiBold.ttf</string>
+		<string>HedvigLettersSerif-Regular.ttf</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>BootSplash</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -51,14 +60,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Urbanist-Bold.ttf</string>
-		<string>Urbanist-Light.ttf</string>
-		<string>Urbanist-Medium.ttf</string>
-		<string>Urbanist-Regular.ttf</string>
-		<string>Urbanist-SemiBold.ttf</string>
-		<string>HedvigLettersSerif-Regular.ttf</string>
-	</array>
 </dict>
 </plist>

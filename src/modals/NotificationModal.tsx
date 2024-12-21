@@ -3,6 +3,7 @@ import {
   Image,
   Modal,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -41,7 +42,7 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
             animationType="slide"
             transparent={true}
             onRequestClose={toggleModal}>
-            <View style={styles.modalOverlay}>
+            <Pressable style={styles.modalOverlay} onPress={toggleModal}>
               <View style={styles.modalContent}>
                 <TouchableOpacity
                   onPress={toggleModal}
@@ -172,7 +173,7 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
                   />
                 </View>
               </View>
-            </View>
+            </Pressable>
           </Modal>
         )}
       </>

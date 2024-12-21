@@ -39,7 +39,7 @@
 		00E356EE1AD99517003FC87E /* daily_shepherdTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = daily_shepherdTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* daily_shepherdTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = daily_shepherdTests.m; sourceTree = "<group>"; };
-		085344C324D241A0B2A01A57 /* HedvigLettersSerif-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "HedvigLettersSerif-Regular.ttf"; path = "../src/fonts/HedvigLettersSerif-Regular.ttf"; sourceTree = "<group>"; };
+		085344C324D241A0B2A01A57 /* HedvigLettersSerif-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "HedvigLettersSerif-Regular.ttf"; path = "../src/fonts/HedvigLettersSerif-Regular.ttf"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* daily_shepherd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = daily_shepherd.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = daily_shepherd/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = daily_shepherd/AppDelegate.mm; sourceTree = "<group>"; };
@@ -48,19 +48,19 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = daily_shepherd/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = daily_shepherd/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-daily_shepherd-daily_shepherdTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-daily_shepherd-daily_shepherdTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		210AB2A23FAF4873A506F458 /* Urbanist-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Urbanist-Regular.ttf"; path = "../src/fonts/Urbanist-Regular.ttf"; sourceTree = "<group>"; };
-		295DE0B1C46A444887228E7A /* Urbanist-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Urbanist-Bold.ttf"; path = "../src/fonts/Urbanist-Bold.ttf"; sourceTree = "<group>"; };
-		32CF83F6BB8E4E9BBFA8C455 /* Urbanist-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Urbanist-Medium.ttf"; path = "../src/fonts/Urbanist-Medium.ttf"; sourceTree = "<group>"; };
+		210AB2A23FAF4873A506F458 /* Urbanist-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Urbanist-Regular.ttf"; path = "../src/fonts/Urbanist-Regular.ttf"; sourceTree = "<group>"; };
+		295DE0B1C46A444887228E7A /* Urbanist-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Urbanist-Bold.ttf"; path = "../src/fonts/Urbanist-Bold.ttf"; sourceTree = "<group>"; };
+		32CF83F6BB8E4E9BBFA8C455 /* Urbanist-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Urbanist-Medium.ttf"; path = "../src/fonts/Urbanist-Medium.ttf"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-daily_shepherd.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-daily_shepherd.debug.xcconfig"; path = "Target Support Files/Pods-daily_shepherd/Pods-daily_shepherd.debug.xcconfig"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-daily_shepherd.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-daily_shepherd.release.xcconfig"; path = "Target Support Files/Pods-daily_shepherd/Pods-daily_shepherd.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-daily_shepherd-daily_shepherdTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-daily_shepherd-daily_shepherdTests.debug.xcconfig"; path = "Target Support Files/Pods-daily_shepherd-daily_shepherdTests/Pods-daily_shepherd-daily_shepherdTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-daily_shepherd.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-daily_shepherd.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6A6D588E3111458BBA56EA2C /* BootSplash.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = BootSplash.storyboard; path = daily_shepherd/BootSplash.storyboard; sourceTree = "<group>"; };
-		78F94A995BC643A9B43822B1 /* Urbanist-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Urbanist-Light.ttf"; path = "../src/fonts/Urbanist-Light.ttf"; sourceTree = "<group>"; };
+		6A6D588E3111458BBA56EA2C /* BootSplash.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = BootSplash.storyboard; path = daily_shepherd/BootSplash.storyboard; sourceTree = "<group>"; };
+		78F94A995BC643A9B43822B1 /* Urbanist-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Urbanist-Light.ttf"; path = "../src/fonts/Urbanist-Light.ttf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = daily_shepherd/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-daily_shepherd-daily_shepherdTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-daily_shepherd-daily_shepherdTests.release.xcconfig"; path = "Target Support Files/Pods-daily_shepherd-daily_shepherdTests/Pods-daily_shepherd-daily_shepherdTests.release.xcconfig"; sourceTree = "<group>"; };
-		C86321AD006E497E857752EC /* Urbanist-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Urbanist-SemiBold.ttf"; path = "../src/fonts/Urbanist-SemiBold.ttf"; sourceTree = "<group>"; };
-		E605122BE5FC42A897D1D4EB /* Colors.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = daily_shepherd/Colors.xcassets; sourceTree = "<group>"; };
+		C86321AD006E497E857752EC /* Urbanist-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Urbanist-SemiBold.ttf"; path = "../src/fonts/Urbanist-SemiBold.ttf"; sourceTree = "<group>"; };
+		E605122BE5FC42A897D1D4EB /* Colors.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = daily_shepherd/Colors.xcassets; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -181,7 +181,6 @@
 				085344C324D241A0B2A01A57 /* HedvigLettersSerif-Regular.ttf */,
 			);
 			name = Resources;
-			path = "";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -511,6 +510,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3R3TM3V34F;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = daily_shepherd/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -524,7 +524,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ahirbusinessnetwork;
 				PRODUCT_NAME = daily_shepherd;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -539,6 +539,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3R3TM3V34F;
 				INFOPLIST_FILE = daily_shepherd/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -551,7 +552,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ahirbusinessnetwork;
 				PRODUCT_NAME = daily_shepherd;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

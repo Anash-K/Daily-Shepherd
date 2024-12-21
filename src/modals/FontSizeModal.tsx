@@ -3,6 +3,7 @@ import {
   Image,
   Modal,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -35,7 +36,7 @@ const FontSizeModal: React.FC<FontSizeModalProps> = memo(
             animationType="slide"
             transparent={true}
             onRequestClose={toggleModal}>
-            <View style={styles.modalOverlay}>
+            <Pressable style={styles.modalOverlay} onPress={toggleModal}>
               <View style={styles.modalContent}>
                 <TouchableOpacity
                   onPress={toggleModal}
@@ -124,7 +125,7 @@ const FontSizeModal: React.FC<FontSizeModalProps> = memo(
                   />
                 </View>
               </View>
-            </View>
+            </Pressable>
           </Modal>
         )}
       </>

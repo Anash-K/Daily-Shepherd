@@ -1,5 +1,12 @@
 import {useCallback, useState} from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {Menu, MenuItem} from 'react-native-material-menu';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
@@ -15,6 +22,15 @@ const CommentBox = (data: any) => {
     setIsVisible(false);
   }, []);
 
+  const CustomAction = () => {
+    return (
+      <View style={{flexDirection: 'row', columnGap: 10, alignItems: 'center'}}>
+        <Image source={CustomImages.warningIcon} style={styles.warningIcon} />
+        <Text style={styles.menuItemText}>Report</Text>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       {/* Profile Picture */}
@@ -29,34 +45,31 @@ const CommentBox = (data: any) => {
           </View>
 
           {/* More Options Menu */}
-          <Menu
-            visible={isVisible}
-            anchor={
-              <TouchableOpacity
-                onPress={toggleMenu}
-                style={styles.detailButton}>
-                <Image
-                  source={CustomImages.moreIcon}
-                  style={styles.moreIcon}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            }
-            onRequestClose={closeMenu}
-            style={styles.menuStyle}>
-            <MenuItem
-              onPress={() => {
-                closeMenu();
-                console.log('Report action triggered');
-              }}
-              style={styles.menuItem}>
-              <Image
-                source={CustomImages.warningIcon}
-                style={styles.warningIcon}
-              />
-              <Text style={styles.menuItemText}>Report</Text>
-            </MenuItem>
-          </Menu>
+          <View
+            style={{position: 'absolute', top: 16, paddingTop: 10, right: 5}}>
+            <Menu
+              visible={isVisible}
+              onRequestClose={closeMenu}
+              style={styles.menuStyle}>
+              <MenuItem
+                onPress={() => {
+                  closeMenu();
+                }}
+                style={styles.menuItem}>
+                <CustomAction />
+              </MenuItem>
+            </Menu>
+          </View>
+
+          <Pressable
+            onPress={toggleMenu}
+            style={[styles.detailButton]}>
+            <Image
+              source={CustomImages.moreIcon}
+              style={styles.moreIcon}
+              resizeMode="contain"
+            />
+          </Pressable>
         </View>
 
         {/* Comment Content */}
@@ -73,16 +86,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(32, 33, 38, 1)',
     shadowColor: 'rgba(0, 0, 0, 0.5)',
     shadowOffset: {width: 4, height: 2},
-    // maxWidth: ,
+    // maxWidth: 117,
   },
   menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 8,
     backgroundColor: 'rgba(32, 33, 38, 1)',
     borderRadius: 8,
     borderWidth: 0.5,
     borderColor: 'rgba(250, 250, 250, 0.15)',
+    height: 35,
   },
   menuItemText: {
     fontFamily: CustomFont.Urbanist400,
@@ -119,7 +131,9 @@ const styles = StyleSheet.create({
     maxWidth: 265,
   },
   detailButton: {
-    paddingLeft:10
+    padding: 10,
+    position: 'absolute',
+    right: 0,
   },
   moreIcon: {
     width: 15,

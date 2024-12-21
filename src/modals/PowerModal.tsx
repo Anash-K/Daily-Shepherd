@@ -4,6 +4,7 @@ import {
   ImageProps,
   Modal,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -44,7 +45,7 @@ const PowerModal: React.FC<PowerModalProps> = memo(
             animationType="slide"
             transparent={true}
             onRequestClose={toggleModal}>
-            <View style={styles.modalOverlay}>
+            <Pressable style={styles.modalOverlay} onPress={toggleModal}>
               <View style={styles.modalContent}>
                 <View
                   style={{
@@ -77,7 +78,7 @@ const PowerModal: React.FC<PowerModalProps> = memo(
                   </TouchableOpacity>
                 </View>
               </View>
-            </View>
+            </Pressable>
           </Modal>
         )}
       </>

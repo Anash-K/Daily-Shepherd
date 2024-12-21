@@ -17,6 +17,7 @@ import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import CustomInput from '../common/CustomInput';
 import {ScreenProps} from '../navigation/Stack';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import ImagePicker from 'react-native-image-crop-picker';
 
 const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
   navigation,
@@ -74,37 +75,24 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
       if (isClose) {
         toggleModal();
       }
-      try {
-        launchCamera(
-          {
+      setTimeout(async () => {
+        try {
+          let response = await ImagePicker.openCamera({
             mediaType: 'photo',
             maxWidth: 300,
             maxHeight: 550,
             quality: 1,
             includeBase64: true,
-          },
-          response => {
-            if (response.didCancel) {
-              console.log('User cancelled camera picker');
-            } else if (response.errorCode) {
-              console.log(
-                'Camera Error: ',
-                response.errorCode,
-                response.errorMessage,
-              );
-            } else if (response.assets && response.assets.length > 0) {
-              const uri = response.assets[0]?.uri;
-              if (uri) {
-                setProfileImage(uri);
-              } else {
-                console.error('Photo URI is undefined');
-              }
-            }
-          },
-        );
-      } catch (error) {
-        console.error('Camera error:', error);
-      }
+            cropping: true,
+          });
+
+          if (response.path) {
+            setProfileImage(response.path);
+          }
+        } catch (error) {
+          console.error('Camera error:', error);
+        }
+      }, 500);
     },
     [toggleModal],
   );
@@ -114,37 +102,25 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
       if (isClose) {
         toggleModal();
       }
-      try {
-        launchImageLibrary(
-          {
+
+      setTimeout(async () => {
+        try {
+          let response = await ImagePicker.openPicker({
             mediaType: 'photo',
             maxWidth: 300,
             maxHeight: 550,
             quality: 1,
             includeBase64: true,
-          },
-          response => {
-            if (response.didCancel) {
-              console.log('User cancelled image picker');
-            } else if (response.errorCode) {
-              console.log(
-                'Gallery Error: ',
-                response.errorCode,
-                response.errorMessage,
-              );
-            } else if (response.assets && response.assets.length > 0) {
-              const uri = response.assets[0]?.uri;
-              if (uri) {
-                setProfileImage(uri);
-              } else {
-                console.error('Photo URI is undefined');
-              }
-            }
-          },
-        );
-      } catch (error) {
-        console.error('Gallery error:', error);
-      }
+            cropping: true,
+          });
+
+          if (response.path) {
+            setProfileImage(response.path);
+          }
+        } catch (error) {
+          console.error('Gallery error:', error);
+        }
+      }, 500);
     },
     [toggleModal],
   );

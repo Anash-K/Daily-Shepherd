@@ -12,6 +12,8 @@ import NotificationsModal from '../modals/NotificationModal';
 import PowerModal from '../modals/PowerModal';
 import {useDispatch} from 'react-redux';
 import {logout} from '../store/reducers/AuthReducer';
+
+
 interface Mode {
   LightTheme: boolean;
   DarkTheme: boolean;
@@ -96,6 +98,7 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
     setIsLogoutVisible(false);
     dispatch(logout());
   }, []);
+
   const handleDelete = useCallback(() => {}, []);
 
   return (

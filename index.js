@@ -22,5 +22,5 @@ const Main = () => (
     </PersistGate>
   </Provider>
 );
-
+console.log('App Name:', appName); // Add this to debug
 AppRegistry.registerComponent(appName, () => Main);

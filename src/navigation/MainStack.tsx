@@ -146,9 +146,8 @@ const styles = StyleSheet.create({
   },
   backButton: {
     backgroundColor: 'rgba(24, 23, 28, 1)',
-    padding: 0,
+    padding: 10,
     margin: 0,
-    marginLeft: 10,
     marginBottom: Platform.select({ios: 10}),
   },
   skipButtonText: {
