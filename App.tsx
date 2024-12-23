@@ -9,6 +9,8 @@ import MainStack from './src/navigation/MainStack';
 
 const Stack = createStackNavigator();
 
+console.error = () => {};
+
 function App(): React.JSX.Element {
   const isAuthenticated = useSelector(
     (state: any) => state.auth.isAuthenticated,

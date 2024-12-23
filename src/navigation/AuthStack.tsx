@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     backgroundColor: 'rgba(24, 23, 28, 1)',
-    padding: 0,
+    padding: 16,
     margin: 0,
     marginBottom: Platform.select({ios: 10}),
   },

@@ -2,8 +2,10 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {
   Button,
   Image,
+  InteractionManager,
   Modal,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -12,16 +14,19 @@ import {
 import CustomFont from '../assets/customFonts';
 import CustomImages from '../assets/customImages';
 import CustomButton from '../common/CustomButton';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import {AuthStackProps} from '../navigation/AuthStack';
 import CustomInput from '../common/CustomInput';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import ImagePicker from 'react-native-image-crop-picker';
+import PermissionModal from '../modals/PermissionModal';
 
 const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
   navigation,
 }) => {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isPermissionModal, setIsPermissionModal] = useState(false);
+  const [permissionError, setPermissionError] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
 
@@ -30,6 +35,7 @@ const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
   }, []);
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isPermissionModalVisible, setPermissionModalVisible] = useState(false);
 
   const handleConfirm = () => {};
 
@@ -38,30 +44,34 @@ const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
   }, [navigation]);
 
   // Request and check for camera permission when the component mounts
-  useEffect(() => {
-    const checkPermission = async () => {
-      const cameraPermission =
-        Platform.OS === 'ios'
-          ? PERMISSIONS.IOS.CAMERA
-          : PERMISSIONS.ANDROID.CAMERA;
+  const checkAndRequestPermission = useCallback(async () => {
+    const cameraPermission =
+      Platform.OS === 'ios'
+        ? PERMISSIONS.IOS.CAMERA
+        : PERMISSIONS.ANDROID.CAMERA;
 
+    try {
       const status = await check(cameraPermission);
+
+      if (status === RESULTS.GRANTED) {
+        return;
+      }
       if (status === RESULTS.DENIED) {
         const requestStatus = await request(cameraPermission);
-        if (requestStatus === RESULTS.GRANTED) {
-          console.log('Camera permission granted');
-        } else {
-          console.log('Camera permission denied');
+        if (requestStatus !== RESULTS.GRANTED) {
         }
-      } else if (status === RESULTS.GRANTED) {
-        console.log('Camera permission already granted');
-      } else {
-        console.log('Permission status: ', status);
+      } else if (status === RESULTS.BLOCKED) {
+        setPermissionError('Permission Needed to Access Camera');
+        setPermissionModalVisible(true);
       }
-    };
-
-    checkPermission();
+    } catch (error) {
+      console.error('Permission error:', error);
+    }
   }, []);
+
+  useEffect(() => {
+    checkAndRequestPermission();
+  }, [checkAndRequestPermission]);
 
   const options = {
     mediaType: 'photo',
@@ -71,89 +81,74 @@ const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
     includeBase64: true,
   };
 
-  const handleCamera = useCallback(
-    async (isClose: Boolean) => {
-      if (isClose) {
-        toggleModal();
+  const handleGalleryModal = useCallback(() => {
+    setModalVisible(false);
+    InteractionManager.runAfterInteractions(() => {
+      setTimeout(() => {
+        handleGallery();
+      }, 700);
+    });
+  }, []);
+
+  const handleCameraModal = useCallback(() => {
+    setModalVisible(false);
+    InteractionManager.runAfterInteractions(() => {
+      setTimeout(() => {
+        handleCamera();
+      }, 700);
+    });
+  }, []);
+
+  const handleCamera = useCallback(async (isClose?: Boolean) => {
+    checkAndRequestPermission();
+    try {
+      let response = await ImagePicker.openCamera({
+        mediaType: 'photo',
+        maxWidth: 300,
+        maxHeight: 550,
+        quality: 1,
+        includeBase64: true,
+        cropping: true,
+      });
+
+      // Process the image if the path exists
+      if (response.path) {
+        setProfileImage(response.path);
       }
-      try {
-        launchCamera(
-          {
-            mediaType: 'photo',
-            maxWidth: 300,
-            maxHeight: 550,
-            quality: 1,
-            includeBase64: true,
-          },
-          response => {
-            if (response.didCancel) {
-              console.log('User cancelled camera picker');
-            } else if (response.errorCode) {
-              console.log(
-                'Camera Error: ',
-                response.errorCode,
-                response.errorMessage,
-              );
-            } else if (response.assets && response.assets.length > 0) {
-              const uri = response.assets[0]?.uri;
-              if (uri) {
-                setProfileImage(uri);
-              } else {
-                console.error('Photo URI is undefined');
-              }
-            }
-          },
-        );
-      } catch (error) {
-        console.error('Camera error:', error);
-      }
-    },
-    [toggleModal],
-  );
+    } catch (error) {
+      console.error('Camera error:', error);
+    }
+  }, []);
 
   const handleGallery = useCallback(
-    async (isClose: Boolean) => {
-      if (isClose) {
-        toggleModal();
-      }
+    async (isClose?: Boolean) => {
+      checkAndRequestPermission();
       try {
-        launchImageLibrary(
-          {
-            mediaType: 'photo',
-            maxWidth: 300,
-            maxHeight: 550,
-            quality: 1,
-            includeBase64: true,
-          },
-          response => {
-            if (response.didCancel) {
-              console.log('User cancelled image picker');
-            } else if (response.errorCode) {
-              console.log(
-                'Gallery Error: ',
-                response.errorCode,
-                response.errorMessage,
-              );
-            } else if (response.assets && response.assets.length > 0) {
-              const uri = response.assets[0]?.uri;
-              if (uri) {
-                setProfileImage(uri);
-              } else {
-                console.error('Photo URI is undefined');
-              }
-            }
-          },
-        );
+        let response = await ImagePicker.openPicker({
+          mediaType: 'photo',
+          maxWidth: 300,
+          maxHeight: 550,
+          quality: 1,
+          includeBase64: true,
+          cropping: true,
+        });
+
+        if (response.path) {
+          setProfileImage(response.path);
+        }
       } catch (error) {
         console.error('Gallery error:', error);
       }
     },
-    [toggleModal],
+    [],
   );
 
-  const handleChangeName = useCallback(() => {
-  }, []);
+  const handleChangeName = useCallback(() => {}, []);
   const handleChangeEmail = useCallback(() => {}, []);
+
+  const togglePermissionModal = useCallback(() => {
+    setPermissionModalVisible(prevState => !prevState);
+  }, []);
 
   const insets = useSafeAreaInsets();
 
@@ -169,7 +164,7 @@ const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
         },
       ]}>
       <View style={{flexGrow: 1}}>
-        <TouchableOpacity style={styles.imageBox} onPress={toggleModal}>
+        <Pressable style={styles.imageBox} onPress={toggleModal}>
           <Image
             source={
               profileImage ? {uri: profileImage} : CustomImages.profilePic
@@ -185,15 +180,15 @@ const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
               style={styles.picAction}
             />
           </View>
-        </TouchableOpacity>
+        </Pressable>
         <CustomInput
           label="Name"
-          onChange={(value) => setName(value)}
+          onChange={value => setName(value)}
           inputConfigurations={{value: name}}
         />
         <CustomInput
           label="Email"
-          onChange={(value) => setEmail(value)}
+          onChange={value => setEmail(value)}
           inputConfigurations={{value: email}}
         />
       </View>
@@ -201,7 +196,12 @@ const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
       <CustomButton text="Continue" onPress={handleNextNav} />
 
       {/* Modal for photo selection */}
-      {isModalVisible && (
+      <PermissionModal
+        isModalVisible={isPermissionModalVisible}
+        toggleModal={togglePermissionModal}
+        contentText={permissionError}
+      />
+      {isModalVisible ? (
         <Modal
           visible={isModalVisible}
           animationType="slide"
@@ -223,7 +223,7 @@ const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
               <View style={{backgroundColor: '#18171C', borderRadius: 15}}>
                 <CustomButton
                   text="Choose from Gallery"
-                  onPress={handleGallery.bind(this, true)}
+                  onPress={handleGalleryModal}
                   textStyle={styles.menuItemText}
                   buttonStyle={styles.menuItemStyle}
                   icon={CustomImages.photoGallery}
@@ -231,15 +231,17 @@ const ProfilePicture: React.FC<AuthStackProps<'ProfilePicture'>> = ({
                 />
                 <CustomButton
                   text="Use Camera"
-                  onPress={handleCamera.bind(this, true)}
+                  onPress={handleCameraModal}
                   textStyle={styles.menuItemText}
-                  buttonStyle={styles.menuItemStyle}
+                  buttonStyle={[styles.menuItemStyle, {borderBottomWidth: 0}]}
                   icon={CustomImages.cameraIcon}
                 />
               </View>
             </View>
           </View>
         </Modal>
+      ) : (
+        <></>
       )}
     </View>
   );
@@ -337,7 +339,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 10,
     position: 'absolute',
-    bottom: 10,
+    bottom: Platform.select({ios: 27, android: 10}),
     zIndex: 100,
   },
   closeButton: {

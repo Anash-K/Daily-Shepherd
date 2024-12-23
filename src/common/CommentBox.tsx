@@ -50,12 +50,13 @@ const CommentBox = (data: any) => {
             <Menu
               visible={isVisible}
               onRequestClose={closeMenu}
-              style={styles.menuStyle}>
+              style={styles.menuStyle}
+               >
               <MenuItem
                 onPress={() => {
                   closeMenu();
                 }}
-                style={styles.menuItem}>
+                style={styles.menuItem} pressColor={'transparent'}>
                 <CustomAction />
               </MenuItem>
             </Menu>
@@ -84,6 +85,7 @@ export default CommentBox;
 const styles = StyleSheet.create({
   menuStyle: {
     backgroundColor: 'rgba(32, 33, 38, 1)',
+    borderRadius: 8,
     shadowColor: 'rgba(0, 0, 0, 0.5)',
     shadowOffset: {width: 4, height: 2},
     // maxWidth: 117,

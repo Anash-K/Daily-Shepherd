@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {
   Button,
   Image,
+  InteractionManager,
   Modal,
   Platform,
   StyleSheet,
@@ -18,6 +19,7 @@ import CustomInput from '../common/CustomInput';
 import {ScreenProps} from '../navigation/Stack';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import ImagePicker from 'react-native-image-crop-picker';
+import PermissionModal from '../modals/PermissionModal';
 
 const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
   navigation,
@@ -25,42 +27,48 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
   const [isModalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState('Christopher Bell');
   const [email, setEmail] = useState('christbell@gmail.com');
+  const [permissionError, setPermissionError] = useState('');
 
   const toggleModal = useCallback(() => {
     setModalVisible(prev => !prev);
   }, []);
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isPermissionModalVisible, setPermissionModalVisible] = useState(false);
 
   const handleConfirm = () => {
     navigation.goBack();
   };
 
   // Request and check for camera permission when the component mounts
-  useEffect(() => {
-    const checkPermission = async () => {
-      const cameraPermission =
-        Platform.OS === 'ios'
-          ? PERMISSIONS.IOS.CAMERA
-          : PERMISSIONS.ANDROID.CAMERA;
+  const checkAndRequestPermission = useCallback(async () => {
+    const cameraPermission =
+      Platform.OS === 'ios'
+        ? PERMISSIONS.IOS.CAMERA
+        : PERMISSIONS.ANDROID.CAMERA;
 
+    try {
       const status = await check(cameraPermission);
+      console.log(status);
+      if (status === RESULTS.GRANTED) {
+        return;
+      }
       if (status === RESULTS.DENIED) {
         const requestStatus = await request(cameraPermission);
-        if (requestStatus === RESULTS.GRANTED) {
-          console.log('Camera permission granted');
-        } else {
-          console.log('Camera permission denied');
+        if (requestStatus !== RESULTS.GRANTED) {
         }
-      } else if (status === RESULTS.GRANTED) {
-        console.log('Camera permission already granted');
-      } else {
-        console.log('Permission status: ', status);
+      } else if (status === RESULTS.BLOCKED) {
+        setPermissionError('Permission Needed to Access Features');
+        setPermissionModalVisible(true);
       }
-    };
-
-    checkPermission();
+    } catch (error) {
+      console.error('Permission error:', error);
+    }
   }, []);
+
+  useEffect(() => {
+    checkAndRequestPermission();
+  }, [checkAndRequestPermission]);
 
   const options = {
     mediaType: 'photo',
@@ -70,62 +78,73 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
     includeBase64: true,
   };
 
-  const handleCamera = useCallback(
-    async (isClose: Boolean) => {
-      if (isClose) {
-        toggleModal();
+  const handleGalleryModal = useCallback(() => {
+    setModalVisible(false);
+    InteractionManager.runAfterInteractions(() => {
+      setTimeout(() => {
+        handleGallery();
+      }, 700);
+    });
+  }, []);
+
+  const handleCameraModal = useCallback(() => {
+    setModalVisible(false);
+    InteractionManager.runAfterInteractions(() => {
+      setTimeout(() => {
+        handleCamera();
+      }, 700);
+    });
+  }, []);
+
+  const handleCamera = useCallback(async (isClose?: Boolean) => {
+    checkAndRequestPermission();
+    try {
+      console.log('IOS Camera');
+
+      let response = await ImagePicker.openCamera({
+        mediaType: 'photo',
+        maxWidth: 300,
+        maxHeight: 550,
+        quality: 1,
+        includeBase64: true,
+        cropping: true,
+      });
+
+      // Process the image if the path exists
+      if (response.path) {
+        setProfileImage(response.path);
       }
-      setTimeout(async () => {
-        try {
-          let response = await ImagePicker.openCamera({
-            mediaType: 'photo',
-            maxWidth: 300,
-            maxHeight: 550,
-            quality: 1,
-            includeBase64: true,
-            cropping: true,
-          });
+    } catch (error) {
+      console.error('Camera error:', error);
+    }
+  }, []);
 
-          if (response.path) {
-            setProfileImage(response.path);
-          }
-        } catch (error) {
-          console.error('Camera error:', error);
-        }
-      }, 500);
-    },
-    [toggleModal],
-  );
+  const handleGallery = useCallback(async (isClose?: Boolean) => {
+    checkAndRequestPermission();
 
-  const handleGallery = useCallback(
-    async (isClose: Boolean) => {
-      if (isClose) {
-        toggleModal();
+    try {
+      let response = await ImagePicker.openPicker({
+        mediaType: 'photo',
+        maxWidth: 300,
+        maxHeight: 550,
+        quality: 1,
+        includeBase64: true,
+        cropping: true,
+      });
+
+      if (response.path) {
+        setProfileImage(response.path);
       }
-
-      setTimeout(async () => {
-        try {
-          let response = await ImagePicker.openPicker({
-            mediaType: 'photo',
-            maxWidth: 300,
-            maxHeight: 550,
-            quality: 1,
-            includeBase64: true,
-            cropping: true,
-          });
-
-          if (response.path) {
-            setProfileImage(response.path);
-          }
-        } catch (error) {
-          console.error('Gallery error:', error);
-        }
-      }, 500);
-    },
-    [toggleModal],
-  );
+    } catch (error) {
+      console.error('Gallery error:', error);
+    }
+  }, []);
 
   const handleChange = useCallback(() => {}, []);
+
+  const togglePermissionModal = useCallback(() => {
+    setPermissionModalVisible(prevState => !prevState);
+  }, []);
 
   const insets = useSafeAreaInsets();
 
@@ -176,6 +195,11 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
       <CustomButton text="Update profile" onPress={handleConfirm} />
 
       {/* Modal for photo selection */}
+      <PermissionModal
+        isModalVisible={isPermissionModalVisible}
+        toggleModal={togglePermissionModal}
+        contentText={permissionError}
+      />
       {isModalVisible && (
         <Modal
           visible={isModalVisible}
@@ -198,7 +222,7 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
               <View style={{backgroundColor: '#18171C', borderRadius: 15}}>
                 <CustomButton
                   text="Choose from Gallery"
-                  onPress={handleGallery.bind(this, true)}
+                  onPress={handleGalleryModal}
                   textStyle={styles.menuItemText}
                   buttonStyle={styles.menuItemStyle}
                   icon={CustomImages.photoGallery}
@@ -206,9 +230,9 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
                 />
                 <CustomButton
                   text="Use Camera"
-                  onPress={handleCamera.bind(this, true)}
+                  onPress={handleCameraModal}
                   textStyle={styles.menuItemText}
-                  buttonStyle={styles.menuItemStyle}
+                  buttonStyle={[styles.menuItemStyle, {borderBottomWidth: 0}]}
                   icon={CustomImages.cameraIcon}
                 />
               </View>

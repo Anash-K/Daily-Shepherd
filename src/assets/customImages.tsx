@@ -43,7 +43,7 @@ const CustomImages = {
   podcast4: require('./images/podcast4.png'),
   podcast5: require('./images/podcast5.png'),
   podcast6: require('./images/podcast6.png'),
-  podcast7: require('./images/podcast7.png'),
+  podcast7: require('./images/podcast7.png'),                      
   playIcon: require('./images/playIcon.png'),
   profilePict: require('./images/profilImage.png'),
   heartIcon: require('./images/heartIcon.png'),

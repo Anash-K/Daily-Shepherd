@@ -84,16 +84,22 @@ const CustomInput: React.FC<CustomInputProps> = ({
         )} */}
 
         <FloatingLabelInput
-          label={
-            (
-              <Text style={{color: 'rgba(250, 250, 250, 0.5)'}}>{label}</Text>
-            ) as any
-          }
-          staticLabel
+          label={(<Text style={styles.labelText}>{label}</Text>) as any}
           isPassword={isPassword}
           labelStyles={styles.label}
-          containerStyles={[styles.input, isDisabled && {opacity: 0.5}]}
-          inputStyles={styles.inputContent}
+          containerStyles={[
+            styles.input,
+            isDisabled && {
+              borderColor: '#38393E',
+            },
+          ]}
+          customLabelStyles={{
+            fontSizeFocused: 14,
+            colorFocused: 'rgba(250, 250, 250, 1)',
+            fontSizeBlurred: 18,
+            topFocused: -28,
+          }}
+          inputStyles={[styles.inputContent] as any}
           togglePassword={isSecure}
           onChangeText={onChange}
           customShowPasswordComponent={
@@ -152,10 +158,10 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: 'white',
+    borderColor: 'rgba(56, 57, 62, 1)',
     backgroundColor: '#18171C',
     paddingLeft: 2,
-    borderRadius: 10,
+    borderRadius: 12,
     paddingVertical: Platform.select({ios: 3, android: 2}),
     height: 56,
     marginBottom: 17,
@@ -172,13 +178,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   label: {
-    textTransform: 'capitalize',
-    fontSize: 14,
-    fontFamily: CustomFont.Urbanist400,
-    lineHeight: 16.8,
-    color: 'rgba(250, 250, 250, 0.5)',
     backgroundColor: 'rgba(24, 23, 28, 1)',
     paddingHorizontal: 5,
+    marginLeft: 10,
+    textTransform: 'capitalize',
+    fontSize: 18,
+    fontFamily: CustomFont.Urbanist400,
+    lineHeight: 16.8,
+  },
+  labelText: {
+    color: 'rgba(250, 250, 250, 0.5)',
   },
   iconEye: {
     width: 24,

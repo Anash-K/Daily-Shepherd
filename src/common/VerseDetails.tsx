@@ -47,7 +47,7 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
 
   const {verseId} = route.params;
 
-  const verseData = Data.filter(item => item.id === verseId);
+  const verseData = Data.filter((item:any) => item.id === verseId);
 
   useLayoutEffect(() => {
     if (verseData) {
