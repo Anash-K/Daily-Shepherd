@@ -32,7 +32,8 @@ const PodCastDetails: React.FC<ScreenProps<'PodCastDetails'>> = ({
       style={[
         styles.container,
         {
-          paddingTop: Platform.select({ios: insets.top}),
+          marginTop: Platform.select({ios: insets.top}),
+          marginBottom: Platform.select({ios: insets.bottom}),
         },
       ]}
       contentContainerStyle={{paddingBottom: 30}}
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     alignSelf: 'flex-start',
     marginBottom: 16,
-    marginTop:24
+    marginTop: 24,
   },
   TabText: {
     fontFamily: CustomFont.Urbanist500,

@@ -6,15 +6,37 @@ import {useSelector} from 'react-redux';
 import BootSplash from 'react-native-bootsplash';
 import AuthStack from './src/navigation/AuthStack';
 import MainStack from './src/navigation/MainStack';
+import {QueryClient, QueryClientProvider, onlineManager} from 'react-query';
+import {OnlineManager} from 'react-query/types/core/onlineManager';
+import NetInfo, {NetInfoSubscription} from '@react-native-community/netinfo';
 
 const Stack = createStackNavigator();
 
-console.error = () => {};
+const queryClient = new QueryClient();
+
+// console.error = () => {};
 
 function App(): React.JSX.Element {
   const isAuthenticated = useSelector(
     (state: any) => state.auth.isAuthenticated,
   );
+
+  useEffect(() => {
+    // Manage online status with NetInfo and react-query's onlineManager
+    const unsubscribe = onlineManager.setEventListener(setOnline => {
+      const netInfoUnsubscribe = NetInfo.addEventListener(state => {
+        setOnline(state?.isInternetReachable ?? false);
+      });
+
+      // Return the cleanup function for NetInfo
+      return netInfoUnsubscribe;
+    });
+
+    // Cleanup for onlineManager event listener
+    return () => {
+      unsubscribe;
+    };
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -24,6 +46,7 @@ function App(): React.JSX.Element {
 
   return (
     <View style={styles.container}>
+      <QueryClientProvider client={queryClient}>
         <StatusBar
           barStyle="light-content"
           backgroundColor="rgba(24, 23, 28, 1)"
@@ -37,6 +60,7 @@ function App(): React.JSX.Element {
             )}
           </Stack.Navigator>
         </NavigationContainer>
+      </QueryClientProvider>
     </View>
   );
 }

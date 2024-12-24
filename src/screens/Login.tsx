@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   Image,
   ImageBackground,
@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Text,
   View,
-} from 'react-native';
+} from 'react-native'; // 11.5.0
 import CustomImages from '../assets/customImages';
 import CustomButton from '../common/CustomButton';
 import CustomFont from '../assets/customFonts';
@@ -15,6 +15,9 @@ import CustomInput from '../common/CustomInput';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {AuthStackProps} from '../navigation/AuthStack';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
+import { LoginApi } from '../axious/PostApis';
 
 const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
   const {top, bottom} = useSafeAreaInsets();
@@ -30,6 +33,27 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
   const handleForgotPassword = () => {
     navigation.navigate('ForgotPassword');
   };
+
+  const CreateAccount = useCallback(async() =>{
+
+    const response = await auth().createUserWithEmailAndPassword(
+      'test@gmail.com',
+      'password123',
+    );
+
+    const firebaseToken = await response.user.getIdToken();
+
+    // const response = await LoginApi()
+  },[]);
+
+  
+
+
+  useEffect(() =>{
+    GoogleSignin.configure({
+      webClientId: '77025911882-38knj3gobjf8490723d3p0jirbrabqvn.apps.googleusercontent.com',
+    });
+  },[]);
 
   return (
     <View
