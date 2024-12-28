@@ -16,6 +16,7 @@ import {Data} from '../utils/verseBoxDemoData';
 import {verseReflectionData} from '../utils/verReflectionDemoData';
 import VerseReflectionBox from '../common/VerseReflectionBox';
 import {ContextChapterData} from '../utils/contextChapterDemoData';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
   route,
@@ -29,17 +30,17 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
 
   const {greeting, image} = getPartOfDay();
 
-  let todaysVerse = Data.filter((chunk: any) => chunk.title == currentDate);
+  let todaysVerse = Data.filter((chunk: any, index) => index == 0);
 
   let todaysReflection = verseReflectionData
-    .filter(chuckItem => chuckItem.date == currentDate)
+    .filter((chunk: any, index) => index == 0)
     .map(item => ({
       ...item,
       title: "Today's Reflection",
     }));
 
   let todaysContext = ContextChapterData.filter(
-    chuckItem => chuckItem.date == currentDate,
+    (chunk: any, index) => index == 0,
   ).map(item => ({
     ...item,
     title: 'Context Chapter',
@@ -47,7 +48,7 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
 
   const {verseId} = route.params;
 
-  const verseData = Data.filter((item:any) => item.id === verseId);
+  const verseData = Data.filter((item: any) => item.id === verseId);
 
   useLayoutEffect(() => {
     if (verseData) {
@@ -59,8 +60,10 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
 
   const handleDetails = () => {};
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, {marginBottom: insets.bottom}]}>
       {verseData?.map((item: any) => (
         <VerseBox key={item.title} {...item} OnPressDetails={handleDetails} />
       ))}

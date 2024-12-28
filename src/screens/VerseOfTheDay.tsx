@@ -29,17 +29,17 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
 
   const {greeting, image} = getPartOfDay();
 
-  let todaysVerse = Data.filter((chunk: any) => chunk.title == currentDate);
+  let todaysVerse = Data.filter((chunk: any, index) => index == 0);
 
   let todaysReflection = verseReflectionData
-    .filter(chuckItem => chuckItem.date == currentDate)
+    .filter((chunk: any, index) => index == 0)
     .map(item => ({
       ...item,
       title: "Today's Reflection",
     }));
 
   let todaysContext = ContextChapterData.filter(
-    chuckItem => chuckItem.date == currentDate,
+    (chunk: any, index) => index == 0,
   ).map(item => ({
     ...item,
     title: 'Context Chapter',

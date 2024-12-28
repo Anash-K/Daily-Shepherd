@@ -31,10 +31,10 @@ const DailyInsPiration: React.FC<AuthStackProps<'DailyInsPiration'>> = ({
       style={[
         styles.container,
         {
-          paddingTop: insets.top,
-          paddingBottom: Platform.select({
+          marginTop: insets.top,
+          marginBottom: Platform.select({
             ios: insets.bottom + 10,
-            android: insets.bottom + 40,
+            android: insets.bottom + 20,
           }),
         },
       ]}>

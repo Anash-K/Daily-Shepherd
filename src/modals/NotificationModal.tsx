@@ -21,17 +21,10 @@ interface AppearanceProps {
 
 const NotificationsModal: React.FC<AppearanceProps> = memo(
   ({isModalVisible, toggleModal}) => {
-    const [toggleStates, setToggleStates] = useState<Record<string, boolean>>({
-      toggle1: false,
-      toggle2: false,
-      toggle3: false,
-    });
+    const [toggleStates, setToggleStates] = useState<boolean>(false);
 
-    const toggleSwitch = (key: string): void => {
-      setToggleStates(prevState => ({
-        ...prevState,
-        [key]: !prevState[key],
-      }));
+    const toggleSwitch = (): void => {
+      setToggleStates(prevState => !prevState);
     };
 
     return (
@@ -60,7 +53,9 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
                   </View>
 
                   {/* First Toggle */}
-                  <View style={styles.preference}>
+                  <TouchableOpacity
+                    style={styles.preference}
+                    onPress={() => toggleSwitch()}>
                     <View>
                       <Text style={styles.text}>Verse only</Text>
                       <TouchableOpacity style={styles.timer}>
@@ -74,7 +69,7 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
                     </View>
 
                     <ToggleSwitch
-                      isOn={toggleStates.toggle1}
+                      isOn={toggleStates}
                       onColor="rgba(24, 23, 28, 1)"
                       offColor="rgba(24, 23, 28, 1)"
                       size="small"
@@ -89,7 +84,7 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
                       thumbOffStyle={styles.thumbStyleOff}
                       thumbOnStyle={styles.thumbStyleOn}
                       icon={
-                        toggleStates.toggle1 ? (
+                        toggleStates ? (
                           <Image
                             source={CustomImages.rightIcon}
                             style={styles.toggleIcon}
@@ -97,12 +92,12 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
                           />
                         ) : null
                       }
-                      onToggle={() => toggleSwitch('toggle1')}
+                      onToggle={() => toggleSwitch()}
                     />
-                  </View>
+                  </TouchableOpacity>
 
                   {/* Second Toggle */}
-                  <View style={styles.preference}>
+                  {/* <View style={styles.preference}>
                     <Text style={styles.text}>Verse with reflection</Text>
                     <ToggleSwitch
                       isOn={toggleStates.toggle2}
@@ -130,10 +125,10 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
                       }
                       onToggle={() => toggleSwitch('toggle2')}
                     />
-                  </View>
+                  </View> */}
 
                   {/* Third Toggle */}
-                  <View style={styles.preference}>
+                  {/* <View style={styles.preference}>
                     <Text style={styles.text}>Verse with teaching</Text>
                     <ToggleSwitch
                       isOn={toggleStates.toggle3}
@@ -161,7 +156,7 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
                       }
                       onToggle={() => toggleSwitch('toggle3')}
                     />
-                  </View>
+                  </View> */}
                   <CustomButton
                     text="Save preference"
                     onPress={toggleModal}

@@ -8,7 +8,6 @@ import rootReducer from './rootReducer'; // Ensure this points to your combined 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage, // Use AsyncStorage for React Native
-  whitelist: ['auth'], // Only persist the `auth` slice of the state if needed
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

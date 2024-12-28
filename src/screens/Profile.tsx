@@ -4,7 +4,7 @@ import CustomButton from '../common/CustomButton';
 import CustomFont from '../assets/customFonts';
 import CustomImages from '../assets/customImages';
 import ProfileTab from '../common/ProfileTabBars';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {ScreenProps} from '../navigation/Stack';
 import Appearance from '../modals/Appearance';
 import FontSizeModal from '../modals/FontSizeModal';
@@ -12,7 +12,13 @@ import NotificationsModal from '../modals/NotificationModal';
 import PowerModal from '../modals/PowerModal';
 import {useDispatch} from 'react-redux';
 import {logout} from '../store/reducers/AuthReducer';
-
+import {LogoutApi} from '../axious/PostApis';
+import {
+  ALERT_TYPE,
+  AlertNotificationToast,
+  Toast,
+} from 'react-native-alert-notification';
+import {AppLoaderRef} from '../../App';
 
 interface Mode {
   LightTheme: boolean;
@@ -49,6 +55,7 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
   const [mode, setMode] = useState<Mode>(ThemeMode);
   const [fontResizer, setFontResizer] =
     useState<CustomFontSize>(CustomFontSize);
+  const ButtonRef = useRef<boolean>(false);
 
   const handleNav = useCallback((title: String) => {
     navigation.navigate(title);
@@ -94,15 +101,46 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
     setIsDeleteModal(prevState => !prevState);
   }, []);
 
-  const handleLogout = useCallback(() => {
-    setIsLogoutVisible(false);
-    dispatch(logout());
-  }, []);
+  const handleSuccessNotification = () => {
+    Toast.show({
+      type: ALERT_TYPE.SUCCESS,
+      title: 'Success',
+      textBody: 'Logged out Successfully',
+    });
+  };
+
+  const handleLogout = useCallback(async () => {
+    if (ButtonRef.current) {
+      return;
+    }
+
+    ButtonRef.current = true;
+    AppLoaderRef.current?.start();
+    try {
+      const response = await LogoutApi();
+
+      console.log(response.data);
+
+      if (response.status === 200) {
+        handleSuccessNotification();
+        dispatch(logout());
+      } else {
+        console.error('Logout failed', response.data);
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    } finally {
+      setIsLogoutVisible(false);
+      AppLoaderRef.current?.stop();
+      ButtonRef.current = false;
+    }
+  }, [dispatch]);
 
   const handleDelete = useCallback(() => {}, []);
 
   return (
     <ScrollView style={styles.container}>
+      <AlertNotificationToast isDark />
       <View style={styles.topHeader}>
         <Image source={CustomImages.profilePict} style={styles.profilePic} />
         <View>
@@ -193,12 +231,6 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
         </View>
 
         <View>
-          <ProfileTab
-            icon={CustomImages.passwordIcon}
-            title={'Change Password'}
-            wantBottomBorder={true}
-            OnPressHandler={() => navigation.navigate('ChangePassword')}
-          />
           <ProfileTab
             icon={CustomImages.trash}
             title={'Delete Account'}

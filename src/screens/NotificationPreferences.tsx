@@ -11,13 +11,14 @@ import CustomFont from '../assets/customFonts';
 import CustomImages from '../assets/customImages';
 import ToggleSwitch from 'toggle-switch-react-native';
 import CustomButton from '../common/CustomButton';
-import {AuthStackProps} from '../navigation/AuthStack';
 import {useDispatch} from 'react-redux';
 import {loginSuccess} from '../store/reducers/AuthReducer';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {StackParams} from '../navigation/MainStack';
+import {ScreenProps} from '../navigation/Stack';
 
 const NotificationPreferences: React.FC<
-  AuthStackProps<'NotificationPreferences'>
+  ScreenProps<'NotificationPreferences'>
 > = ({navigation}) => {
   // State to track each switch independently
   const [toggleStates, setToggleStates] = useState<Record<string, boolean>>({
@@ -25,8 +26,6 @@ const NotificationPreferences: React.FC<
     toggle2: false,
     toggle3: false,
   });
-
-  const dispatcher = useDispatch();
 
   // Handler to update the state for a specific toggle
   const toggleSwitch = (key: string): void => {
@@ -37,7 +36,7 @@ const NotificationPreferences: React.FC<
   };
 
   const handlePress = () => {
-    dispatcher(loginSuccess('Login'));
+    navigation.navigate('BottomStack');
   };
 
   const insets = useSafeAreaInsets();
@@ -94,7 +93,7 @@ const NotificationPreferences: React.FC<
         </View>
 
         {/* Second Toggle */}
-        <View style={styles.preference}>
+        {/* <View style={styles.preference}>
           <Text style={styles.text}>Verse with reflection</Text>
           <ToggleSwitch
             isOn={toggleStates.toggle2}
@@ -119,10 +118,10 @@ const NotificationPreferences: React.FC<
             }
             onToggle={() => toggleSwitch('toggle2')}
           />
-        </View>
+        </View> */}
 
         {/* Third Toggle */}
-        <View style={styles.preference}>
+        {/* <View style={styles.preference}>
           <Text style={styles.text}>Verse with teaching</Text>
           <ToggleSwitch
             isOn={toggleStates.toggle3}
@@ -147,7 +146,7 @@ const NotificationPreferences: React.FC<
             }
             onToggle={() => toggleSwitch('toggle3')}
           />
-        </View>
+        </View> */}
       </View>
       <View style={{flexDirection: 'row', columnGap: 12}}>
         <CustomButton

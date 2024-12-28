@@ -18,8 +18,6 @@ import {createStackNavigator} from '@react-navigation/stack';
 type AuthScreenParams = {
   Login: undefined;
   CreateAccount: undefined;
-  ProfilePicture: undefined;
-  NotificationPreferences: undefined;
   ForgotPassword: undefined;
   DailyInsPiration: undefined;
   InspiringPodcast: undefined;
@@ -60,45 +58,6 @@ const AuthStack: React.FC = () => {
         name="CreateAccount"
         component={CreateAccount}
         options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="ProfilePicture"
-        component={ProfilePicture}
-        options={({navigation}) => ({
-          headerTitle: 'Profile setup',
-          headerLeft: () => (
-            <CustomButton
-              onPress={() => navigation.goBack()}
-              icon={CustomImages.backIcon}
-              iconStyle={styles.backButtonIcon}
-              buttonStyle={styles.backButton}
-            />
-          ),
-        })}
-      />
-      <Stack.Screen
-        name="NotificationPreferences"
-        component={NotificationPreferences}
-        options={({navigation}) => ({
-          headerShown: true,
-          title: 'Notifications preference',
-          headerLeft: () => '',
-        })}
-      />
-      <Stack.Screen
-        name="ForgotPassword"
-        component={ForgotPassword}
-        options={({navigation}) => ({
-          headerLeft: () => (
-            <CustomButton
-              onPress={() => navigation.goBack()}
-              icon={CustomImages.backIcon}
-              iconStyle={styles.backButtonIcon}
-              buttonStyle={styles.backButton}
-            />
-          ),
-          headerTitle: () => null,
-        })}
       />
     </Stack.Navigator>
   );

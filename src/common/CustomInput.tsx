@@ -64,6 +64,11 @@ const CustomInput: React.FC<CustomInputProps> = ({
     setIsSecure(!isSecure);
   };
 
+  const InputStyle = isDisabled ? styles.disabledInputStyle : styles.input;
+  const InputContentStyle = isDisabled
+    ? styles.disabledInputContentStyle
+    : styles.inputContent;
+
   return (
     <View style={[styles.container, inputBoxStyle]}>
       <View style={styles.inputContainer}>
@@ -87,19 +92,15 @@ const CustomInput: React.FC<CustomInputProps> = ({
           label={(<Text style={styles.labelText}>{label}</Text>) as any}
           isPassword={isPassword}
           labelStyles={styles.label}
-          containerStyles={[
-            styles.input,
-            isDisabled && {
-              borderColor: '#38393E',
-            },
-          ]}
+          containerStyles={InputStyle}
+          aria-disabled={isDisabled}
           customLabelStyles={{
             fontSizeFocused: 14,
             colorFocused: 'rgba(250, 250, 250, 1)',
             fontSizeBlurred: 18,
             topFocused: -28,
           }}
-          inputStyles={[styles.inputContent] as any}
+          inputStyles={InputContentStyle}
           togglePassword={isSecure}
           onChangeText={onChange}
           customShowPasswordComponent={
@@ -146,6 +147,17 @@ const styles = StyleSheet.create({
     width: 19,
     marginRight: 22,
   },
+  disabledInputStyle: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#38393E',
+    backgroundColor: '#18171C',
+    paddingLeft: 2,
+    borderRadius: 12,
+    paddingVertical: Platform.select({ios: 3, android: 2}),
+    height: 56,
+    marginBottom: 17,
+  },
   outlineInput: {
     borderRadius: 10,
     borderColor: 'rgba(56, 57, 62, 1)',
@@ -165,6 +177,17 @@ const styles = StyleSheet.create({
     paddingVertical: Platform.select({ios: 3, android: 2}),
     height: 56,
     marginBottom: 17,
+  },
+  disabledInputContentStyle: {
+    fontSize: 18,
+    lineHeight: 21.6,
+    fontFamily: CustomFont.Urbanist400,
+    color: 'rgba(250, 250, 250, 0.5)',
+    backgroundColor: 'transparent',
+    margin: Platform.select({ios: 3, android: 3}),
+    marginVertical: Platform.select({ios: 3, android: 3}),
+    // paddingVertical: Platform.select({ios: 5, android: 5}),
+    paddingHorizontal: 16,
   },
   inputContent: {
     fontSize: 18,

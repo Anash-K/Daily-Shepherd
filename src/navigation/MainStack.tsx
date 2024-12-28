@@ -14,6 +14,7 @@ import EditProfilePic from '../screens/EditProfilePic';
 import Favorites from '../screens/Favorites';
 import ChangePassword from '../screens/ChangePassword';
 import {createStackNavigator} from '@react-navigation/stack';
+import NotificationPreferences from '../screens/NotificationPreferences';
 
 export type StackParams = {
   BottomStack: undefined;
@@ -27,6 +28,8 @@ export type StackParams = {
   EditProfilePic: undefined;
   Favorites: undefined;
   ChangePassword: undefined;
+  NotificationPreferences: undefined;
+  ProfilePicture: undefined;
 };
 
 const Stack = createStackNavigator<StackParams>();
@@ -48,7 +51,32 @@ const MainStack = () => {
         headerTitleStyle: styles.title,
         headerTitleAlign: 'center',
         headerShadowVisible: true,
-      })}>
+      })}
+      initialRouteName="ProfilePicture">
+      <Stack.Screen
+        name="ProfilePicture"
+        component={ProfilePicture}
+        options={({navigation}) => ({
+          headerTitle: 'Profile setup',
+          headerLeft: () => (
+            <CustomButton
+              onPress={() => navigation.goBack()}
+              icon={CustomImages.backIcon}
+              iconStyle={styles.backButtonIcon}
+              buttonStyle={styles.backButton}
+            />
+          ),
+        })}
+      />
+      <Stack.Screen
+        name="NotificationPreferences"
+        component={NotificationPreferences}
+        options={({navigation}) => ({
+          headerShown: true,
+          title: 'Notifications preference',
+          headerLeft: () => '',
+        })}
+      />
       <Stack.Screen
         name="BottomStack"
         component={BottomStack}

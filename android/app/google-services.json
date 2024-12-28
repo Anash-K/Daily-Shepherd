@@ -29,6 +29,13 @@
             {
               "client_id": "77025911882-38knj3gobjf8490723d3p0jirbrabqvn.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "77025911882-es68arab1map8sms24213rutgl7lbkrs.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ahirbusinessnetwork"
+              }
             }
           ]
         }

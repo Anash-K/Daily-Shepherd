@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {
   Image,
   ImageBackground,
@@ -11,16 +11,39 @@ import {
 import CustomImages from '../assets/customImages';
 import CustomButton from '../common/CustomButton';
 import CustomFont from '../assets/customFonts';
-import CustomInput from '../common/CustomInput';
-import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
+import {ScrollView} from 'react-native-gesture-handler';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {AuthStackProps} from '../navigation/AuthStack';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
-import { LoginApi } from '../axious/PostApis';
+import {LoginApi} from '../axious/PostApis';
+import {getFCMToken} from '../utils/FCM';
+import {
+  ALERT_TYPE,
+  Dialog,
+  AlertNotificationToast,
+  AlertNotificationDialog,
+  Toast,
+} from 'react-native-alert-notification';
+import {appleAuth} from '@invertase/react-native-apple-authentication';
+import Loader from '../utils/Loader';
+import {AppLoaderRef} from '../../App';
+import axios from 'axios';
+import {useDispatch, useSelector} from 'react-redux';
+import {loginSuccess} from '../store/reducers/AuthReducer';
+import {ErrorHandler} from '../utils/ErrorHandler';
 
 const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
   const {top, bottom} = useSafeAreaInsets();
+
+  const buttonRef = useRef<boolean>(false);
+  const dispatch = useDispatch();
+
+  const {token, email, isAuthenticated} = useSelector(
+    (state: any) => state.auth,
+  );
+
+  console.log(token, email, isAuthenticated);
 
   const handlePress = () => {};
   const handleNav = () => {
@@ -34,75 +57,172 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
     navigation.navigate('ForgotPassword');
   };
 
-  const CreateAccount = useCallback(async() =>{
+  const onGoogleSignIn = useCallback(async () => {
+    if (buttonRef.current) {
+      return;
+    }
 
-    const response = await auth().createUserWithEmailAndPassword(
-      'test@gmail.com',
-      'password123',
-    );
+    buttonRef.current = true;
 
-    const firebaseToken = await response.user.getIdToken();
+    AppLoaderRef?.current?.start();
 
-    // const response = await LoginApi()
-  },[]);
+    try {
+      // Sign out any existing session to start fresh
+      await GoogleSignin.signOut();
 
-  
+      // Check if Google Play Services are available
+      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
 
+      // Proceed to sign in
+      const userInfo = await GoogleSignin.signIn();
 
-  useEffect(() =>{
-    GoogleSignin.configure({
-      webClientId: '77025911882-38knj3gobjf8490723d3p0jirbrabqvn.apps.googleusercontent.com',
-    });
-  },[]);
+      // Get tokens for authentication
+      const {idToken, accessToken} = await GoogleSignin.getTokens();
+
+      const credential = auth.GoogleAuthProvider.credential(
+        idToken,
+        accessToken,
+      );
+      await auth().signInWithCredential(credential);
+
+      const token = await auth()?.currentUser?.getIdToken();
+
+      // Get FCM token
+      const pushToken = await getFCMToken();
+
+      const response = await LoginApi({
+        firebase_token: token,
+        device_type: Platform.OS,
+        push_token: pushToken,
+        email: userInfo?.data?.user?.email ?? '',
+      });
+
+      if (response?.status === 200) {
+        const {data} = response;
+        Toast.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          textBody:
+            'Welcome! You have successfully Logged in. Let’s get started!',
+        });
+        dispatch(loginSuccess(data.payload, data.token));
+      }
+    } catch (error) {
+      console.error('An error occurred during Google Sign-In:', error);
+      ErrorHandler(error);
+    } finally {
+      buttonRef.current = false; // Reset the button state
+      AppLoaderRef?.current?.stop();
+    }
+  }, []);
+
+  const onAppleSignIn = useCallback(async () => {
+    if (buttonRef.current) {
+      console.warn('Button click blocked to prevent multiple sign-ins.');
+      return;
+    }
+
+    buttonRef.current = true;
+
+    AppLoaderRef?.current?.start();
+
+    try {
+      const appleAuthRequestResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
+        requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+      });
+
+      const credentialState = await appleAuth.getCredentialStateForUser(
+        appleAuthRequestResponse.user,
+      );
+
+      if (credentialState == appleAuth.State.AUTHORIZED) {
+        const credential = auth.AppleAuthProvider.credential(
+          appleAuthRequestResponse.identityToken,
+          appleAuthRequestResponse.nonce,
+        );
+
+        await auth().signInWithCredential(credential);
+
+        const token = await auth()?.currentUser?.getIdToken();
+
+        if (
+          appleAuthRequestResponse?.email &&
+          appleAuthRequestResponse?.fullName?.givenName &&
+          appleAuthRequestResponse?.fullName?.familyName
+        ) {
+          auth()?.currentUser?.updateProfile({
+            displayName: `${appleAuthRequestResponse.fullName.givenName} ${appleAuthRequestResponse.fullName.familyName}`,
+          });
+          auth()?.currentUser?.updateEmail(appleAuthRequestResponse.email);
+        }
+
+        const pushToken = await getFCMToken();
+
+        const response = await LoginApi({
+          device_type: Platform.OS,
+          firebase_token: token,
+          push_token: pushToken,
+          email: auth()?.currentUser?.email ?? '',
+        });
+
+        console.log(response, 'response');
+      }
+    } catch (error) {
+      // throw error;
+      console.log(error);
+      ErrorHandler(error);
+    } finally {
+      buttonRef.current = false;
+      AppLoaderRef?.current?.stop();
+    }
+  }, []);
 
   return (
-    <View
+    <ScrollView
+      contentContainerStyle={{flexGrow: 1}}
       style={[
         styles.container,
         {paddingBottom: Platform.select({ios: bottom, android: 20})},
       ]}>
-      <KeyboardAvoidingView
-        behavior="padding"
-        style={{flex: 1}}
-        contentContainerStyle={{flexGrow: 1}}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 30 : 20}>
-        <View style={{flex: 1}}>
-          <ImageBackground
-            source={CustomImages.loginTopBg}
-            style={{height: 300, justifyContent: 'center'}}>
-            <Image
-              source={CustomImages.logo}
-              resizeMode="contain"
-              style={styles.logo}
-            />
-          </ImageBackground>
+      <Loader ref={AppLoaderRef} />
 
-          <View style={{paddingHorizontal: 16}}>
-            <Text style={styles.title}>
-              Your Daily <Text style={{color: '#20C997'}}>Bible</Text> Companion
-            </Text>
-            <Text style={styles.subTitle}>
-              Start your day with meaningful Bible verses and reflections. Sign
-              in to explore.
-            </Text>
-            <CustomButton
-              text="Sign In with Apple"
-              onPress={handleLogin}
-              buttonStyle={styles.appleSign}
-              icon={CustomImages.appleLogo}
-              iconStyle={{width: 24, height: 24}}
-            />
-            <CustomButton
-              text="Sign In with Google"
-              onPress={handleLogin}
-              buttonStyle={styles.googleSign}
-              icon={CustomImages.googleLogo}
-              iconStyle={{width: 24, height: 24}}
-              textStyle={{color: '#FAFAFA'}}
-            />
-          </View>
+      <View style={{flex: 1}}>
+        <ImageBackground
+          source={CustomImages.loginTopBg}
+          style={{height: 300, justifyContent: 'center'}}>
+          <Image
+            source={CustomImages.logo}
+            resizeMode="contain"
+            style={styles.logo}
+          />
+        </ImageBackground>
+
+        <View style={{paddingHorizontal: 16}}>
+          <Text style={styles.title}>
+            Your Daily <Text style={{color: '#20C997'}}>Bible</Text> Companion
+          </Text>
+          <Text style={styles.subTitle}>
+            Start your day with meaningful Bible verses and reflections. Sign in
+            to explore.
+          </Text>
+          <CustomButton
+            text="Sign In with Apple"
+            onPress={onAppleSignIn}
+            buttonStyle={styles.appleSign}
+            icon={CustomImages.appleLogo}
+            iconStyle={{width: 24, height: 24}}
+          />
+          <CustomButton
+            text="Sign In with Google"
+            onPress={onGoogleSignIn}
+            buttonStyle={styles.googleSign}
+            icon={CustomImages.googleLogo}
+            iconStyle={{width: 24, height: 24}}
+            textStyle={{color: '#FAFAFA'}}
+          />
         </View>
-      </KeyboardAvoidingView>
+      </View>
 
       <View style={[styles.bottomBox]}>
         <Text style={styles.bottomText}>
@@ -118,7 +238,9 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
           .
         </Text>
       </View>
-    </View>
+      {/* Dark-Themed Toast */}
+      <AlertNotificationToast isDark />
+    </ScrollView>
   );
 };
 

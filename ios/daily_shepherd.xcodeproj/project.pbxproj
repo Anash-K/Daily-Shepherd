@@ -13,6 +13,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		14DB79712D1D348600509D03 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 14DB79702D1D348600509D03 /* GoogleService-Info.plist */; };
 		1870C6D4F9C8434CB58BE481 /* Urbanist-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C86321AD006E497E857752EC /* Urbanist-SemiBold.ttf */; };
 		2A47E5D04A6042FD96334B2B /* Urbanist-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 210AB2A23FAF4873A506F458 /* Urbanist-Regular.ttf */; };
 		3C6408AFBD8706530D89AE42 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
@@ -47,6 +48,7 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = daily_shepherd/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = daily_shepherd/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = daily_shepherd/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		14DB79702D1D348600509D03 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		210AB2A23FAF4873A506F458 /* Urbanist-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Urbanist-Regular.ttf"; path = "../src/fonts/Urbanist-Regular.ttf"; sourceTree = "<group>"; };
 		295DE0B1C46A444887228E7A /* Urbanist-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Urbanist-Bold.ttf"; path = "../src/fonts/Urbanist-Bold.ttf"; sourceTree = "<group>"; };
 		32BDDE677D0CC1B49F061B99 /* Pods_daily_shepherd_daily_shepherdTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_daily_shepherd_daily_shepherdTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -137,6 +139,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				14DB79702D1D348600509D03 /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* daily_shepherd */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* daily_shepherdTests */,
@@ -282,6 +285,7 @@
 				3C6408AFBD8706530D89AE42 /* PrivacyInfo.xcprivacy in Resources */,
 				CF471B4D4DA749E2BDDAAE1E /* BootSplash.storyboard in Resources */,
 				85EC18E095C5453C8CDF7665 /* Colors.xcassets in Resources */,
+				14DB79712D1D348600509D03 /* GoogleService-Info.plist in Resources */,
 				4D764A573FA8496A9CD11C4F /* Urbanist-Bold.ttf in Resources */,
 				ECB173CA46694317AEF5A62D /* Urbanist-Light.ttf in Resources */,
 				90A99566725C4B679242F0B5 /* Urbanist-Medium.ttf in Resources */,

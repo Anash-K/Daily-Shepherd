@@ -27,7 +27,7 @@ const InspiringPodcast: React.FC<AuthStackProps<'InspiringPodcast'>> = ({
       style={[
         styles.container,
         {
-          paddingTop: insets.top,
+          marginTop: insets.top,
           paddingBottom: Platform.select({
             ios: insets.bottom + 0,
             android: insets.bottom + 20,
