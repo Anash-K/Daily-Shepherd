@@ -1,11 +1,10 @@
 import axios from 'axios';
 import {useEffect} from 'react';
 import {onlineManager} from 'react-query';
-import configureStore from '../store/ configureStore';
+import configureStore from '../store/configureStore';
 import {useDispatch} from 'react-redux';
 import {logout} from '../store/reducers/AuthReducer';
-
-const {store  } = configureStore();
+import store from '../store/configureStore';
 
 const AxiosInstance = axios.create({
   baseURL: 'https://api.dailyshepherd.host/api/',
@@ -15,27 +14,31 @@ const AxiosInstance = axios.create({
   },
 });
 
-
-
 AxiosInstance.interceptors.request.use(
   request => {
+    // Check for online status before proceeding with the request
     if (!onlineManager.isOnline()) {
       return Promise.reject(new Error('Internet connection is not available'));
     }
 
     const storeData = store.getState();
-    // Log the entire store state (optional for debugging)
-    console.log('Store Data:', storeData);
+    const token = storeData.auth?.token; // Safely access token
 
-    const token = storeData.auth.token;
+    if (request.data instanceof FormData) {
+      request.headers['Content-Type'] = 'multipart/form-data';
+    } else {
+      request.headers['Content-Type'] = 'application/json';
+    }
 
     if (token) {
+      console.log('Adding token to request headers:', token);
       request.headers['Authorization'] = `Bearer ${token}`;
     }
 
     return request;
   },
   error => {
+    console.error('Request error:', error);
     return Promise.reject(error);
   },
 );
@@ -45,13 +48,14 @@ AxiosInstance.interceptors.response.use(
     return response;
   },
   error => {
-    console.log(error,"instance error")
-    const errorObj = JSON.parse(JSON.stringify(error?.response ?? error));
+    console.error('Response error:', error);
 
-    if (errorObj.status == 401) {
-      store.dispatch(logout());
+    if (error?.response?.status === 401) {
+      console.warn('Unauthorized error, logging out...');
+      store.dispatch(logout()); // Logout the user if 401 status
     } else {
-      throw errorObj;
+      // If the error is not 401, throw it so the calling function can handle it
+      throw JSON.parse(JSON.stringify(error?.response ?? error))
     }
   },
 );

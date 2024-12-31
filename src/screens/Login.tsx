@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useRef} from 'react';
 import {
   Image,
   ImageBackground,
-  KeyboardAvoidingView,
   Platform,
   StyleSheet,
   Text,
@@ -20,15 +19,12 @@ import {LoginApi} from '../axious/PostApis';
 import {getFCMToken} from '../utils/FCM';
 import {
   ALERT_TYPE,
-  Dialog,
   AlertNotificationToast,
-  AlertNotificationDialog,
   Toast,
 } from 'react-native-alert-notification';
 import {appleAuth} from '@invertase/react-native-apple-authentication';
 import Loader from '../utils/Loader';
 import {AppLoaderRef} from '../../App';
-import axios from 'axios';
 import {useDispatch, useSelector} from 'react-redux';
 import {loginSuccess} from '../store/reducers/AuthReducer';
 import {ErrorHandler} from '../utils/ErrorHandler';
@@ -43,14 +39,13 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
     (state: any) => state.auth,
   );
 
-  console.log(token, email, isAuthenticated);
+  console.log(token, email);
+
+  console.log(token, email, isAuthenticated,"klnsdns");
 
   const handlePress = () => {};
   const handleNav = () => {
     navigation.navigate('CreateAccount'); // This will work as expected now
-  };
-  const handleLogin = () => {
-    navigation.navigate('ProfilePicture');
   };
 
   const handleForgotPassword = () => {
@@ -99,13 +94,14 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
 
       if (response?.status === 200) {
         const {data} = response;
+        console.log(response);
         Toast.show({
           type: ALERT_TYPE.SUCCESS,
           title: 'Success',
           textBody:
             'Welcome! You have successfully Logged in. Let’s get started!',
         });
-        dispatch(loginSuccess(data.payload, data.token));
+        dispatch(loginSuccess(data.payload));
       }
     } catch (error) {
       console.error('An error occurred during Google Sign-In:', error);
@@ -118,7 +114,6 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
 
   const onAppleSignIn = useCallback(async () => {
     if (buttonRef.current) {
-      console.warn('Button click blocked to prevent multiple sign-ins.');
       return;
     }
 
@@ -127,53 +122,87 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
     AppLoaderRef?.current?.start();
 
     try {
+      // Perform the Apple Sign-In request
       const appleAuthRequestResponse = await appleAuth.performRequest({
         requestedOperation: appleAuth.Operation.LOGIN,
         requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
       });
+      console.log(appleAuthRequestResponse, 'appleAuthRequestResponse');
 
+      // Get credential state for the user
       const credentialState = await appleAuth.getCredentialStateForUser(
         appleAuthRequestResponse.user,
       );
 
-      if (credentialState == appleAuth.State.AUTHORIZED) {
+      console.log(credentialState, 'credentialState');
+
+      if (credentialState === appleAuth.State.AUTHORIZED) {
+        // Create a credential for Firebase authentication
         const credential = auth.AppleAuthProvider.credential(
-          appleAuthRequestResponse.identityToken,
-          appleAuthRequestResponse.nonce,
+          appleAuthRequestResponse.identityToken ?? '',
+          appleAuthRequestResponse.nonce ?? '',
         );
 
+        console.log(credential, 'credential');
+
+        // Sign in with Firebase using the credential
         await auth().signInWithCredential(credential);
 
+        console.log('signInWithCredential');
+
+        // Fetch the Firebase ID token for authentication
         const token = await auth()?.currentUser?.getIdToken();
 
-        if (
-          appleAuthRequestResponse?.email &&
+        console.log('token');
+
+        // Get the user's email and display name (if provided)
+        const email =
+          appleAuthRequestResponse?.email || auth()?.currentUser?.email;
+        const displayName =
           appleAuthRequestResponse?.fullName?.givenName &&
           appleAuthRequestResponse?.fullName?.familyName
-        ) {
-          auth()?.currentUser?.updateProfile({
-            displayName: `${appleAuthRequestResponse.fullName.givenName} ${appleAuthRequestResponse.fullName.familyName}`,
-          });
-          auth()?.currentUser?.updateEmail(appleAuthRequestResponse.email);
+            ? `${appleAuthRequestResponse.fullName.givenName} ${appleAuthRequestResponse.fullName.familyName}`
+            : auth()?.currentUser?.displayName;
+
+        // Update Firebase user profile (optional)
+        if (appleAuthRequestResponse?.fullName?.givenName) {
+          await auth()?.currentUser?.updateProfile({displayName});
         }
 
+        // Get FCM token for push notifications
         const pushToken = await getFCMToken();
 
+        // Make API call to your Login API
         const response = await LoginApi({
-          device_type: Platform.OS,
           firebase_token: token,
+          device_type: Platform.OS,
           push_token: pushToken,
-          email: auth()?.currentUser?.email ?? '',
+          email: email ?? '',
         });
 
-        console.log(response, 'response');
+        if (response?.status === 200) {
+          const {data} = response;
+          console.log(response);
+
+          Toast.show({
+            type: ALERT_TYPE.SUCCESS,
+            title: 'Success',
+            textBody:
+              'Welcome! You have successfully Logged in. Let’s get started!',
+          });
+
+          dispatch(loginSuccess(data.payload));
+        } else {
+          console.log('error in api');
+        }
+      } else {
+        console.warn('Apple Sign-In not authorized');
       }
     } catch (error) {
-      // throw error;
-      console.log(error);
+      console.error('An error occurred during Apple Sign-In:', error);
       ErrorHandler(error);
     } finally {
-      buttonRef.current = false;
+      buttonRef.current = false; // Reset the button state
       AppLoaderRef?.current?.stop();
     }
   }, []);

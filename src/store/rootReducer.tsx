@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+import {combineReducers} from 'redux';
 // Adjust the import path
 import authReducer from './reducers/AuthReducer';
 

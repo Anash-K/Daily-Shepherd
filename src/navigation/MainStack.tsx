@@ -15,6 +15,7 @@ import Favorites from '../screens/Favorites';
 import ChangePassword from '../screens/ChangePassword';
 import {createStackNavigator} from '@react-navigation/stack';
 import NotificationPreferences from '../screens/NotificationPreferences';
+import {useSelector} from 'react-redux';
 
 export type StackParams = {
   BottomStack: undefined;
@@ -35,6 +36,7 @@ export type StackParams = {
 const Stack = createStackNavigator<StackParams>();
 
 const MainStack = () => {
+  const {name} = useSelector((state: any) => state.authReducer);
   return (
     <Stack.Navigator
       screenOptions={({navigation}) => ({
@@ -51,32 +53,35 @@ const MainStack = () => {
         headerTitleStyle: styles.title,
         headerTitleAlign: 'center',
         headerShadowVisible: true,
-      })}
-      initialRouteName="ProfilePicture">
-      <Stack.Screen
-        name="ProfilePicture"
-        component={ProfilePicture}
-        options={({navigation}) => ({
-          headerTitle: 'Profile setup',
-          headerLeft: () => (
-            <CustomButton
-              onPress={() => navigation.goBack()}
-              icon={CustomImages.backIcon}
-              iconStyle={styles.backButtonIcon}
-              buttonStyle={styles.backButton}
-            />
-          ),
-        })}
-      />
-      <Stack.Screen
-        name="NotificationPreferences"
-        component={NotificationPreferences}
-        options={({navigation}) => ({
-          headerShown: true,
-          title: 'Notifications preference',
-          headerLeft: () => '',
-        })}
-      />
+      })}>
+      {!name && (
+        <>
+          <Stack.Screen
+            name="ProfilePicture"
+            component={ProfilePicture}
+            options={({navigation}) => ({
+              headerTitle: 'Profile setup',
+              headerLeft: () => (
+                <CustomButton
+                  onPress={() => navigation.goBack()}
+                  icon={CustomImages.backIcon}
+                  iconStyle={styles.backButtonIcon}
+                  buttonStyle={styles.backButton}
+                />
+              ),
+            })}
+          />
+          <Stack.Screen
+            name="NotificationPreferences"
+            component={NotificationPreferences}
+            options={({navigation}) => ({
+              headerShown: true,
+              title: 'Notifications preference',
+              headerLeft: () => '',
+            })}
+          />
+        </>
+      )}
       <Stack.Screen
         name="BottomStack"
         component={BottomStack}

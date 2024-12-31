@@ -12,7 +12,7 @@ interface CustomToastProps {
 export const ErrorToaster = ({type, message, title}: CustomToastProps) => {
   Toast.show({
     type,
-    title: title || type.charAt(0).toUpperCase() + type.slice(1),
+    title: title,
     textBody: message,
     autoClose: true,
   });

@@ -30,9 +30,9 @@ GoogleSignin.configure({
 export const AppLoaderRef = React.createRef<Loader>();
 
 function App(): React.JSX.Element {
-  const isAuthenticated = useSelector(
-    (state: any) => state.auth.isAuthenticated,
-  );
+  const isAuthenticated = useSelector(state => !!state?.auth?.token);
+
+  console.log(isAuthenticated, 'App tokenm');
 
   useEffect(() => {
     // Manage online status with NetInfo and react-query's onlineManager

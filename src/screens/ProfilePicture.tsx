@@ -21,32 +21,49 @@ import CustomInput from '../common/CustomInput';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import ImagePicker from 'react-native-image-crop-picker';
 import PermissionModal from '../modals/PermissionModal';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {ScreenProps} from '../navigation/Stack';
 import {UpdateProfile} from '../axious/PostApis';
 import {ErrorHandler} from '../utils/ErrorHandler';
 import {ALERT_TYPE, Toast} from 'react-native-alert-notification';
+import {getFileNameFromUri, getMimeTypeFromUri} from '../utils/MimeTypePicker';
+import {AppLoaderRef} from '../../App';
+import {ErrorToaster} from '../utils/AlertNotification';
+import {updateProfile} from '../store/reducers/AuthReducer';
+import {Text} from 'react-native-paper';
+import Loader from '../utils/Loader';
+
+interface buttonRef {
+  start: () => void;
+  stop: () => void;
+}
 
 const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
   navigation,
 }) => {
   const userData = useSelector((state: any) => state.auth);
+  const nameValidation = {
+    text: userData.name ? userData.name : '',
+    error: '',
+    isValid: false,
+  };
+
   const [isModalVisible, setModalVisible] = useState(false);
   const [permissionError, setPermissionError] = useState('');
-  const [name, setName] = useState('test');
+  const [name, setName] = useState(nameValidation);
   const [email, setEmail] = useState(userData.email);
-  const buttonRef = useRef<boolean>(false);
+  const buttonRef = React.createRef<buttonRef>();
+  const dispatch = useDispatch();
 
   const toggleModal = useCallback(() => {
     setModalVisible(prev => !prev);
   }, []);
 
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(
+    userData.profile ? userData.profile : null,
+  );
   const [isPermissionModalVisible, setPermissionModalVisible] = useState(false);
-
-  useEffect(() => {
-    console.log(profileImage, 'profileImage');
-  }, [profileImage]);
+  const lastSubmittedImageRef = useRef<string | null>(null);
 
   const handleConfirm = () => {};
 
@@ -84,14 +101,6 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
     checkAndRequestPermission();
   }, [checkAndRequestPermission]);
 
-  const options = {
-    mediaType: 'photo',
-    maxWidth: '100%',
-    maxHeight: '100%',
-    quality: 1,
-    includeBase64: true,
-  };
-
   const handleGalleryModal = useCallback(() => {
     setModalVisible(false);
     InteractionManager.runAfterInteractions(() => {
@@ -124,6 +133,8 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
 
       // Process the image if the path exists
       if (response.path) {
+        getMimeTypeFromUri(response.path);
+
         setProfileImage(response.path);
       }
     } catch (error) {
@@ -151,7 +162,31 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
     }
   }, []);
 
-  const handleChangeName = useCallback(() => {}, []);
+  const handleChangeName = useCallback(
+    (value: string) => {
+      if (!value || value.trim() === '') {
+        setName({
+          text: '',
+          error: 'Name cannot be empty',
+          isValid: false,
+        });
+      } else if (value.length < 3) {
+        setName({
+          text: value,
+          error: 'Name must be at least 3 characters',
+          isValid: false,
+        });
+      } else {
+        setName({
+          text: value,
+          error: '',
+          isValid: true,
+        });
+      }
+    },
+    [name],
+  );
+
   const handleChangeEmail = useCallback(() => {}, []);
 
   const togglePermissionModal = useCallback(() => {
@@ -160,50 +195,78 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
 
   const insets = useSafeAreaInsets();
 
+  console.log(buttonRef.current, 'normalRef');
+
   const handleSubmit = useCallback(async () => {
-    if (buttonRef.current) {
+    if (buttonRef.current?.start()) {
       return;
     }
-    buttonRef.current = true;
-  
-    const data = { name: name, profile: profileImage };
-  
-    console.log(data, "request info data");
-  
+
+    buttonRef.current?.start();
+
+    AppLoaderRef.current?.start();
+
+    let ImageType = '';
+    let ImageName = '';
+
+    if (profileImage) {
+      ImageType = getMimeTypeFromUri(profileImage);
+      ImageName = getFileNameFromUri(profileImage);
+
+      if (lastSubmittedImageRef.current === profileImage) {
+        buttonRef.current?.stop();
+        AppLoaderRef.current?.stop();
+        return;
+      }
+    }
+
+    const data = {
+      name: name.text,
+      profile: {
+        uri: profileImage,
+        type: ImageType,
+        name: ImageName,
+      },
+    };
+
+    console.log(data, 'req');
+
     try {
       const response = await UpdateProfile(data);
-      console.log(response, 'API response');
-  
+
       // Check if response is valid and status is success
-      if (response && response.status === 200) {
-        Toast.show({
+      if (response && response?.status === 200) {
+        lastSubmittedImageRef.current = profileImage;
+        dispatch(updateProfile(response?.data?.payload));
+        ErrorToaster({
           type: ALERT_TYPE.SUCCESS,
           title: 'Success',
-          textBody: 'Profile Updated Successfully!',
+          message: 'Profile Updated Successfully!',
         });
+        setTimeout(() => {
+          handleNextNav();
+        }, 2000);
       } else {
         // Handle unexpected response status
-        Toast.show({
+        ErrorToaster({
           type: ALERT_TYPE.DANGER,
           title: 'Error',
-          textBody: 'Something went wrong, please try again.',
+          message: 'Something went wrong, please try again.',
         });
       }
     } catch (error) {
-      console.error('Error:', error);
-      // Call your custom error handler function
       ErrorHandler(error);
     } finally {
-      // Reset buttonRef to allow submitting again
-      buttonRef.current = false;
+      buttonRef.current?.stop();
+      AppLoaderRef.current?.stop();
     }
-  }, [name, profileImage]); // Ensure dependencies are correct
-  
+  }, [name, profileImage]);
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
         style={{flex: 1}}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}>
         <ScrollView
           contentContainerStyle={{flexGrow: 1}}
           style={[
@@ -211,7 +274,7 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
             {
               paddingBottom: Platform.select({
                 ios: insets.bottom + 10,
-                android: 35,
+                android: 25,
               }),
             },
           ]}>
@@ -233,11 +296,25 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
                 />
               </View>
             </Pressable>
-            <CustomInput
-              label="Name"
-              onChange={value => setName(value)}
-              inputConfigurations={{value: name}}
-            />
+            <View>
+              <CustomInput
+                label="Name"
+                onChange={handleChangeName}
+                inputConfigurations={{value: name.text}}
+              />
+              {name.error && (
+                <Text
+                  style={{
+                    color: 'red',
+                    fontSize: 10,
+                    position: 'absolute',
+                    bottom: 5,
+                  }}>
+                  {name.error}
+                </Text>
+              )}
+            </View>
+
             <CustomInput
               label="Email"
               onChange={handleChangeEmail}
@@ -246,7 +323,11 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
             />
           </View>
 
-          <CustomButton text="Continue" onPress={handleSubmit} />
+          <CustomButton
+            text="Continue"
+            onPress={handleSubmit}
+            buttonStyle={{marginBottom: 10}}
+          />
 
           {/* Modal for photo selection */}
           <PermissionModal
@@ -260,7 +341,7 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
               animationType="slide"
               transparent={true}
               onRequestClose={toggleModal}>
-              <View style={styles.modalOverlay}>
+              <Pressable style={styles.modalOverlay} onPress={toggleModal}>
                 <View style={styles.modalContent}>
                   <TouchableOpacity
                     onPress={() => {
@@ -294,7 +375,8 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
                     />
                   </View>
                 </View>
-              </View>
+              </Pressable>
+              <Loader ref={AppLoaderRef} />
             </Modal>
           ) : (
             <></>

@@ -20,25 +20,31 @@ export const LogoutApi = async () => {
 };
 
 export const UpdateProfile = async (data: any) => {
-  console.log(data, 'request data');
   try {
-    // Create FormData
     const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('profile', {
-      uri: data.profile.uri, // Local file path or URI
-      type: data.profile.type, // MIME type (e.g., 'image/jpeg')
-      name: data.profile.name, // File name
-    } as unknown as Blob); // Cast to Blob for compatibility in some environments
 
-    console.log(formData, 'request formData');
+    formData.append('name', data?.name?.text);
+    formData.append('_method', 'patch');
 
-    // Send PATCH request with FormData
-    const response = await AxiosInstance.patch('update-profile', data);
+    if (
+      data.profile &&
+      data.profile.uri &&
+      data.profile.type &&
+      data.profile.name
+    ) {
+      formData.append('profile', {
+        uri: data.profile.uri,
+        type: data.profile.type,
+        name: data.profile.name,
+      });
+    } else {
+      formData.append('profile', null); // Optional field
+    }
+
+    const response = await AxiosInstance.post('update-profile', formData);
 
     return response;
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
     throw error;
   }
 };

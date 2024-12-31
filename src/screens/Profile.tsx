@@ -19,6 +19,9 @@ import {
   Toast,
 } from 'react-native-alert-notification';
 import {AppLoaderRef} from '../../App';
+import {ErrorToaster} from '../utils/AlertNotification';
+import {DeleteAccount} from '../axious/DeleteApi';
+import {ErrorHandler} from '../utils/ErrorHandler';
 
 interface Mode {
   LightTheme: boolean;
@@ -102,10 +105,10 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
   }, []);
 
   const handleSuccessNotification = () => {
-    Toast.show({
+    ErrorToaster({
       type: ALERT_TYPE.SUCCESS,
       title: 'Success',
-      textBody: 'Logged out Successfully',
+      message: 'Logged out Successfully',
     });
   };
 
@@ -118,8 +121,6 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
     AppLoaderRef.current?.start();
     try {
       const response = await LogoutApi();
-
-      console.log(response.data);
 
       if (response.status === 200) {
         handleSuccessNotification();
@@ -136,7 +137,37 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
     }
   }, [dispatch]);
 
-  const handleDelete = useCallback(() => {}, []);
+  const handleDelete = useCallback(async () => {
+    try {
+      AppLoaderRef.current?.start();
+
+      const response = await DeleteAccount();
+
+      if (response?.status === 200) {
+        ErrorToaster({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          message: 'Account Deleted Successfully',
+        });
+
+        setTimeout(() => {
+          dispatch(logout());
+        }, 2000);
+      } else {
+        // Handle unexpected response status
+        ErrorToaster({
+          type: ALERT_TYPE.DANGER,
+          title: 'Error',
+          message: 'Failed to delete account. Please try again.',
+        });
+      }
+    } catch (error) {
+      console.error('Error during delete account:', error);
+      ErrorHandler(error);
+    } finally {
+      AppLoaderRef.current?.stop();
+    }
+  }, [dispatch]);
 
   return (
     <ScrollView style={styles.container}>
