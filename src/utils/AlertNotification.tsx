@@ -9,7 +9,7 @@ interface CustomToastProps {
   title?: string;
 }
 
-export const ErrorToaster = ({type, message, title}: CustomToastProps) => {
+export const CustomToaster = ({type, message, title}: CustomToastProps) => {
   Toast.show({
     type,
     title: title,

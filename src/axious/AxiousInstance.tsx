@@ -31,14 +31,12 @@ AxiosInstance.interceptors.request.use(
     }
 
     if (token) {
-      console.log('Adding token to request headers:', token);
       request.headers['Authorization'] = `Bearer ${token}`;
     }
 
     return request;
   },
   error => {
-    console.error('Request error:', error);
     return Promise.reject(error);
   },
 );
@@ -48,10 +46,8 @@ AxiosInstance.interceptors.response.use(
     return response;
   },
   error => {
-    console.error('Response error:', error);
 
     if (error?.response?.status === 401) {
-      console.warn('Unauthorized error, logging out...');
       store.dispatch(logout()); // Logout the user if 401 status
     } else {
       // If the error is not 401, throw it so the calling function can handle it

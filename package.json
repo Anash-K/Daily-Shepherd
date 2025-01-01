@@ -7,7 +7,8 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "postinstall": "patch-package && pod-install"
   },
   "dependencies": {
     "@invertase/react-native-apple-authentication": "^2.4.0",
@@ -26,16 +27,17 @@
     "axios": "^1.7.9",
     "babel-plugin-optional-require": "^0.3.1",
     "framer-motion": "^11.13.5",
+    "patch-package": "^8.0.0",
     "react": "18.3.1",
     "react-modal-sheet": "^3.3.0",
     "react-native": "0.76.3",
     "react-native-alert-notification": "^0.4.2",
     "react-native-bootsplash": "^6.3.2",
+    "react-native-fast-image": "^8.6.3",
     "react-native-floating-label-input": "^1.4.3",
     "react-native-gesture-handler": "^2.21.2",
     "react-native-image-crop-picker": "^0.41.6",
     "react-native-image-picker": "^7.2.3",
-    "react-native-loader-kit": "^2.0.8",
     "react-native-material-menu": "^2.0.0",
     "react-native-modal": "^13.0.1",
     "react-native-paper": "^5.12.5",

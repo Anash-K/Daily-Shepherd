@@ -5,6 +5,7 @@ const initialState = {
   email: null, // Store email
   name: '', // Store name
   profile: null, // Store profile
+  oldUser: false,
 };
 
 const authSlice = createSlice({
@@ -13,7 +14,6 @@ const authSlice = createSlice({
   reducers: {
     loginSuccess: (state, action) => {
       const {token, email, name, profile} = action.payload;
-      console.log(action.payload, 'payload');
       state.token = token;
       state.email = email;
       state.name = name;
@@ -27,12 +27,14 @@ const authSlice = createSlice({
     },
     updateProfile: (state, action) => {
       const {name, profile} = action.payload;
-      console.log(action.payload);
       state.name = name;
       state.profile = profile;
+    },
+    updateIsOldUser: (state, action) => {
+      state.oldUser = action.payload;
     },
   },
 });
 
-export const {loginSuccess, logout, updateProfile} = authSlice.actions;
+export const {loginSuccess, logout, updateProfile ,updateIsOldUser} = authSlice.actions;
 export default authSlice.reducer;

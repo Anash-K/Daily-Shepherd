@@ -1,7 +1,6 @@
 import AxiosInstance from './AxiousInstance';
 
 export const LoginApi = async (data: any) => {
-  console.log(data, 'data');
   try {
     const response = await AxiosInstance.post('login', data);
     return response;
@@ -23,7 +22,7 @@ export const UpdateProfile = async (data: any) => {
   try {
     const formData = new FormData();
 
-    formData.append('name', data?.name?.text);
+    formData.append('name', data?.name);
     formData.append('_method', 'patch');
 
     if (

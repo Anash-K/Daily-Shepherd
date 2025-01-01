@@ -61,7 +61,7 @@ export const Data = [
 
 const Podcast: React.FC<ScreenProps<'Podcast'>> = ({navigation}) => {
   const handleDetails = (id: any) => {
-    console.log(id);
+    
     navigation.navigate('PodCastDetails',{
       DataId:id
     });

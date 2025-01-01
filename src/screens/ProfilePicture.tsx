@@ -1,4 +1,10 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   Image,
   InteractionManager,
@@ -28,15 +34,11 @@ import {ErrorHandler} from '../utils/ErrorHandler';
 import {ALERT_TYPE, Toast} from 'react-native-alert-notification';
 import {getFileNameFromUri, getMimeTypeFromUri} from '../utils/MimeTypePicker';
 import {AppLoaderRef} from '../../App';
-import {ErrorToaster} from '../utils/AlertNotification';
+import {CustomToaster} from '../utils/AlertNotification';
 import {updateProfile} from '../store/reducers/AuthReducer';
 import {Text} from 'react-native-paper';
 import Loader from '../utils/Loader';
-
-interface buttonRef {
-  start: () => void;
-  stop: () => void;
-}
+import CustomImageHandler from '../utils/CustomImageHandler';
 
 const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
   navigation,
@@ -52,7 +54,7 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
   const [permissionError, setPermissionError] = useState('');
   const [name, setName] = useState(nameValidation);
   const [email, setEmail] = useState(userData.email);
-  const buttonRef = React.createRef<buttonRef>();
+  const buttonRef = useRef<boolean>(false);
   const dispatch = useDispatch();
 
   const toggleModal = useCallback(() => {
@@ -62,6 +64,7 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
   const [profileImage, setProfileImage] = useState<string | null>(
     userData.profile ? userData.profile : null,
   );
+
   const [isPermissionModalVisible, setPermissionModalVisible] = useState(false);
   const lastSubmittedImageRef = useRef<string | null>(null);
 
@@ -121,6 +124,7 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
 
   const handleCamera = useCallback(async (isClose?: Boolean) => {
     checkAndRequestPermission();
+
     try {
       let response = await ImagePicker.openCamera({
         mediaType: 'photo',
@@ -139,6 +143,8 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
       }
     } catch (error) {
       console.error('Camera error:', error);
+    } finally {
+      AppLoaderRef.current?.stop();
     }
   }, []);
 
@@ -159,6 +165,8 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
       }
     } catch (error) {
       console.error('Gallery error:', error);
+    } finally {
+      AppLoaderRef.current?.stop();
     }
   }, []);
 
@@ -195,14 +203,19 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
 
   const insets = useSafeAreaInsets();
 
-  console.log(buttonRef.current, 'normalRef');
-
   const handleSubmit = useCallback(async () => {
-    if (buttonRef.current?.start()) {
+   
+    if (buttonRef?.current) {
       return;
     }
 
-    buttonRef.current?.start();
+    if (!name.text) {
+      return;
+    }
+  
+    buttonRef.current = true;
+
+   
 
     AppLoaderRef.current?.start();
 
@@ -214,11 +227,13 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
       ImageName = getFileNameFromUri(profileImage);
 
       if (lastSubmittedImageRef.current === profileImage) {
-        buttonRef.current?.stop();
+        buttonRef.current = false;
         AppLoaderRef.current?.stop();
         return;
       }
     }
+
+   
 
     const data = {
       name: name.text,
@@ -228,9 +243,7 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
         name: ImageName,
       },
     };
-
-    console.log(data, 'req');
-
+  
     try {
       const response = await UpdateProfile(data);
 
@@ -238,7 +251,7 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
       if (response && response?.status === 200) {
         lastSubmittedImageRef.current = profileImage;
         dispatch(updateProfile(response?.data?.payload));
-        ErrorToaster({
+        CustomToaster({
           type: ALERT_TYPE.SUCCESS,
           title: 'Success',
           message: 'Profile Updated Successfully!',
@@ -248,7 +261,7 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
         }, 2000);
       } else {
         // Handle unexpected response status
-        ErrorToaster({
+        CustomToaster({
           type: ALERT_TYPE.DANGER,
           title: 'Error',
           message: 'Something went wrong, please try again.',
@@ -257,10 +270,12 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
     } catch (error) {
       ErrorHandler(error);
     } finally {
-      buttonRef.current?.stop();
+      buttonRef.current = false;
       AppLoaderRef.current?.stop();
     }
   }, [name, profileImage]);
+
+
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -278,15 +293,15 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
               }),
             },
           ]}>
+          
           <View style={{flexGrow: 1}}>
             <Pressable style={styles.imageBox} onPress={toggleModal}>
-              <Image
-                source={
-                  profileImage ? {uri: profileImage} : CustomImages.profilePic
-                }
-                style={[styles.profilePicture]}
-                resizeMode="cover"
+              <CustomImageHandler
+                sourceImage={profileImage}
+                placeholderImage={CustomImages.profilePic}
+                imageStyle={styles.profilePicture}
               />
+
               <View style={styles.ActionIconBox}>
                 <Image
                   source={
@@ -367,16 +382,12 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
                       text="Use Camera"
                       onPress={handleCameraModal}
                       textStyle={styles.menuItemText}
-                      buttonStyle={[
-                        styles.menuItemStyle,
-                        {borderBottomWidth: 0},
-                      ]}
+                      buttonStyle={styles.menuItemStyleBottom}
                       icon={CustomImages.cameraIcon}
                     />
                   </View>
                 </View>
               </Pressable>
-              <Loader ref={AppLoaderRef} />
             </Modal>
           ) : (
             <></>
@@ -456,6 +467,15 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(29, 30, 35, 1)',
     backgroundColor: 'transparent',
     borderBottomWidth: 1.5,
+    marginHorizontal: 0,
+    justifyContent: 'flex-start',
+    borderRadius: 0,
+  },
+  menuItemStyleBottom: {
+    borderBottomWidth: 0,
+    paddingVertical: 17,
+    borderBottomColor: 'rgba(29, 30, 35, 1)',
+    backgroundColor: 'transparent',
     marginHorizontal: 0,
     justifyContent: 'flex-start',
     borderRadius: 0,

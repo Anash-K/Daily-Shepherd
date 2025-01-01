@@ -10,8 +10,10 @@ import {QueryClient, QueryClientProvider, onlineManager} from 'react-query';
 import {OnlineManager} from 'react-query/types/core/onlineManager';
 import NetInfo, {NetInfoSubscription} from '@react-native-community/netinfo';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {Loader} from './src/types/CommonTypes';
+import {Loader as LoaderType} from './src/types/CommonTypes';
 import {AlertNotificationRoot} from 'react-native-alert-notification';
+import RootScreen from './src/navigation/RootScreen';
+import Loader from './src/utils/Loader';
 
 const Stack = createStackNavigator();
 
@@ -25,14 +27,13 @@ GoogleSignin.configure({
   forceCodeForRefreshToken: true,
 });
 
-// console.error = () => {};
+console.error = () => {};
 
-export const AppLoaderRef = React.createRef<Loader>();
+export const AppLoaderRef = React.createRef<LoaderType>();
 
 function App(): React.JSX.Element {
-  const isAuthenticated = useSelector(state => !!state?.auth?.token);
+  const isAuthenticated = useSelector((state:any) => !!state?.auth?.token);
 
-  console.log(isAuthenticated, 'App tokenm');
 
   useEffect(() => {
     // Manage online status with NetInfo and react-query's onlineManager
@@ -57,7 +58,9 @@ function App(): React.JSX.Element {
     }, 3000);
   }, []);
 
+
   return (
+    <>
     <View style={styles.container}>
       <AlertNotificationRoot
         theme="dark"
@@ -86,18 +89,12 @@ function App(): React.JSX.Element {
             barStyle="light-content"
             backgroundColor="rgba(24, 23, 28, 1)"
           />
-          <NavigationContainer>
-            <Stack.Navigator screenOptions={{headerShown: false}}>
-              {isAuthenticated ? (
-                <Stack.Screen name="MainStack" component={MainStack} />
-              ) : (
-                <Stack.Screen name="AuthStack" component={AuthStack} />
-              )}
-            </Stack.Navigator>
-          </NavigationContainer>
+          <RootScreen/>
+    <Loader ref={AppLoaderRef} />
         </QueryClientProvider>
       </AlertNotificationRoot>
     </View>
+    </>
   );
 }
 

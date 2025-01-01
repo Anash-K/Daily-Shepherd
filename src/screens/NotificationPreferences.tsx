@@ -12,7 +12,7 @@ import CustomImages from '../assets/customImages';
 import ToggleSwitch from 'toggle-switch-react-native';
 import CustomButton from '../common/CustomButton';
 import {useDispatch} from 'react-redux';
-import {loginSuccess} from '../store/reducers/AuthReducer';
+import {loginSuccess, updateIsOldUser} from '../store/reducers/AuthReducer';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {StackParams} from '../navigation/MainStack';
 import {ScreenProps} from '../navigation/Stack';
@@ -27,6 +27,8 @@ const NotificationPreferences: React.FC<
     toggle3: false,
   });
 
+  const dispatch = useDispatch();
+
   // Handler to update the state for a specific toggle
   const toggleSwitch = (key: string): void => {
     setToggleStates(prevState => ({
@@ -36,6 +38,7 @@ const NotificationPreferences: React.FC<
   };
 
   const handlePress = () => {
+    dispatch(updateIsOldUser(true));
     navigation.navigate('BottomStack');
   };
 

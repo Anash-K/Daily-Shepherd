@@ -36,7 +36,9 @@ export type StackParams = {
 const Stack = createStackNavigator<StackParams>();
 
 const MainStack = () => {
-  const {name} = useSelector((state: any) => state.authReducer);
+  const {oldUser} = useSelector((state: any) => state.auth);
+
+
   return (
     <Stack.Navigator
       screenOptions={({navigation}) => ({
@@ -54,7 +56,7 @@ const MainStack = () => {
         headerTitleAlign: 'center',
         headerShadowVisible: true,
       })}>
-      {!name && (
+      {!oldUser ? (
         <>
           <Stack.Screen
             name="ProfilePicture"
@@ -81,6 +83,8 @@ const MainStack = () => {
             })}
           />
         </>
+      ) : (
+        <></>
       )}
       <Stack.Screen
         name="BottomStack"

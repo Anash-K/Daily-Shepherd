@@ -26,8 +26,9 @@ import {appleAuth} from '@invertase/react-native-apple-authentication';
 import Loader from '../utils/Loader';
 import {AppLoaderRef} from '../../App';
 import {useDispatch, useSelector} from 'react-redux';
-import {loginSuccess} from '../store/reducers/AuthReducer';
+import {loginSuccess, updateIsOldUser} from '../store/reducers/AuthReducer';
 import {ErrorHandler} from '../utils/ErrorHandler';
+import {CustomToaster} from '../utils/AlertNotification';
 
 const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
   const {top, bottom} = useSafeAreaInsets();
@@ -41,7 +42,7 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
 
   console.log(token, email);
 
-  console.log(token, email, isAuthenticated,"klnsdns");
+  console.log(token, email, isAuthenticated, 'klnsdns');
 
   const handlePress = () => {};
   const handleNav = () => {
@@ -66,13 +67,24 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
       await GoogleSignin.signOut();
 
       // Check if Google Play Services are available
-      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
-
+      if (Platform.OS === 'android') {
+        await GoogleSignin.hasPlayServices({
+          showPlayServicesUpdateDialog: true,
+        });
+      }
       // Proceed to sign in
       const userInfo = await GoogleSignin.signIn();
 
+      if (!userInfo) {
+        throw new Error('User info is missing');
+      }
+
       // Get tokens for authentication
       const {idToken, accessToken} = await GoogleSignin.getTokens();
+
+      if (!idToken || !accessToken) {
+        throw new Error('Failed to get tokens');
+      }
 
       const credential = auth.GoogleAuthProvider.credential(
         idToken,
@@ -81,6 +93,10 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
       await auth().signInWithCredential(credential);
 
       const token = await auth()?.currentUser?.getIdToken();
+
+      if (!token) {
+        throw new Error('Failed to retrieve Firebase ID token');
+      }
 
       // Get FCM token
       const pushToken = await getFCMToken();
@@ -95,12 +111,18 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
       if (response?.status === 200) {
         const {data} = response;
         console.log(response);
-        Toast.show({
+        CustomToaster({
           type: ALERT_TYPE.SUCCESS,
           title: 'Success',
-          textBody:
+          message:
             'Welcome! You have successfully Logged in. Let’s get started!',
         });
+        if (data?.payload?.name) {
+          dispatch(updateIsOldUser(true));
+        } else {
+          dispatch(updateIsOldUser(false));
+        }
+
         dispatch(loginSuccess(data.payload));
       }
     } catch (error) {
@@ -114,6 +136,10 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
 
   const onAppleSignIn = useCallback(async () => {
     if (buttonRef.current) {
+      return;
+    }
+
+    if (Platform.OS !== 'ios') {
       return;
     }
 
@@ -184,12 +210,20 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
           const {data} = response;
           console.log(response);
 
-          Toast.show({
+          CustomToaster({
             type: ALERT_TYPE.SUCCESS,
             title: 'Success',
-            textBody:
+            message:
               'Welcome! You have successfully Logged in. Let’s get started!',
           });
+
+          console.log(data?.payload?.name, 'name');
+
+          if (data?.payload?.name) {
+            dispatch(updateIsOldUser(true));
+          } else {
+            dispatch(updateIsOldUser(false));
+          }
 
           dispatch(loginSuccess(data.payload));
         } else {
@@ -214,7 +248,7 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
         styles.container,
         {paddingBottom: Platform.select({ios: bottom, android: 20})},
       ]}>
-      <Loader ref={AppLoaderRef} />
+      {/* <Loader ref={AppLoaderRef} /> */}
 
       <View style={{flex: 1}}>
         <ImageBackground

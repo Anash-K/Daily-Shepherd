@@ -10,12 +10,11 @@ import App from './App'; // Adjust the import paths as necessary
 import {name as appName} from './app.json';
 import {Provider as PaperProvider} from 'react-native-paper';
 import store, { persistor } from './src/store/configureStore';
-import Loader from './src/utils/Loader';
 
 
 const Main = () => (
   <Provider store={store}>
-    <PersistGate loading={<Loader/>} persistor={persistor}>
+    <PersistGate  persistor={persistor}>
       <PaperProvider>
         <App />
       </PaperProvider>

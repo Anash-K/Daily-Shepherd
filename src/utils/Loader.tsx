@@ -1,5 +1,5 @@
 import React, {forwardRef, memo, useImperativeHandle, useState} from 'react';
-import {Modal, View, StyleSheet} from 'react-native';
+import {Modal, View, StyleSheet, ActivityIndicator} from 'react-native';
 import LoaderKit from 'react-native-loader-kit';
 import {Loader as LoaderType} from '../types/CommonTypes';
 
@@ -16,8 +16,6 @@ const Loader = memo(
       },
     }));
 
-    if (!isLoader) return null;
-
     return (
       <Modal
         transparent={true}
@@ -25,9 +23,9 @@ const Loader = memo(
         visible={isLoader}
         onRequestClose={() => setIsLoader(false)}>
         <View style={styles.overlay}>
-          <LoaderKit
+          <ActivityIndicator
             style={styles.loader}
-            name="BallSpinFadeLoader"
+            size={80}
             color="rgba(32, 201, 151, 1)"
           />
         </View>
@@ -44,8 +42,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   loader: {
-    width: 70,
-    height: 70, 
+    width: 250,
+    height: 250,
+    color: 'rgba(32, 201, 151, 1)',
   },
 });
 

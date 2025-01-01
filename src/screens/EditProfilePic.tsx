@@ -1,44 +1,71 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
-  Button,
   Image,
   InteractionManager,
   Modal,
   Platform,
+  Pressable,
+  ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import CustomFont from '../assets/customFonts';
 import CustomImages from '../assets/customImages';
 import CustomButton from '../common/CustomButton';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import CustomInput from '../common/CustomInput';
-import {ScreenProps} from '../navigation/Stack';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import ImagePicker from 'react-native-image-crop-picker';
 import PermissionModal from '../modals/PermissionModal';
+import {useDispatch, useSelector} from 'react-redux';
+import {ScreenProps} from '../navigation/Stack';
+import {UpdateProfile} from '../axious/PostApis';
+import {ErrorHandler} from '../utils/ErrorHandler';
+import {ALERT_TYPE, Toast} from 'react-native-alert-notification';
+import {getFileNameFromUri, getMimeTypeFromUri} from '../utils/MimeTypePicker';
+import {AppLoaderRef} from '../../App';
+import {CustomToaster} from '../utils/AlertNotification';
+import {updateProfile} from '../store/reducers/AuthReducer';
+import {Text} from 'react-native-paper';
+import Loader from '../utils/Loader';
+import CustomImageHandler from '../utils/CustomImageHandler';
+
+interface buttonRef {
+  start: () => void;
+  stop: () => void;
+}
 
 const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
   navigation,
 }) => {
+  const userData = useSelector((state: any) => state.auth);
+
+  const nameValidation = {
+    text: userData.name ? userData.name : '',
+    error: '',
+    isValid: false,
+  };
+
   const [isModalVisible, setModalVisible] = useState(false);
-  const [name, setName] = useState('Christopher Bell');
-  const [email, setEmail] = useState('christbell@gmail.com');
   const [permissionError, setPermissionError] = useState('');
+  const [name, setName] = useState(nameValidation);
+  const [email, setEmail] = useState(userData.email);
+  const buttonRef = React.createRef<buttonRef>();
+  const dispatch = useDispatch();
 
   const toggleModal = useCallback(() => {
     setModalVisible(prev => !prev);
   }, []);
 
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(
+    userData.profile ? userData.profile : null,
+  );
   const [isPermissionModalVisible, setPermissionModalVisible] = useState(false);
-
-  const handleConfirm = () => {
-    navigation.goBack();
-  };
+  const lastSubmittedImageRef = useRef<string | null>(null);
 
   // Request and check for camera permission when the component mounts
   const checkAndRequestPermission = useCallback(async () => {
@@ -49,7 +76,7 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
 
     try {
       const status = await check(cameraPermission);
-      console.log(status);
+
       if (status === RESULTS.GRANTED) {
         return;
       }
@@ -58,7 +85,7 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
         if (requestStatus !== RESULTS.GRANTED) {
         }
       } else if (status === RESULTS.BLOCKED) {
-        setPermissionError('Permission Needed to Access Features');
+        setPermissionError('Permission Needed to Access Camera');
         setPermissionModalVisible(true);
       }
     } catch (error) {
@@ -69,14 +96,6 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
   useEffect(() => {
     checkAndRequestPermission();
   }, [checkAndRequestPermission]);
-
-  const options = {
-    mediaType: 'photo',
-    maxWidth: '100%',
-    maxHeight: '100%',
-    quality: 1,
-    includeBase64: true,
-  };
 
   const handleGalleryModal = useCallback(() => {
     setModalVisible(false);
@@ -99,8 +118,6 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
   const handleCamera = useCallback(async (isClose?: Boolean) => {
     checkAndRequestPermission();
     try {
-      console.log('IOS Camera');
-
       let response = await ImagePicker.openCamera({
         mediaType: 'photo',
         maxWidth: 300,
@@ -112,6 +129,8 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
 
       // Process the image if the path exists
       if (response.path) {
+        getMimeTypeFromUri(response.path);
+
         setProfileImage(response.path);
       }
     } catch (error) {
@@ -121,7 +140,6 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
 
   const handleGallery = useCallback(async (isClose?: Boolean) => {
     checkAndRequestPermission();
-
     try {
       let response = await ImagePicker.openPicker({
         mediaType: 'photo',
@@ -140,7 +158,33 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
     }
   }, []);
 
-  const handleChange = useCallback(() => {}, []);
+
+  const handleChangeName = useCallback(
+    (value: string) => {
+      if (!value || value.trim() === '') {
+        setName({
+          text: '',
+          error: 'Name cannot be empty',
+          isValid: false,
+        });
+      } else if (value.length < 3) {
+        setName({
+          text: value,
+          error: 'Name must be at least 3 characters',
+          isValid: false,
+        });
+      } else {
+        setName({
+          text: value,
+          error: '',
+          isValid: true,
+        });
+      }
+    },
+    [name],
+  );
+
+  const handleChangeEmail = useCallback(() => {}, []);
 
   const togglePermissionModal = useCallback(() => {
     setPermissionModalVisible(prevState => !prevState);
@@ -148,99 +192,200 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
 
   const insets = useSafeAreaInsets();
 
+
+
+  const handleBackNav = useCallback(() => {
+    setTimeout(() => {
+      navigation.goBack();
+    }, 2000);
+  }, []);
+
+  const handleSubmit = useCallback(async () => {
+    if (buttonRef.current?.start()) {
+      return;
+    }
+
+    buttonRef.current?.start();
+
+    AppLoaderRef.current?.start();
+
+    let ImageType = '';
+    let ImageName = '';
+
+    if (profileImage) {
+      ImageType = getMimeTypeFromUri(profileImage);
+      ImageName = getFileNameFromUri(profileImage);
+
+      if (lastSubmittedImageRef.current === profileImage) {
+        buttonRef.current?.stop();
+        AppLoaderRef.current?.stop();
+        return;
+      }
+    }
+
+    const data = {
+      name: name.text,
+      profile: {
+        uri: profileImage,
+        type: ImageType,
+        name: ImageName,
+      },
+    };
+
+    try {
+      const response = await UpdateProfile(data);
+
+      // Check if response is valid and status is success
+      if (response && response?.status === 200) {
+        lastSubmittedImageRef.current = profileImage;
+        dispatch(updateProfile(response?.data?.payload));
+        CustomToaster({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          message: 'Profile Updated Successfully!',
+        });
+        handleBackNav();
+      } else {
+        // Handle unexpected response status
+        CustomToaster({
+          type: ALERT_TYPE.DANGER,
+          title: 'Error',
+          message: 'Something went wrong, please try again.',
+        });
+      }
+    } catch (error) {
+      ErrorHandler(error);
+    } finally {
+      buttonRef.current?.stop();
+      AppLoaderRef.current?.stop();
+    }
+  }, [name, profileImage]);
+
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          marginBottom: Platform.select({
-            ios: insets.bottom,
-            android: insets.bottom + 30,
-          }),
-        },
-      ]}>
-      <View style={{flexGrow: 1}}>
-        <TouchableOpacity style={styles.imageBox} onPress={toggleModal}>
-          <Image
-            source={
-              profileImage ? {uri: profileImage} : CustomImages.profilePict
-            }
-            style={[styles.profilePicture]}
-            resizeMode="cover"
-          />
-          <View style={styles.ActionIconBox}>
-            <Image
-              source={
-                // profileImage ? CustomImages.editIcon : CustomImages.addIcon
-                CustomImages.editIcon
-              }
-              tintColor={'rgba(24, 23, 28, 1)'}
-              style={styles.picAction}
-            />
-          </View>
-        </TouchableOpacity>
-        <CustomInput
-          label="Name"
-          onChange={value => setName(value)}
-          inputConfigurations={{value: name}}
-        />
-        <CustomInput
-          label="Email"
-          onChange={value => setEmail(value)}
-          inputConfigurations={{value: email, editable: false}}
-          isDisabled={true}
-        />
-      </View>
-
-      <CustomButton text="Update profile" onPress={handleConfirm} />
-
-      {/* Modal for photo selection */}
-      <PermissionModal
-        isModalVisible={isPermissionModalVisible}
-        toggleModal={togglePermissionModal}
-        contentText={permissionError}
-      />
-      {isModalVisible && (
-        <Modal
-          visible={isModalVisible}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={toggleModal}>
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <TouchableOpacity
-                onPress={() => {
-                  toggleModal();
-                }}
-                style={styles.closeButton}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        style={{flex: 1}}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}>
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1}}
+          style={[
+            styles.container,
+            {
+              paddingBottom: Platform.select({
+                ios: insets.bottom + 10,
+                android: 25,
+              }),
+            },
+          ]}>
+      
+          <View style={{flexGrow: 1}}>
+            
+            <Pressable style={styles.imageBox} onPress={toggleModal}>
+              <CustomImageHandler
+                sourceImage={profileImage}
+                placeholderImage={CustomImages.profilePic}
+                imageStyle={styles.profilePicture}
+              />
+              {/* <Image
+                source={
+                  profileImage ? {uri: profileImage} : CustomImages.profilePic
+                }
+                style={[styles.profilePicture]}
+                resizeMode="cover"
+              /> */}
+              <View style={styles.ActionIconBox}>
                 <Image
-                  source={CustomImages.closeIcon}
-                  style={styles.closeIcon}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-              <View style={{backgroundColor: '#18171C', borderRadius: 15}}>
-                <CustomButton
-                  text="Choose from Gallery"
-                  onPress={handleGalleryModal}
-                  textStyle={styles.menuItemText}
-                  buttonStyle={styles.menuItemStyle}
-                  icon={CustomImages.photoGallery}
-                  iconStyle={{backgroundColor: '#3a393d', borderRadius: 4}}
-                />
-                <CustomButton
-                  text="Use Camera"
-                  onPress={handleCameraModal}
-                  textStyle={styles.menuItemText}
-                  buttonStyle={[styles.menuItemStyle, {borderBottomWidth: 0}]}
-                  icon={CustomImages.cameraIcon}
+                  source={
+                    profileImage ? CustomImages.editIcon : CustomImages.addIcon
+                  }
+                  style={styles.picAction}
                 />
               </View>
+            </Pressable>
+            <View>
+              <CustomInput
+                label="Name"
+                onChange={handleChangeName}
+                inputConfigurations={{value: name.text}}
+              />
+              {name.error && (
+                <Text
+                  style={{
+                    color: 'red',
+                    fontSize: 10,
+                    position: 'absolute',
+                    bottom: 5,
+                  }}>
+                  {name.error}
+                </Text>
+              )}
             </View>
+
+            <CustomInput
+              label="Email"
+              onChange={handleChangeEmail}
+              isDisabled={true}
+              inputConfigurations={{value: email, editable: false}}
+            />
           </View>
-        </Modal>
-      )}
-    </View>
+
+          <CustomButton
+            text="Continue"
+            onPress={handleSubmit}
+            buttonStyle={{marginBottom: 10}}
+          />
+
+          {/* Modal for photo selection */}
+          <PermissionModal
+            isModalVisible={isPermissionModalVisible}
+            toggleModal={togglePermissionModal}
+            contentText={permissionError}
+          />
+          {isModalVisible ? (
+            <Modal
+              visible={isModalVisible}
+              animationType="slide"
+              transparent={true}
+              onRequestClose={toggleModal}>
+              <Pressable style={styles.modalOverlay} onPress={toggleModal}>
+                <View style={styles.modalContent}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      toggleModal();
+                    }}
+                    style={styles.closeButton}>
+                    <Image
+                      source={CustomImages.closeIcon}
+                      style={styles.closeIcon}
+                      resizeMode="contain"
+                    />
+                  </TouchableOpacity>
+                  <View style={{backgroundColor: '#18171C', borderRadius: 15}}>
+                    <CustomButton
+                      text="Choose from Gallery"
+                      onPress={handleGalleryModal}
+                      textStyle={styles.menuItemText}
+                      buttonStyle={styles.menuItemStyle}
+                      icon={CustomImages.photoGallery}
+                      iconStyle={{backgroundColor: '#3a393d', borderRadius: 4}}
+                    />
+                    <CustomButton
+                      text="Use Camera"
+                      onPress={handleCameraModal}
+                      textStyle={styles.menuItemText}
+                      buttonStyle={styles.menuItemStyleBottom}
+                      icon={CustomImages.cameraIcon}
+                    />
+                  </View>
+                </View>
+              </Pressable>
+            </Modal>
+          ) : (
+            <></>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -273,7 +418,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    marginBottom: Platform.select({ios: 0, android: 10}),
   },
   title: {
     fontFamily: CustomFont.Urbanist600,
@@ -296,6 +440,7 @@ const styles = StyleSheet.create({
     height: 125,
     alignSelf: 'center',
     borderRadius: 125 / 2,
+    resizeMode: 'cover',
   },
   imageBox: {
     marginTop: 32,
@@ -314,6 +459,15 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(29, 30, 35, 1)',
     backgroundColor: 'transparent',
     borderBottomWidth: 1.5,
+    marginHorizontal: 0,
+    justifyContent: 'flex-start',
+    borderRadius: 0,
+  },
+  menuItemStyleBottom: {
+    borderBottomWidth: 0,
+    paddingVertical: 17,
+    borderBottomColor: 'rgba(29, 30, 35, 1)',
+    backgroundColor: 'transparent',
     marginHorizontal: 0,
     justifyContent: 'flex-start',
     borderRadius: 0,
@@ -337,7 +491,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 10,
     position: 'absolute',
-    bottom: 10,
+    bottom: Platform.select({ios: 27, android: 10}),
     zIndex: 100,
   },
   closeButton: {
