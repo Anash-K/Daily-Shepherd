@@ -1,12 +1,20 @@
-import {Image, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
-import {memo, useState} from 'react';
+import {memo, useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {ScreenProps} from '../navigation/Stack';
+import {DateComparison, formatDate} from '../utils/currentDateIntlFormat';
 interface VerseBoxProps {
-  id: number;
-  title: string;
+  id: string;
+  date: string | Date;
   reference: string;
   verse: string;
   commentNumber: number;
@@ -15,7 +23,7 @@ interface VerseBoxProps {
 }
 
 const VerseBox: React.FC<VerseBoxProps> = memo(
-  ({id, title, reference, verse, commentNumber, OnPressDetails, liked}) => {
+  ({id, date, reference, verse, commentNumber, OnPressDetails, liked}) => {
     const [isLiked, setIsLiked] = useState(liked);
 
     const navigation =
@@ -29,11 +37,17 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
       setIsLiked(prev => !prev);
     };
 
+    console.log(date,"date is this")
+    
+    // Usage
+    const displayDate = DateComparison(date);
+
+
     return (
       <TouchableOpacity style={styles.container} onPress={OnPressDetails}>
         <View style={styles.verseHeader}>
           <View style={styles.titleBox}>
-            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.title}>{displayDate}</Text>
             <Text style={styles.reference}>{reference}</Text>
           </View>
 
@@ -156,7 +170,10 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 1)',
   },
   verse: {
-    fontFamily:  Platform.select({ios:'HedvigLettersSerif18pt-Regular',android:CustomFont.HLS400}),
+    fontFamily: Platform.select({
+      ios: 'HedvigLettersSerif18pt-Regular',
+      android: CustomFont.HLS400,
+    }),
     fontSize: 24,
     lineHeight: 32.16,
     color: 'rgba(255, 255, 255, 1)',

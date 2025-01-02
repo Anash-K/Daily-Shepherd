@@ -1,13 +1,9 @@
-import React, {useEffect, useRef} from 'react';
-import {SafeAreaView, StatusBar, StyleSheet, View} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
+import React, {useEffect} from 'react';
+import { StatusBar, StyleSheet, View} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {useSelector} from 'react-redux';
 import BootSplash from 'react-native-bootsplash';
-import AuthStack from './src/navigation/AuthStack';
-import MainStack from './src/navigation/MainStack';
 import {QueryClient, QueryClientProvider, onlineManager} from 'react-query';
-import {OnlineManager} from 'react-query/types/core/onlineManager';
 import NetInfo, {NetInfoSubscription} from '@react-native-community/netinfo';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {Loader as LoaderType} from './src/types/CommonTypes';
@@ -15,7 +11,6 @@ import {AlertNotificationRoot} from 'react-native-alert-notification';
 import RootScreen from './src/navigation/RootScreen';
 import Loader from './src/utils/Loader';
 
-const Stack = createStackNavigator();
 
 const queryClient = new QueryClient();
 
@@ -23,11 +18,11 @@ GoogleSignin.configure({
   webClientId:
     '77025911882-38knj3gobjf8490723d3p0jirbrabqvn.apps.googleusercontent.com',
   offlineAccess: true,
-  scopes: ['https://www.googleapis.com/auth/drive'],
-  forceCodeForRefreshToken: true,
+  // scopes: ['https://www.googleapis.com/auth/drive'],
+  // forceCodeForRefreshToken: true,
 });
 
-console.error = () => {};
+// console.error = () => {};
 
 export const AppLoaderRef = React.createRef<LoaderType>();
 

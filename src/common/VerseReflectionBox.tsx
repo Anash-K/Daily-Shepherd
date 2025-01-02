@@ -1,25 +1,34 @@
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
+import React, {memo} from 'react';
 
-const VerseReflectionBox = (data: any) => {
-  return (
-    <View style={styles.container}>
-      <View style={styles.topHeadingBox}>
-        <Text style={styles.title}>{data.title}</Text>
-        <TouchableOpacity style={styles.showDetailsButton}>
-          <Image
-            source={CustomImages.crossArrow}
-            style={styles.arrowIcon}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
+interface VerseReflectionBoxProps {
+  title: string;
+  content: string;
+  OnPressLink: () => void
+}
+
+const VerseReflectionBox: React.FC<VerseReflectionBoxProps> = memo(
+  ({title, content, OnPressLink}) => {
+    return (
+      <View style={styles.container}>
+        <View style={styles.topHeadingBox}>
+          <Text style={styles.title}>{title}</Text>
+          <TouchableOpacity style={styles.showDetailsButton} onPress={OnPressLink}>
+            <Image
+              source={CustomImages.crossArrow}
+              style={styles.arrowIcon}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.verseReflection}>{content}</Text>
       </View>
-
-      <Text style={styles.verseReflection}>{data.content}</Text>
-    </View>
-  );
-};
+    );
+  },
+);
 
 export default VerseReflectionBox;
 

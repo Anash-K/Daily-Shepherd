@@ -154,7 +154,7 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
       let response = await ImagePicker.openPicker({
         mediaType: 'photo',
         maxWidth: 300,
-        maxHeight: 550,
+        maxHeight: 300,
         quality: 1,
         includeBase64: true,
         cropping: true,

@@ -120,8 +120,8 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
     try {
       let response = await ImagePicker.openCamera({
         mediaType: 'photo',
-        maxWidth: 300,
-        maxHeight: 550,
+        width: 300,
+        height: 300,
         quality: 1,
         includeBase64: true,
         cropping: true,
@@ -143,8 +143,8 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
     try {
       let response = await ImagePicker.openPicker({
         mediaType: 'photo',
-        maxWidth: 300,
-        maxHeight: 550,
+        width: 300,
+        height: 300,
         quality: 1,
         includeBase64: true,
         cropping: true,
@@ -157,7 +157,6 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
       console.error('Gallery error:', error);
     }
   }, []);
-
 
   const handleChangeName = useCallback(
     (value: string) => {
@@ -191,8 +190,6 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
   }, []);
 
   const insets = useSafeAreaInsets();
-
-
 
   const handleBackNav = useCallback(() => {
     setTimeout(() => {
@@ -277,9 +274,7 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
               }),
             },
           ]}>
-      
           <View style={{flexGrow: 1}}>
-            
             <Pressable style={styles.imageBox} onPress={toggleModal}>
               <CustomImageHandler
                 sourceImage={profileImage}

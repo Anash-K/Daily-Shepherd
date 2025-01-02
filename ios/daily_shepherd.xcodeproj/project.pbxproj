@@ -531,7 +531,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = daily_shepherd/daily_shepherd.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3R3TM3V34F;
+				DEVELOPMENT_TEAM = TYCQ32SSH4;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = daily_shepherd/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -545,7 +545,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ahirbusinessnetwork;
+				PRODUCT_BUNDLE_IDENTIFIER = com.DailyShepherd;
 				PRODUCT_NAME = daily_shepherd;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -561,7 +561,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = daily_shepherd/daily_shepherd.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3R3TM3V34F;
+				DEVELOPMENT_TEAM = TYCQ32SSH4;
 				INFOPLIST_FILE = daily_shepherd/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -574,7 +574,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ahirbusinessnetwork;
+				PRODUCT_BUNDLE_IDENTIFIER = com.DailyShepherd;
 				PRODUCT_NAME = daily_shepherd;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

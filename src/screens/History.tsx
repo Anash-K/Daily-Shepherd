@@ -33,7 +33,7 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
           style={styles.searchInput}
         />
       </View>
-
+{/* 
       <FlatList
         data={Data}
         renderItem={({item}) => (
@@ -49,7 +49,7 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
         )}
         keyExtractor={item => item.id.toString()}
         showsVerticalScrollIndicator={false}
-      />
+      /> */}
     </View>
   );
 };

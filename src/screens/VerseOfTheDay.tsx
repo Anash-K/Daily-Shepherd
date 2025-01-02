@@ -1,12 +1,14 @@
-import React from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   FlatList,
   Image,
+  Linking,
   Platform,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import {ScreenProps} from '../navigation/Stack';
@@ -19,8 +21,32 @@ import {verseReflectionData} from '../utils/verReflectionDemoData';
 import VerseReflectionBox from '../common/VerseReflectionBox';
 import {ContextChapterData} from '../utils/contextChapterDemoData';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {CustomToaster} from '../utils/AlertNotification';
+import {ALERT_TYPE} from 'react-native-alert-notification';
+import {AppLoaderRef} from '../../App';
+import {ErrorHandler} from '../utils/ErrorHandler';
+import {GetScriptureOfTheDay} from '../axious/getApis';
+import {useMutation} from 'react-query';
+import {MutationKeys} from '../utils/MutationKeys';
+import Video, {VideoRef} from 'react-native-video';
+import ThumbnailGenerator from '../utils/ThumnailGenerator';
 
 const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
+  const initialVerseState = {
+    comment_count: 0,
+    context_chapter: '',
+    context_chapter_link: '',
+    date: '',
+    id: '',
+    is_favorite: false,
+    reflection: '',
+    reflection_link: '',
+    verse: '',
+    verse_reference: '',
+    video_link: '',
+  };
+
+  const [verseData, setVerseData] = useState(initialVerseState);
   const currentDate = new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
@@ -29,25 +55,57 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
 
   const {greeting, image} = getPartOfDay();
 
-  let todaysVerse = Data.filter((chunk: any, index) => index == 0);
-
-  let todaysReflection = verseReflectionData
-    .filter((chunk: any, index) => index == 0)
-    .map(item => ({
-      ...item,
-      title: "Today's Reflection",
-    }));
-
-  let todaysContext = ContextChapterData.filter(
-    (chunk: any, index) => index == 0,
-  ).map(item => ({
-    ...item,
-    title: 'Context Chapter',
-  }));
-
   const handlePress = () => {};
+  const videoRef = useRef<VideoRef>(null);
 
   const insets = useSafeAreaInsets();
+
+  const commonErrorHandler = useCallback((error: any) => {
+    console.error(error);
+    ErrorHandler(error);
+  }, []);
+
+  const handleData = (data: any) => {
+    setVerseData(prevState => ({
+      ...prevState,
+      comment_count: data?.comment_count ?? prevState.comment_count,
+      context_chapter: data?.context_chapter ?? prevState.context_chapter,
+      context_chapter_link:
+        data?.context_chapter_link ?? prevState.context_chapter_link,
+      date: data?.date ?? prevState.date,
+      id: data?.id ?? prevState.id,
+      is_favorite: data?.is_favorite ?? prevState.is_favorite,
+      reflection: data?.reflection ?? prevState.reflection,
+      reflection_link: data?.reflection_link ?? prevState.reflection_link,
+      verse: data?.verse ?? prevState.verse,
+      verse_reference: data?.verse_reference ?? prevState.verse_reference,
+      video_link: data?.video_link ?? prevState.video_link,
+    }));
+  };
+
+  const {mutate: todaysVerseMutate} = useMutation({
+    mutationKey: MutationKeys.todaysVerseMutationKey,
+    mutationFn: async () => await GetScriptureOfTheDay(),
+    onMutate: () => AppLoaderRef.current?.start(),
+    onError: error => commonErrorHandler(error),
+    onSuccess(data, variables, context) {
+      handleData(data?.data?.payload);
+    },
+    onSettled: () => AppLoaderRef.current?.stop(),
+  });
+
+  useEffect(() => {
+    todaysVerseMutate();
+  }, []);
+
+  const handleLink = useCallback((link: any) => {
+    Linking.openURL(link);
+  }, []);
+
+  let videoThumbnail = verseData.video_link
+    ? {uri: ThumbnailGenerator({videoLink: verseData.video_link})}
+    : CustomImages.videoImage;
+
 
   return (
     <ScrollView style={[styles.container, {marginTop: insets.top}]}>
@@ -75,32 +133,44 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
         </View>
       </View>
 
-      {todaysVerse.map(item => (
-        <VerseBox
-          key={item.title}
-          id={item.id}
-          title={item.title}
-          liked={item.liked}
-          commentNumber={item.commentNumber}
-          reference={item.reference}
-          verse={item.verse}
-          OnPressDetails={handlePress}
-        />
-      ))}
+      {verseData ? (
+        <>
+          <VerseBox
+            id={verseData.id}
+            date={verseData.date}
+            liked={verseData.is_favorite}
+            commentNumber={verseData.comment_count}
+            reference={verseData.verse_reference}
+            verse={verseData.verse}
+            OnPressDetails={handlePress}
+          />
 
-      {todaysReflection.map(item => (
-        <VerseReflectionBox key={item.title} {...item} />
-      ))}
-      {todaysContext.map(item => (
-        <VerseReflectionBox key={item.title} {...item} />
-      ))}
+          <VerseReflectionBox
+            title={'Todays Reflection'}
+            content={verseData.reflection}
+            OnPressLink={handleLink.bind(null, verseData.reflection_link)}
+          />
+          <VerseReflectionBox
+            title={'Context Chapter'}
+            content={verseData.context_chapter}
+            OnPressLink={handleLink.bind(null, verseData.context_chapter_link)}
+          />
+        </>
+      ) : (
+        <Text style={styles.noDataText}>No Verse Today</Text>
+      )}
+
       <View style={styles.videoBox}>
         <Text style={styles.videoHeading}>Watch Video</Text>
-        <Image
-          source={CustomImages.videoImage}
-          style={styles.videoStyle}
-          resizeMode="contain"
-        />
+        <TouchableOpacity
+          onPress={handleLink.bind(null, verseData.video_link)}
+          style={{borderRadius: 15.4}}>
+          <Image
+            source={videoThumbnail}
+            style={styles.videoStyle}
+            resizeMode="cover"
+          />
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -109,6 +179,10 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
 export default VerseOfTheDay;
 
 const styles = StyleSheet.create({
+  noDataText: {
+    fontSize: 18,
+    color: '#FFFFFF',
+  },
   videoBox: {
     backgroundColor: 'rgba(32, 33, 38, 1)',
     borderRadius: 15,
@@ -126,7 +200,7 @@ const styles = StyleSheet.create({
   videoStyle: {
     width: '100%',
     height: 200,
-    // aspectRatio: 1,
+    borderRadius: 15.4,
   },
   container: {
     flex: 1,
