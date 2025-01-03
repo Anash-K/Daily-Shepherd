@@ -19,20 +19,19 @@ const Favorites: React.FC<ScreenProps<'Favorites'>> = ({navigation}) => {
       verseId: id, // Pass only the verse ID
     });
   };
-  const FavoriteData = Data.filter(item => item.liked == true);
   return (
     <View style={styles.container}>
       <FlatList
-        data={FavoriteData}
+        data={Data}
         renderItem={({item}) => (
           <VerseBox
+            liked={item.is_favorite}
             id={item.id}
-            title={item.title}
-            reference={item.reference}
+            date={item.date}
+            reference={item.verse_reference}
             verse={item.verse}
-            commentNumber={item.commentNumber}
-            liked={item.liked}
-            OnPressDetails={handleDetails.bind(null, item.id)}
+            commentNumber={item.comment_count}
+            OnPressDetails={handleDetails.bind(null, item.date)}
           />
         )}
         keyExtractor={item => item.id.toString()}

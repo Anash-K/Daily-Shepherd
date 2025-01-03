@@ -1,6 +1,7 @@
-import React, {useLayoutEffect} from 'react';
+import React, {useCallback, useLayoutEffect} from 'react';
 import {
   Image,
+  Linking,
   Platform,
   ScrollView,
   StyleSheet,
@@ -53,7 +54,7 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
   useLayoutEffect(() => {
     if (verseData) {
       navigation.setOptions({
-        title: verseData[0].title,
+        title: 'Jan 2, 2025',
       });
     }
   }, [verseData, navigation]);
@@ -62,19 +63,39 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
 
   const insets = useSafeAreaInsets();
 
+  const handleLink = useCallback((link: any) => {
+    Linking.openURL(link);
+  }, []);
   return (
     <ScrollView style={[styles.container, {marginBottom: insets.bottom}]}>
-      {verseData?.map((item: any) => (
-        <VerseBox key={item.title} {...item} OnPressDetails={handleDetails} />
+      {todaysVerse?.map((item: any) => (
+        <React.Fragment key={item.id}>
+          {/* Verse Box */}
+          <VerseBox
+            id={item.id}
+            date={item.date}
+            liked={item.is_favorite}
+            commentNumber={item.comment_count}
+            reference={item.verse_reference}
+            verse={item.verse}
+            OnPressDetails={handleDetails}
+          />
+
+          {/* Reflection Boxes */}
+          <VerseReflectionBox
+            title={"Today's Reflection"}
+            content={item.verse_reference}
+            OnPressLink={handleLink.bind(null, item.reflection_link)}
+          />
+          <VerseReflectionBox
+            title={'Context Chapter'}
+            content={item.context_chapter}
+            OnPressLink={handleLink.bind(null, item.context_chapter_link)}
+          />
+        </React.Fragment>
       ))}
 
-      {todaysReflection.map(item => (
-        <VerseReflectionBox key={item.title} {...item} />
-      ))}
-      {todaysContext.map(item => (
-        <VerseReflectionBox key={item.title} {...item} />
-      ))}
-
+      {/* Video Section */}
       <View style={styles.videoBox}>
         <Text style={styles.videoHeading}>Watch Video</Text>
         <Image
@@ -86,7 +107,6 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
     </ScrollView>
   );
 };
-
 export default VerseDetails;
 
 const styles = StyleSheet.create({
@@ -94,7 +114,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(32, 33, 38, 1)',
     borderRadius: 15,
     padding: 16,
-    paddingBottom: 16,
+    paddingBottom: Platform.select({android: 10, ios: 16}),
     // marginTop: 16,
     marginBottom: 40,
   },
@@ -103,7 +123,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19.2,
     color: 'rgba(250, 250, 250, 0.75)',
-    marginBottom: 12,
+    marginBottom: Platform.select({android: 5, ios: 12}),
   },
   videoStyle: {
     width: '100%',

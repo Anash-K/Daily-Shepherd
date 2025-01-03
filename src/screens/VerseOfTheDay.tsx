@@ -105,7 +105,7 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
   let videoThumbnail = verseData.video_link
     ? {uri: ThumbnailGenerator({videoLink: verseData.video_link})}
     : CustomImages.videoImage;
-
+        
 
   return (
     <ScrollView style={[styles.container, {marginTop: insets.top}]}>
@@ -166,7 +166,7 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
           onPress={handleLink.bind(null, verseData.video_link)}
           style={{borderRadius: 15.4}}>
           <Image
-            source={videoThumbnail}
+            source={CustomImages.videoImage}
             style={styles.videoStyle}
             resizeMode="cover"
           />
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19.2,
     color: 'rgba(250, 250, 250, 0.75)',
-    marginBottom: 15,
+    marginBottom: 12,
   },
   videoStyle: {
     width: '100%',

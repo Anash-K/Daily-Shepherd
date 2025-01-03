@@ -3,9 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>77025911882-es68arab1map8sms24213rutgl7lbkrs.apps.googleusercontent.com</string>
+	<string>77025911882-k148hcmib8lghourrdqmglospi5if67a.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.77025911882-es68arab1map8sms24213rutgl7lbkrs</string>
+	<string>com.googleusercontent.apps.77025911882-k148hcmib8lghourrdqmglospi5if67a</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>77025911882-0i61rvdcope4b2b0s9qe148v1no6kbva.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyBSwEeOaIOWsGE2QX3T_IxfCFUKPhwuMC4</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.ahirbusinessnetwork</string>
+	<string>com.DailyShepherd</string>
 	<key>PROJECT_ID</key>
 	<string>daily-shepherd-633f3</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:77025911882:ios:3411ed535b68e2fba972b3</string>
+	<string>1:77025911882:ios:7075395eb84806c4a972b3</string>
 </dict>
 </plist>

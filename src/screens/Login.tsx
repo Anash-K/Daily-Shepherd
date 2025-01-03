@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useRef} from 'react';
 import {
   Image,
   ImageBackground,
+  InteractionManager,
   Platform,
   StyleSheet,
   Text,
@@ -36,13 +37,9 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
   const buttonRef = useRef<boolean>(false);
   const dispatch = useDispatch();
 
-  const {token, email, isAuthenticated} = useSelector(
-    (state: any) => state.auth,
-  );
-
-  console.log(token, email);
-
-  console.log(token, email, isAuthenticated, 'klnsdns');
+  // const {token, email, isAuthenticated} = useSelector(
+  //   (state: any) => state.auth,
+  // );
 
   const handlePress = () => {};
   const handleNav = () => {
@@ -53,6 +50,15 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
     navigation.navigate('ForgotPassword');
   };
 
+  const GoogleSignModalHandler = useCallback(() => {
+    AppLoaderRef?.current?.start();
+    InteractionManager.runAfterInteractions(() => {
+      setTimeout(() => {
+        onGoogleSignIn();
+      }, 500);
+    });
+  }, []);
+
   const onGoogleSignIn = useCallback(async () => {
     if (buttonRef.current) {
       return;
@@ -60,20 +66,20 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
 
     buttonRef.current = true;
 
-    AppLoaderRef?.current?.start();
-
     try {
       // Sign out any existing session to start fresh
       await GoogleSignin.signOut();
 
       // Check if Google Play Services are available
-      if (Platform.OS === 'android') {
-        await GoogleSignin.hasPlayServices({
-          showPlayServicesUpdateDialog: true,
-        });
-      }
+
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+
       // Proceed to sign in
       const userInfo = await GoogleSignin.signIn();
+
+      
 
       if (!userInfo) {
         throw new Error('User info is missing');
@@ -90,6 +96,7 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
         idToken,
         accessToken,
       );
+
       await auth().signInWithCredential(credential);
 
       const token = await auth()?.currentUser?.getIdToken();
@@ -99,6 +106,7 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
       }
 
       // Get FCM token
+
       const pushToken = await getFCMToken();
 
       const response = await LoginApi({
@@ -110,7 +118,7 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
 
       if (response?.status === 200) {
         const {data} = response;
-        console.log(response);
+
         CustomToaster({
           type: ALERT_TYPE.SUCCESS,
           title: 'Success',
@@ -122,15 +130,16 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
         } else {
           dispatch(updateIsOldUser(false));
         }
-
-        dispatch(loginSuccess(data.payload));
+        setTimeout(() => {
+          dispatch(loginSuccess(data.payload));
+        }, 500);
       }
     } catch (error) {
       console.error('An error occurred during Google Sign-In:', error);
       ErrorHandler(error);
     } finally {
       buttonRef.current = false; // Reset the button state
-      AppLoaderRef?.current?.stop();
+      AppLoaderRef.current?.stop();
     }
   }, []);
 
@@ -153,14 +162,11 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
         requestedOperation: appleAuth.Operation.LOGIN,
         requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
       });
-      console.log(appleAuthRequestResponse, 'appleAuthRequestResponse');
 
       // Get credential state for the user
       const credentialState = await appleAuth.getCredentialStateForUser(
         appleAuthRequestResponse.user,
       );
-
-      console.log(credentialState, 'credentialState');
 
       if (credentialState === appleAuth.State.AUTHORIZED) {
         // Create a credential for Firebase authentication
@@ -169,17 +175,11 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
           appleAuthRequestResponse.nonce ?? '',
         );
 
-        console.log(credential, 'credential');
-
         // Sign in with Firebase using the credential
         await auth().signInWithCredential(credential);
 
-        console.log('signInWithCredential');
-
         // Fetch the Firebase ID token for authentication
         const token = await auth()?.currentUser?.getIdToken();
-
-        console.log('token');
 
         // Get the user's email and display name (if provided)
         const email =
@@ -208,7 +208,7 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
 
         if (response?.status === 200) {
           const {data} = response;
-          console.log(response);
+        
 
           CustomToaster({
             type: ALERT_TYPE.SUCCESS,
@@ -217,15 +217,15 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
               'Welcome! You have successfully Logged in. Let’s get started!',
           });
 
-          console.log(data?.payload?.name, 'name');
-
           if (data?.payload?.name) {
             dispatch(updateIsOldUser(true));
           } else {
             dispatch(updateIsOldUser(false));
           }
 
-          dispatch(loginSuccess(data.payload));
+          setTimeout(() => {
+            dispatch(loginSuccess(data.payload));
+          }, 500);
         } else {
           console.log('error in api');
         }
@@ -248,8 +248,6 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
         styles.container,
         {paddingBottom: Platform.select({ios: bottom, android: 20})},
       ]}>
-      {/* <Loader ref={AppLoaderRef} /> */}
-
       <View style={{flex: 1}}>
         <ImageBackground
           source={CustomImages.loginTopBg}
@@ -269,21 +267,26 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
             Start your day with meaningful Bible verses and reflections. Sign in
             to explore.
           </Text>
-          <CustomButton
-            text="Sign In with Apple"
-            onPress={onAppleSignIn}
-            buttonStyle={styles.appleSign}
-            icon={CustomImages.appleLogo}
-            iconStyle={{width: 24, height: 24}}
-          />
-          <CustomButton
-            text="Sign In with Google"
-            onPress={onGoogleSignIn}
-            buttonStyle={styles.googleSign}
-            icon={CustomImages.googleLogo}
-            iconStyle={{width: 24, height: 24}}
-            textStyle={{color: '#FAFAFA'}}
-          />
+          <View style={{marginTop: 48}}>
+            {Platform.OS == 'ios' && (
+              <CustomButton
+                text="Sign In with Apple"
+                onPress={onAppleSignIn}
+                buttonStyle={styles.appleSign}
+                icon={CustomImages.appleLogo}
+                iconStyle={{width: 24, height: 24}}
+              />
+            )}
+
+            <CustomButton
+              text="Sign In with Google"
+              onPress={GoogleSignModalHandler}
+              buttonStyle={styles.googleSign}
+              icon={CustomImages.googleLogo}
+              iconStyle={{width: 24, height: 24}}
+              textStyle={{color: '#FAFAFA'}}
+            />
+          </View>
         </View>
       </View>
 
@@ -328,7 +331,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA',
     columnGap: 11,
     marginBottom: 16,
-    marginTop: 48,
   },
   container: {
     backgroundColor: 'rgba(24, 23, 28, 1)',

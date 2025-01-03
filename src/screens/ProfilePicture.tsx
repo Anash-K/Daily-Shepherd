@@ -128,8 +128,8 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
     try {
       let response = await ImagePicker.openCamera({
         mediaType: 'photo',
-        maxWidth: 300,
-        maxHeight: 550,
+        width: 300,
+        height: 300,
         quality: 1,
         includeBase64: true,
         cropping: true,
@@ -153,8 +153,8 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
     try {
       let response = await ImagePicker.openPicker({
         mediaType: 'photo',
-        maxWidth: 300,
-        maxHeight: 300,
+        width: 300,
+        height: 300,
         quality: 1,
         includeBase64: true,
         cropping: true,

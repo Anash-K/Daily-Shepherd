@@ -130,7 +130,6 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
       // Process the image if the path exists
       if (response.path) {
         getMimeTypeFromUri(response.path);
-
         setProfileImage(response.path);
       }
     } catch (error) {

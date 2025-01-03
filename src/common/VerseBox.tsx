@@ -37,7 +37,7 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
       setIsLiked(prev => !prev);
     };
 
-    console.log(date,"date is this")
+ 
     
     // Usage
     const displayDate = DateComparison(date);

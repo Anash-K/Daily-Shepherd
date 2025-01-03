@@ -1,9 +1,9 @@
 PODS:
-  - AppAuth (1.7.5):
-    - AppAuth/Core (= 1.7.5)
-    - AppAuth/ExternalUserAgent (= 1.7.5)
-  - AppAuth/Core (1.7.5)
-  - AppAuth/ExternalUserAgent (1.7.5):
+  - AppAuth (1.7.6):
+    - AppAuth/Core (= 1.7.6)
+    - AppAuth/ExternalUserAgent (= 1.7.6)
+  - AppAuth/Core (1.7.6)
+  - AppAuth/ExternalUserAgent (1.7.6):
     - AppAuth/Core
   - boost (1.84.0)
   - DoubleConversion (1.1.6)
@@ -2340,7 +2340,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  AppAuth: 501c04eda8a8d11f179dbe8637b7a91bb7e5d2fa
+  AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   boost: 1dca942403ed9342f98334bf4c3621f011aa7946
   DoubleConversion: f16ae600a246532c4020132d54af21d0ddb2a385
   FBLazyVector: be7314029d6ec6b90f0f75ce1195b8130ed9ac4f
@@ -2436,7 +2436,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 15ee1ab573a954c92641877ca946e2680f2e58da
   RNGoogleSignin: 27c2199f487ee08cc692d8d2c035bc9c154ddc22
   RNImageCropPicker: 8e39c01f205e00d739c31e682f068aac315587bf
-  RNPermissions: 01eab88f1f6dbb69f507aaa8984cd1519371d4ac
+  RNPermissions: a884c30ad1e162097f406303133c6b470de392c4
   RNReanimated: 77a04017cdf54b9da500ccefde56d9d15b8ddff6
   RNScreens: 8ae716a7e26b9ecee7f2856e6ff47b8e7e253ee8
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
@@ -2445,6 +2445,6 @@ SPEC CHECKSUMS:
   TOCropViewController: 80b8985ad794298fb69d3341de183f33d1853654
   Yoga: e6c2f5a192a47cd0c5523ec8c4f7eca01d15d077
 
-PODFILE CHECKSUM: 4408d668af4cde305241271249a368dd782a83d7
+PODFILE CHECKSUM: 7fa2bef8efed6e78143f3223a6dfb39a1c0cbf2d
 
 COCOAPODS: 1.15.2

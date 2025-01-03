@@ -1,6 +1,5 @@
 import React, {forwardRef, memo, useImperativeHandle, useState} from 'react';
 import {Modal, View, StyleSheet, ActivityIndicator} from 'react-native';
-import LoaderKit from 'react-native-loader-kit';
 import {Loader as LoaderType} from '../types/CommonTypes';
 
 const Loader = memo(
@@ -19,9 +18,8 @@ const Loader = memo(
     return (
       <Modal
         transparent={true}
-        animationType="fade"
         visible={isLoader}
-        onRequestClose={() => setIsLoader(false)}>
+        onRequestClose={ setIsLoader.bind(null,false)}>
         <View style={styles.overlay}>
           <ActivityIndicator
             style={styles.loader}

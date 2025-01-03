@@ -60,6 +60,8 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
 
   const userData = useSelector((state: any) => state.auth);
 
+
+
   const dispatch = useDispatch();
   const [profileImage, setProfileImage] = useState<string | null>(
     userData.profile ? userData.profile : null,
