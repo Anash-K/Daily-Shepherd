@@ -1,4 +1,4 @@
-import React, {useCallback, useLayoutEffect} from 'react';
+import React, {useCallback, useEffect, useLayoutEffect, useState} from 'react';
 import {
   Image,
   Linking,
@@ -11,53 +11,74 @@ import {
 import {ScreenProps} from '../navigation/Stack';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
-import {getPartOfDay} from '../utils/getPartOfDay';
 import VerseBox from '../common/VerseBox';
-import {Data} from '../utils/verseBoxDemoData';
-import {verseReflectionData} from '../utils/verReflectionDemoData';
 import VerseReflectionBox from '../common/VerseReflectionBox';
-import {ContextChapterData} from '../utils/contextChapterDemoData';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useMutation} from 'react-query';
+import {GetScriptureDetails} from '../axious/getApis';
+import {AppLoaderRef} from '../../App';
+import {ErrorHandler} from '../utils/ErrorHandler';
+import {MutationKeys} from '../utils/MutationKeys';
+import {VerseState} from '../types/CommonTypes';
+import NoDataFound from '../utils/NoDataFound';
+import {formatDate} from '../utils/currentDateIntlFormat';
 
 const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
   route,
   navigation,
 }) => {
-  const currentDate = new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date());
-
-  const {greeting, image} = getPartOfDay();
-
-  let todaysVerse = Data.filter((chunk: any, index) => index == 0);
-
-  let todaysReflection = verseReflectionData
-    .filter((chunk: any, index) => index == 0)
-    .map(item => ({
-      ...item,
-      title: "Today's Reflection",
-    }));
-
-  let todaysContext = ContextChapterData.filter(
-    (chunk: any, index) => index == 0,
-  ).map(item => ({
-    ...item,
-    title: 'Context Chapter',
-  }));
+  const initialVerseState: VerseState = {
+    comment_count: 0,
+    context_chapter: '',
+    context_chapter_link: '',
+    date: '',
+    id: '',
+    is_favorite: false,
+    reflection: '',
+    reflection_link: '',
+    verse: '',
+    verse_reference: '',
+    video_link: '',
+  };
 
   const {verseId} = route.params;
+  const [verseData, setVerseData] = useState<VerseState>(initialVerseState);
 
-  const verseData = Data.filter((item: any) => item.id === verseId);
+  // const verseData = Data.filter((verseData: any) => verseData.id === verseId);
 
   useLayoutEffect(() => {
-    if (verseData) {
-      navigation.setOptions({
-        title: 'Jan 2, 2025',
-      });
+    if (verseData.date) {
+      const dateObj = new Date(verseData.date);
+      // Format the date
+      const dateTitle = formatDate(dateObj);
+      if (verseData) {
+        navigation.setOptions({
+          title: dateTitle,
+        });
+      }
     }
   }, [verseData, navigation]);
+
+  const {mutate: GetScriptureData} = useMutation({
+    mutationKey: MutationKeys.VerseDetailsKey,
+    mutationFn: async () => await GetScriptureDetails({id: verseId}),
+    onMutate: () => AppLoaderRef.current?.start(),
+    onSuccess(data) {
+      setVerseData(data?.payload);
+    },
+    onError(error) {
+      console.log(error);
+      ErrorHandler(error);
+    },
+    onSettled: () => AppLoaderRef.current?.stop(),
+  });
+
+  useEffect(() => {
+    if (verseData) {
+      GetScriptureData();
+    }
+    console.log(verseId);
+  }, [verseId]);
 
   const handleDetails = () => {};
 
@@ -66,50 +87,56 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
   const handleLink = useCallback((link: any) => {
     Linking.openURL(link);
   }, []);
+
   return (
-    <ScrollView style={[styles.container, {marginBottom: insets.bottom}]}>
-      {todaysVerse?.map((item: any) => (
-        <React.Fragment key={item.id}>
+    <ScrollView
+      style={[styles.container, {marginBottom: insets.bottom}]}
+      contentContainerStyle={styles.contentStyle}>
+      {verseData.verse ? (
+        <View style={styles.innerContainer}>
           {/* Verse Box */}
           <VerseBox
-            id={item.id}
-            date={item.date}
-            liked={item.is_favorite}
-            commentNumber={item.comment_count}
-            reference={item.verse_reference}
-            verse={item.verse}
+            id={verseData.id}
+            date={verseData.date}
+            liked={verseData.is_favorite}
+            commentNumber={verseData.comment_count}
+            reference={verseData.verse_reference}
+            verse={verseData.verse}
             OnPressDetails={handleDetails}
           />
 
           {/* Reflection Boxes */}
           <VerseReflectionBox
             title={"Today's Reflection"}
-            content={item.verse_reference}
-            OnPressLink={handleLink.bind(null, item.reflection_link)}
+            content={verseData.reflection}
+            OnPressLink={handleLink.bind(null, verseData.reflection_link)}
           />
           <VerseReflectionBox
             title={'Context Chapter'}
-            content={item.context_chapter}
-            OnPressLink={handleLink.bind(null, item.context_chapter_link)}
+            content={verseData.context_chapter}
+            OnPressLink={handleLink.bind(null, verseData.context_chapter_link)}
           />
-        </React.Fragment>
-      ))}
-
-      {/* Video Section */}
-      <View style={styles.videoBox}>
-        <Text style={styles.videoHeading}>Watch Video</Text>
-        <Image
-          source={CustomImages.videoImage}
-          style={styles.videoStyle}
-          resizeMode="contain"
-        />
-      </View>
+          {/* Video Section */}
+          <View style={styles.videoBox}>
+            <Text style={styles.videoHeading}>Watch Video</Text>
+            <Image
+              source={CustomImages.videoImage}
+              style={styles.videoStyle}
+              resizeMode="contain"
+            />
+          </View>
+        </View>
+      ) : (
+        <NoDataFound title="No Details Available..." />
+      )}
     </ScrollView>
   );
 };
 export default VerseDetails;
 
 const styles = StyleSheet.create({
+  contentStyle: {flexGrow: 1},
+  innerContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
   videoBox: {
     backgroundColor: 'rgba(32, 33, 38, 1)',
     borderRadius: 15,
@@ -117,6 +144,7 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.select({android: 10, ios: 16}),
     // marginTop: 16,
     marginBottom: 40,
+    width: '100%',
   },
   videoHeading: {
     fontFamily: CustomFont.Urbanist500,
@@ -132,7 +160,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    paddingBottom: 50,
   },
   rightBox: {},
   leftBox: {

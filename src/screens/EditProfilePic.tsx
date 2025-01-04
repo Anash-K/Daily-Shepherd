@@ -44,6 +44,8 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
 }) => {
   const userData = useSelector((state: any) => state.auth);
 
+  console.log(userData.token,"token")
+
   const nameValidation = {
     text: userData.name ? userData.name : '',
     error: '',
@@ -198,6 +200,9 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
 
   const handleSubmit = useCallback(async () => {
     if (buttonRef.current?.start()) {
+      return;
+    }
+    if (!name.isValid) {
       return;
     }
 

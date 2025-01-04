@@ -9,11 +9,21 @@ export const GetScriptureOfTheDay = async () => {
   }
 };
 
-export const GetHistory = async () => {
+export const GetHistory = async (keyword?: string) => {
   try {
-    const response = AxiosInstance.get('scriptures-history');
+    const response = AxiosInstance.get(`scriptures-history?text=${keyword}`);
     return response;
   } catch (error) {
     throw error;
   }
 };
+export const GetScriptureDetails = async ({ id }: { id: string }) => {
+  try {
+    const response = await AxiosInstance.get(`scriptures/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching scripture details:", error);
+    throw error; // Re-throw the error for upstream handling
+  }
+};
+

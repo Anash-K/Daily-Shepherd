@@ -13,6 +13,7 @@ import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
 import React from 'react';
 import {ScreenProps} from '../navigation/Stack';
+import { useMutation } from 'react-query';
 
 export const Data = [
   {
@@ -66,6 +67,10 @@ const Podcast: React.FC<ScreenProps<'Podcast'>> = ({navigation}) => {
       DataId:id
     });
   };
+
+  const {} = useMutation({
+    
+  })
 
   const renderPodcastItem = ({item}: any) => (
     <TouchableOpacity

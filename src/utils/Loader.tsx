@@ -1,5 +1,5 @@
 import React, {forwardRef, memo, useImperativeHandle, useState} from 'react';
-import {Modal, View, StyleSheet, ActivityIndicator} from 'react-native';
+import {Modal, View, StyleSheet, ActivityIndicator, Text} from 'react-native';
 import {Loader as LoaderType} from '../types/CommonTypes';
 
 const Loader = memo(
@@ -19,8 +19,9 @@ const Loader = memo(
       <Modal
         transparent={true}
         visible={isLoader}
-        onRequestClose={ setIsLoader.bind(null,false)}>
+        onRequestClose={setIsLoader.bind(null, false)}>
         <View style={styles.overlay}>
+          <Text style={styles.pleaseWait}>Please Wait...</Text>
           <ActivityIndicator
             style={styles.loader}
             size={80}
@@ -33,6 +34,15 @@ const Loader = memo(
 );
 
 const styles = StyleSheet.create({
+  pleaseWait: {
+    color: 'rgba(32, 201, 151, 0.5)',
+    textAlign: 'center',
+    fontSize: 16,
+    position:'absolute',
+    top:'55%',
+    left:0,
+    right:0,
+  },
   overlay: {
     flex: 1,
     justifyContent: 'center',
@@ -42,7 +52,7 @@ const styles = StyleSheet.create({
   loader: {
     width: 250,
     height: 250,
-    color: 'rgba(32, 201, 151, 1)',
+    color: '#20C997',
   },
 });
 

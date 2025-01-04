@@ -3,6 +3,7 @@ import {
   Image,
   Platform,
   StyleSheet,
+  Text,
   TextInput,
   View,
 } from 'react-native';
@@ -18,10 +19,11 @@ import {AppLoaderRef} from '../../App';
 import {ErrorHandler} from '../utils/ErrorHandler';
 import {GetHistory} from '../axious/getApis';
 import {CustomToaster} from '../utils/AlertNotification';
+import {HistoryItem} from '../types/CommonTypes';
 
 const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
   const [search, setSearch] = React.useState<string>('');
-  const [history, setHistory] = React.useState([]);
+  const [history, setHistory] = React.useState<HistoryItem[]>([]);
   const handleDetails = (id: any) => {
     navigation.navigate('VerseDetails', {
       verseId: id, // Pass only the verse ID
@@ -31,12 +33,12 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
   const {mutate: getHistoryData} = useMutation({
     mutationKey: MutationKeys.historyMutationKey,
     onMutate: () => AppLoaderRef.current?.start(),
-    mutationFn: async () => await GetHistory(),
-    onSuccess(data, variables, context) {
-      console.log(data?.data?.payload);
-      setHistory(data?.data?.payload);
+    mutationFn: async () => await GetHistory(search),
+    onSuccess(data) {
+      console.log(data?.data?.payload?.data)
+      setHistory(data?.data?.payload?.data);
     },
-    onError(error, variables, context) {
+    onError(error) {
       console.log(error);
       ErrorHandler(error);
     },
@@ -45,6 +47,10 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
 
   useEffect(() => {
     getHistoryData();
+  }, [search]);
+
+  const handleSearch = useCallback((val: string) => {
+    setSearch(val);
   }, []);
 
   return (
@@ -60,10 +66,10 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
           placeholderTextColor={'rgba(250, 250, 250, 0.5)'}
           style={styles.searchInput}
           value={search}
-          onChange={val => setSearch(val)}
+          onChangeText={handleSearch}
         />
       </View>
-      {/* {history.length > 0 ? (
+      {history.length > 0 ? (
         <FlatList
           data={history}
           renderItem={({item}) => (
@@ -74,15 +80,20 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
               reference={item.verse_reference}
               verse={item.verse}
               commentNumber={item.comment_count}
-              OnPressDetails={handleDetails.bind(null, item.date)}
+              OnPressDetails={handleDetails.bind(null, item.id)}
             />
           )}
           keyExtractor={item => item.id.toString()}
           showsVerticalScrollIndicator={false}
+          bounces={false}
+          overScrollMode='never'
         />
       ) : (
-        <View style={styles.noHistory}>No history found</View>
-      )} */}
+        <View
+          style={{flexGrow: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Text style={styles.noHistory}>No history found</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -90,7 +101,11 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
 export default History;
 
 const styles = StyleSheet.create({
-  noHistory: {},
+  noHistory: {
+    color: '#20C997',
+    textAlign: 'center',
+    fontSize: 16,
+  },
   searchInput: {
     fontSize: 18,
     fontFamily: CustomFont.Urbanist400,
@@ -100,9 +115,9 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 16,
-    paddingBottom: 30,
-    marginBottom: 60,
+    paddingBottom: 0,
     paddingTop: 0,
+    flex: 1,
   },
   searchBox: {
     flexDirection: 'row',

@@ -6,7 +6,7 @@ import React, {memo} from 'react';
 interface VerseReflectionBoxProps {
   title: string;
   content: string;
-  OnPressLink: () => void
+  OnPressLink: () => void;
 }
 
 const VerseReflectionBox: React.FC<VerseReflectionBoxProps> = memo(
@@ -15,7 +15,9 @@ const VerseReflectionBox: React.FC<VerseReflectionBoxProps> = memo(
       <View style={styles.container}>
         <View style={styles.topHeadingBox}>
           <Text style={styles.title}>{title}</Text>
-          <TouchableOpacity style={styles.showDetailsButton} onPress={OnPressLink}>
+          <TouchableOpacity
+            style={styles.showDetailsButton}
+            onPress={OnPressLink}>
             <Image
               source={CustomImages.crossArrow}
               style={styles.arrowIcon}
@@ -49,6 +51,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 16,
     marginBottom: 16,
+    width: '100%',
   },
   showDetailsButton: {
     backgroundColor: 'rgba(32, 201, 151, 1)',

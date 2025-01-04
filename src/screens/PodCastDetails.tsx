@@ -29,6 +29,8 @@ const PodCastDetails: React.FC<ScreenProps<'PodCastDetails'>> = ({
 
   return (
     <ScrollView
+      bounces={false}
+      overScrollMode="never"
       style={[
         styles.container,
         {
