@@ -1,11 +1,9 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
-  FlatList,
+  DeviceEventEmitter,
   Image,
   Linking,
-  Platform,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -16,20 +14,14 @@ import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
 import {getPartOfDay} from '../utils/getPartOfDay';
 import VerseBox from '../common/VerseBox';
-import {Data} from '../utils/verseBoxDemoData';
-import {verseReflectionData} from '../utils/verReflectionDemoData';
 import VerseReflectionBox from '../common/VerseReflectionBox';
-import {ContextChapterData} from '../utils/contextChapterDemoData';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {CustomToaster} from '../utils/AlertNotification';
-import {ALERT_TYPE} from 'react-native-alert-notification';
 import {AppLoaderRef} from '../../App';
 import {ErrorHandler} from '../utils/ErrorHandler';
 import {GetScriptureOfTheDay} from '../axious/getApis';
 import {useMutation} from 'react-query';
 import {MutationKeys} from '../utils/MutationKeys';
-import Video, {VideoRef} from 'react-native-video';
-import ThumbnailGenerator from '../utils/ThumnailGenerator';
+import NoDataFound from '../utils/NoDataFound';
 
 const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
   const initialVerseState = {
@@ -54,41 +46,48 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
   }).format(new Date());
 
   const {greeting, image} = getPartOfDay();
+  const [ScreenText, setScreenText] = useState('please wait...');
 
   const handlePress = () => {};
-  const videoRef = useRef<VideoRef>(null);
 
   const insets = useSafeAreaInsets();
 
   const commonErrorHandler = useCallback((error: any) => {
     console.error(error);
+    setScreenText('No Data Found');
     ErrorHandler(error);
   }, []);
 
   const handleData = (data: any) => {
-    setVerseData(prevState => ({
-      ...prevState,
-      comment_count: data?.comment_count ?? prevState.comment_count,
-      context_chapter: data?.context_chapter ?? prevState.context_chapter,
-      context_chapter_link:
-        data?.context_chapter_link ?? prevState.context_chapter_link,
-      date: data?.date ?? prevState.date,
-      id: data?.id ?? prevState.id,
-      is_favorite: data?.is_favorite ?? prevState.is_favorite,
-      reflection: data?.reflection ?? prevState.reflection,
-      reflection_link: data?.reflection_link ?? prevState.reflection_link,
-      verse: data?.verse ?? prevState.verse,
-      verse_reference: data?.verse_reference ?? prevState.verse_reference,
-      video_link: data?.video_link ?? prevState.video_link,
-    }));
+    if (data.id) {
+      setVerseData(prevState => ({
+        ...prevState,
+        comment_count: data?.comment_count ?? prevState.comment_count,
+        context_chapter: data?.context_chapter ?? prevState.context_chapter,
+        context_chapter_link:
+          data?.context_chapter_link ?? prevState.context_chapter_link,
+        date: data?.date ?? prevState.date,
+        id: data?.id ?? prevState.id,
+        is_favorite: data?.is_favorite ?? prevState.is_favorite,
+        reflection: data?.reflection ?? prevState.reflection,
+        reflection_link: data?.reflection_link ?? prevState.reflection_link,
+        verse: data?.verse ?? prevState.verse,
+        verse_reference: data?.verse_reference ?? prevState.verse_reference,
+        video_link: data?.video_link ?? prevState.video_link,
+      }));
+    } else {
+      setScreenText('No Data Found');
+    }
   };
 
   const {mutate: todaysVerseMutate} = useMutation({
     mutationKey: MutationKeys.todaysVerseMutationKey,
     mutationFn: async () => await GetScriptureOfTheDay(),
     onMutate: () => AppLoaderRef.current?.start(),
-    onError: error => commonErrorHandler(error),
-    onSuccess(data, variables, context) {
+    onError: error => {
+      commonErrorHandler(error);
+    },
+    onSuccess(data) {
       handleData(data?.data?.payload);
     },
     onSettled: () => AppLoaderRef.current?.stop(),
@@ -102,13 +101,23 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
     Linking.openURL(link);
   }, []);
 
-  let videoThumbnail = verseData.video_link
-    ? {uri: ThumbnailGenerator({videoLink: verseData.video_link})}
-    : CustomImages.videoImage;
-        
+  useEffect(() => {
+    const verseEvent = DeviceEventEmitter.addListener('trackLike', data => {
+      console.log(data,verseData.id)
+      console.log('verse off the day')
+      if (data.id == verseData.id) {
+        todaysVerseMutate();
+      }
+    });
+    return () => {
+      verseEvent.remove();
+    };
+  }, []);
 
   return (
-    <ScrollView style={[styles.container, {marginTop: insets.top}]}>
+    <ScrollView
+      style={[styles.container, {marginTop: insets.top}]}
+      contentContainerStyle={{flexGrow: 1}}>
       <View style={styles.headContainer}>
         <View style={styles.leftBox}>
           <Image
@@ -133,11 +142,11 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
         </View>
       </View>
 
-      {verseData ? (
+      {verseData.id ? (
         <>
           <VerseBox
             id={verseData.id}
-            date={verseData.date}
+            date={'Verse of the day'}
             liked={verseData.is_favorite}
             commentNumber={verseData.comment_count}
             reference={verseData.verse_reference}
@@ -155,23 +164,22 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
             content={verseData.context_chapter}
             OnPressLink={handleLink.bind(null, verseData.context_chapter_link)}
           />
+          <View style={styles.videoBox}>
+            <Text style={styles.videoHeading}>Watch Video</Text>
+            <TouchableOpacity
+              onPress={handleLink.bind(null, verseData.video_link)}
+              style={{borderRadius: 15.4}}>
+              <Image
+                source={CustomImages.videoImage}
+                style={styles.videoStyle}
+                resizeMode="cover"
+              />
+            </TouchableOpacity>
+          </View>
         </>
       ) : (
-        <Text style={styles.noDataText}>No Verse Today</Text>
+        <NoDataFound title={ScreenText} />
       )}
-
-      <View style={styles.videoBox}>
-        <Text style={styles.videoHeading}>Watch Video</Text>
-        <TouchableOpacity
-          onPress={handleLink.bind(null, verseData.video_link)}
-          style={{borderRadius: 15.4}}>
-          <Image
-            source={CustomImages.videoImage}
-            style={styles.videoStyle}
-            resizeMode="cover"
-          />
-        </TouchableOpacity>
-      </View>
     </ScrollView>
   );
 };

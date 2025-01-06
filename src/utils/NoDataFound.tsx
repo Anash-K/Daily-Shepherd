@@ -1,5 +1,5 @@
 import React, {memo} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {Platform, StyleSheet, Text, View} from 'react-native';
 
 interface NoDataFound {
   title: string;
@@ -8,7 +8,7 @@ interface NoDataFound {
 const NoDataFound: React.FC<NoDataFound> = memo(({title}) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.noHistory}>No history found</Text>
+      <Text style={styles.noHistory}>{title}</Text>
     </View>
   );
 });
@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
     color: '#20C997',
     textAlign: 'center',
     fontSize: 16,
+    marginTop: Platform.select({ios: 0, android: 25}),
   },
   container: {
     flexGrow: 1,

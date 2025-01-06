@@ -43,7 +43,7 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
 
   const {verseId} = route.params;
   const [verseData, setVerseData] = useState<VerseState>(initialVerseState);
-
+  const [ScreenText, setScreenText] = useState('please wait...');
   // const verseData = Data.filter((verseData: any) => verseData.id === verseId);
 
   useLayoutEffect(() => {
@@ -64,10 +64,15 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
     mutationFn: async () => await GetScriptureDetails({id: verseId}),
     onMutate: () => AppLoaderRef.current?.start(),
     onSuccess(data) {
-      setVerseData(data?.payload);
+      if (data?.payload?.verse) {
+        setVerseData(data?.payload);
+      } else {
+        setScreenText('No Details Available...');
+      }
     },
     onError(error) {
       console.log(error);
+      setScreenText('No Details Available...');
       ErrorHandler(error);
     },
     onSettled: () => AppLoaderRef.current?.stop(),
@@ -77,7 +82,6 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
     if (verseData) {
       GetScriptureData();
     }
-    console.log(verseId);
   }, [verseId]);
 
   const handleDetails = () => {};
@@ -127,7 +131,7 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
           </View>
         </View>
       ) : (
-        <NoDataFound title="No Details Available..." />
+        <NoDataFound title={ScreenText} />
       )}
     </ScrollView>
   );

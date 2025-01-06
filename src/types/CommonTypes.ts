@@ -3,7 +3,7 @@ export interface Loader {
   stop: () => void;
 }
 
-export interface HistoryItem {
+export interface VerseBoxDetailsType {
   id: string;
   date: string;
   verse: string;

@@ -21,7 +21,6 @@ const Loader = memo(
         visible={isLoader}
         onRequestClose={setIsLoader.bind(null, false)}>
         <View style={styles.overlay}>
-          <Text style={styles.pleaseWait}>Please Wait...</Text>
           <ActivityIndicator
             style={styles.loader}
             size={80}
@@ -38,10 +37,10 @@ const styles = StyleSheet.create({
     color: 'rgba(32, 201, 151, 0.5)',
     textAlign: 'center',
     fontSize: 16,
-    position:'absolute',
-    top:'55%',
-    left:0,
-    right:0,
+    position: 'absolute',
+    top: '55%',
+    left: 0,
+    right: 0,
   },
   overlay: {
     flex: 1,

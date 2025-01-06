@@ -1,4 +1,5 @@
 import {
+  DeviceEventEmitter,
   Image,
   Platform,
   StyleSheet,
@@ -8,13 +9,21 @@ import {
 } from 'react-native';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
-import {memo, useEffect, useState} from 'react';
+import {memo, useCallback, useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {ScreenProps} from '../navigation/Stack';
 import {DateComparison, formatDate} from '../utils/currentDateIntlFormat';
+import {useMutation} from 'react-query';
+import {MutationKeys} from '../utils/MutationKeys';
+import {AddToFavorite} from '../axious/PostApis';
+import {AppLoaderRef} from '../../App';
+import {ErrorHandler} from '../utils/ErrorHandler';
+import {CustomToaster} from '../utils/AlertNotification';
+import {ALERT_TYPE} from 'react-native-alert-notification';
+
 interface VerseBoxProps {
   id: string;
-  date: string | Date;
+  date: string | Date | any;
   reference: string;
   verse: string;
   commentNumber: number;
@@ -24,7 +33,6 @@ interface VerseBoxProps {
 
 const VerseBox: React.FC<VerseBoxProps> = memo(
   ({id, date, reference, verse, commentNumber, OnPressDetails, liked}) => {
-    const [isLiked, setIsLiked] = useState(liked);
 
     const navigation =
       useNavigation<ScreenProps<'VerseOfTheDay'>['navigation']>();
@@ -33,15 +41,53 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
       navigation.navigate('Comments');
     };
 
+    const handleAction = useCallback(({message}: {message: string}) => {
+      CustomToaster({
+        type: ALERT_TYPE.SUCCESS,
+        message: message,
+        title: 'Favorites',
+      });
+      if (message === 'Added to favorites.') {
+        DeviceEventEmitter.emit('trackLike', {id: id, isLiked: true});
+      }
+      if (message === 'Removed from favorites.') {
+        DeviceEventEmitter.emit('trackLike', {id: id, isLiked: false});
+      }
+    }, []);
+
+    const {mutate: addVerseToFavorite} = useMutation({
+      mutationKey: MutationKeys.AddToFavoriteMutationKey,
+      mutationFn: async () => await AddToFavorite({id}),
+      onMutate: () => AppLoaderRef.current?.start(),
+      onSuccess(data) {
+        handleAction(data?.data);
+      },
+      onError(error) {
+        console.log(error);
+        ErrorHandler(error);
+      },
+      onSettled: () => AppLoaderRef.current?.stop(),
+    });
+
     const handleLike = () => {
-      setIsLiked(prev => !prev);
+      // setIsLiked(prev => !prev);
+      addVerseToFavorite();
     };
 
- 
-    
     // Usage
-    const displayDate = DateComparison(date);
 
+    let displayDate;
+    if (date instanceof Date && !isNaN(date as any)) {
+      // If `input` is a valid Date object
+      displayDate = DateComparison(date);
+    } else if (!isNaN(Date.parse(date as any))) {
+      // If `input` is a valid date string
+      const parsedDate = new Date(date);
+      displayDate = DateComparison(parsedDate);
+    } else {
+      // If `input` is not a valid date, show it as a string
+      displayDate = date;
+    }
 
     return (
       <TouchableOpacity style={styles.container} onPress={OnPressDetails}>
@@ -67,7 +113,7 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
             <TouchableOpacity style={styles.like} onPress={handleLike}>
               <Image
                 source={
-                  isLiked
+                  liked
                     ? CustomImages.likedIcon // Replace with your "liked" icon
                     : CustomImages.unLikedIcon // Replace with your "unliked" icon
                 }

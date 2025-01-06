@@ -1,4 +1,5 @@
 import {
+  DeviceEventEmitter,
   FlatList,
   Image,
   Platform,
@@ -7,23 +8,22 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import {Data} from '../utils/verseBoxDemoData';
 import VerseBox from '../common/VerseBox';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {ScreenProps} from '../navigation/Stack';
 import {useMutation} from 'react-query';
 import {MutationKeys} from '../utils/MutationKeys';
 import {AppLoaderRef} from '../../App';
 import {ErrorHandler} from '../utils/ErrorHandler';
 import {GetHistory} from '../axious/getApis';
-import {CustomToaster} from '../utils/AlertNotification';
-import {HistoryItem} from '../types/CommonTypes';
+import {VerseBoxDetailsType} from '../types/CommonTypes';
 
 const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
   const [search, setSearch] = React.useState<string>('');
-  const [history, setHistory] = React.useState<HistoryItem[]>([]);
+  const [history, setHistory] = React.useState<VerseBoxDetailsType[]>([]);
+  const [ScreenText, setScreenText] = useState('please wait...');
   const handleDetails = (id: any) => {
     navigation.navigate('VerseDetails', {
       verseId: id, // Pass only the verse ID
@@ -35,11 +35,16 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
     onMutate: () => AppLoaderRef.current?.start(),
     mutationFn: async () => await GetHistory(search),
     onSuccess(data) {
-      console.log(data?.data?.payload?.data)
-      setHistory(data?.data?.payload?.data);
+      console.log(data?.data?.payload?.data);
+      if (data?.data?.payload?.data?.length > 0) {
+        setHistory(data?.data?.payload?.data);
+      } else {
+        setScreenText('No Data Found');
+      }
     },
     onError(error) {
       console.log(error);
+      setScreenText('No Data Found');
       ErrorHandler(error);
     },
     onSettled: () => AppLoaderRef.current?.stop(),
@@ -48,6 +53,18 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
   useEffect(() => {
     getHistoryData();
   }, [search]);
+
+
+  useEffect(() => {
+    const verseEvent = DeviceEventEmitter.addListener('trackLike', data => {
+      getHistoryData();
+      console.log('enent trigger on history')
+    });
+
+    return () => {
+      verseEvent.remove();
+    };
+  }, []);
 
   const handleSearch = useCallback((val: string) => {
     setSearch(val);
@@ -86,12 +103,12 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
           keyExtractor={item => item.id.toString()}
           showsVerticalScrollIndicator={false}
           bounces={false}
-          overScrollMode='never'
+          overScrollMode="never"
         />
       ) : (
         <View
           style={{flexGrow: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Text style={styles.noHistory}>No history found</Text>
+          <Text style={styles.noHistory}>{ScreenText}</Text>
         </View>
       )}
     </View>

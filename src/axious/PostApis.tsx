@@ -48,3 +48,12 @@ export const UpdateProfile = async (data: any) => {
     throw error;
   }
 };
+
+export const AddToFavorite = async ({id} : {id: string}) =>{
+  try {
+    const response =  await AxiosInstance.post(`/scriptures/${id}/favorite`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
