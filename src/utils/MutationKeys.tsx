@@ -3,5 +3,7 @@ export const MutationKeys = {
   historyMutationKey: 'history-verse',
   VerseDetailsKey:'details-verse',
   FavoriteVerseMutationKey:'favorite-verse',
-  AddToFavoriteMutationKey:'addToFavorite-verse'
+  AddToFavoriteMutationKey:'addToFavorite-verse',
+  VerseCommentKey:'verse-comments',
+  AddCommentKey:'addVerse-comment'
 };

@@ -16,15 +16,18 @@ import ChangePassword from '../screens/ChangePassword';
 import {createStackNavigator} from '@react-navigation/stack';
 import NotificationPreferences from '../screens/NotificationPreferences';
 import {useSelector} from 'react-redux';
+import { PodcastState } from '../types/CommonTypes';
 
 export type StackParams = {
   BottomStack: undefined;
-  Comments: undefined;
+  Comments: {
+    verseId:string
+  };
   VerseDetails: {
     verseId: string; // The type for `verseId` should match here
   };
   PodCastDetails: {
-    DataId: string; // The type for `verseId` should match here
+    Data: PodcastState; // The type for `verseId` should match here
   };
   EditProfilePic: undefined;
   Favorites: undefined;

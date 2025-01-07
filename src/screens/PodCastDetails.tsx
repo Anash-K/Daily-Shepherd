@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Image,
+  Linking,
   Platform,
   StyleSheet,
   Text,
@@ -10,20 +11,21 @@ import {
 import CustomButton from '../common/CustomButton';
 import {ScreenProps} from '../navigation/Stack';
 import CustomImages from '../assets/customImages';
-import {Data} from './Podcast';
 import CustomFont from '../assets/customFonts';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import NoDataFound from '../utils/NoDataFound';
+import CustomImageHandler from '../utils/CustomImageHandler';
 
 const PodCastDetails: React.FC<ScreenProps<'PodCastDetails'>> = ({
   navigation,
   route,
 }) => {
-  const {DataId} = route.params;
+  const {Data} = route.params;
 
-  const PodCastData = Data.find((item: any) => item.id === DataId);
-
-  const handlePress = () => {};
+  const handlePress = (link: string) => {
+    Linking.openURL(link);
+  };
 
   const insets = useSafeAreaInsets();
 
@@ -38,68 +40,56 @@ const PodCastDetails: React.FC<ScreenProps<'PodCastDetails'>> = ({
           marginBottom: Platform.select({ios: insets.bottom}),
         },
       ]}
-      contentContainerStyle={{paddingBottom: 30}}
+      contentContainerStyle={{paddingBottom: 30, flex: 1}}
       showsVerticalScrollIndicator={false}>
-      <View style={styles.topHeader}>
-        <CustomButton
-          onPress={() => navigation.goBack()}
-          icon={CustomImages.backIcon}
-          iconStyle={styles.backButtonIcon}
-          buttonStyle={styles.backButton}
-        />
-        <Image source={PodCastData?.imageSrc} style={styles.picStyle} />
-      </View>
-      <Text style={styles.PodcastPenName}>{PodCastData?.name}</Text>
-      <Text style={styles.podcastName}>Faith Over Fear</Text>
-      <View style={styles.buttonContainer}>
-        <CustomButton
-          text="Play"
-          onPress={handlePress}
-          icon={CustomImages.playIcon}
-          iconStyle={{width: 12, height: 16}}
-          buttonStyle={{
-            paddingHorizontal: 32,
-            paddingVertical: 9,
-            columnGap: 6,
-          }}
-        />
-      </View>
-      <View style={styles.TabBox}>
-        <Text style={styles.TabText}>Description</Text>
-      </View>
-      <View style={{rowGap: 1}}>
-        <Text style={[styles.textColor]}>
-          Life is too short and God has too much for us to do for any of us to
-          live enslaved. Jesus promised His followers would experience filled to
-          overflowing life, a life characterized by joy, peace, and spiritual
-          and emotional vitality. And yet, we daily make decisions based on
-          fear, not faith. In Faith Over Fear, author and speaker Jennifer
-          Slattery helps us see different areas of life where fear has a
-          foothold, and how our identity as children of God can help us move
-          from fear to faithful, bold living.
-        </Text>
-        <Text style={[styles.textColor, {marginVertical: 16}]}>
-          This podcast covers topics like:
-        </Text>
-        <Text style={[styles.textColor]}>⭐️ How to Overcome Fear</Text>
-        <Text style={[styles.textColor]}>
-          ⭐️ Biblical Strategies for Overcoming Fear and Anxiety
-        </Text>
-        <Text style={[styles.textColor]}>
-          ⭐️ Powerful Steps to Fight Anxiety
-        </Text>
-        <Text style={[styles.textColor]}>
-          ⭐️ Finding God Faithful in Hard Seasons
-        </Text>
-        <Text style={[styles.textColor]}>
-          ⭐️ Courage to Wait on God Jesus has more planned for us than we could
-          imagine and He’s fully committed to perfecting that which concerns us.{' '}
-        </Text>
-        <Text style={[styles.textColor]}>
-          ⭐️ Fear holds us back, but His perfect love has the power to cast out
-          all fear!
-        </Text>
-      </View>
+      {Data.host ? (
+        <>
+          <View style={styles.topHeader}>
+            <CustomButton
+              onPress={() => navigation.goBack()}
+              icon={CustomImages.backIcon}
+              iconStyle={styles.backButtonIcon}
+              buttonStyle={styles.backButton}
+            />
+            <CustomImageHandler
+              sourceImage={Data.thumbnail}
+              placeholderImage={CustomImages.podcastPlaceHolder}
+              imageStyle={styles.picStyle}
+            />
+          </View>
+          <Text style={styles.PodcastPenName}>{Data?.title}</Text>
+          <Text style={styles.podcastName}>{Data?.host}</Text>
+          <View style={styles.buttonContainer}>
+            <CustomButton
+              text="Play"
+              onPress={handlePress.bind(this, Data.link)}
+              icon={CustomImages.playIcon}
+              iconStyle={{width: 12, height: 16}}
+              buttonStyle={{
+                paddingHorizontal: 32,
+                paddingVertical: 9,
+                columnGap: 6,
+              }}
+            />
+          </View>
+          <View style={styles.TabBox}>
+            <Text style={styles.TabText}>Description</Text>
+          </View>
+          <View style={{rowGap: 1}}>
+            <Text style={[styles.textColor]}>{Data.description}</Text>
+          </View>
+        </>
+      ) : (
+        <>
+          <CustomButton
+            onPress={() => navigation.goBack()}
+            icon={CustomImages.backIcon}
+            iconStyle={styles.backButtonIcon}
+            buttonStyle={styles.backButton}
+          />
+          <NoDataFound />
+        </>
+      )}
     </ScrollView>
   );
 };
@@ -168,6 +158,9 @@ const styles = StyleSheet.create({
   picStyle: {
     width: 150,
     height: 150,
+    borderRadius: 12,
+    borderWidth: 0.46,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
   },
   podcastName: {
     fontFamily: CustomFont.Urbanist600,

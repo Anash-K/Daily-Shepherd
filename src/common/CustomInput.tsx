@@ -58,7 +58,6 @@ const CustomInput: React.FC<CustomInputProps> = ({
   isDisabled = false,
 }) => {
   const [isSecure, setIsSecure] = useState(true);
-  const animatedLabel = React.useRef(new Animated.Value(0)).current;
 
   const toggleSecurity = () => {
     setIsSecure(!isSecure);
@@ -72,22 +71,6 @@ const CustomInput: React.FC<CustomInputProps> = ({
   return (
     <View style={[styles.container, inputBoxStyle]}>
       <View style={styles.inputContainer}>
-        {/* {isPhoneInput ? (
-          <PhoneInput
-            containerStyle={[styles.phoneInputContainer, inputStyle]}
-            textContainerStyle={styles.phoneTextContainer}
-            textInputStyle={styles.phoneTextInput}
-            onChangeFormattedText={onChange}
-            defaultCode="US"
-            layout="second"
-            textInputProps={{
-              ...inputConfigurations,
-            }}
-          />
-        ) : (
-          
-        )} */}
-
         <FloatingLabelInput
           label={(<Text style={styles.labelText}>{label}</Text>) as any}
           isPassword={isPassword}

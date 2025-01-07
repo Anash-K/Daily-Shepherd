@@ -22,6 +22,8 @@ import {GetScriptureOfTheDay} from '../axious/getApis';
 import {useMutation} from 'react-query';
 import {MutationKeys} from '../utils/MutationKeys';
 import NoDataFound from '../utils/NoDataFound';
+import CustomImageHandler from '../utils/CustomImageHandler';
+import { VerseState } from '../types/CommonTypes';
 
 const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
   const initialVerseState = {
@@ -36,9 +38,10 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
     verse: '',
     verse_reference: '',
     video_link: '',
+    thumbnail: '',
   };
 
-  const [verseData, setVerseData] = useState(initialVerseState);
+  const [verseData, setVerseData] = useState<VerseState>(initialVerseState);
   const currentDate = new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
@@ -46,7 +49,8 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
   }).format(new Date());
 
   const {greeting, image} = getPartOfDay();
-  const [ScreenText, setScreenText] = useState('please wait...');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [onFirstLoad, setOnFirstLoad] = useState<boolean>(true);
 
   const handlePress = () => {};
 
@@ -54,11 +58,10 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
 
   const commonErrorHandler = useCallback((error: any) => {
     console.error(error);
-    setScreenText('No Data Found');
     ErrorHandler(error);
   }, []);
 
-  const handleData = (data: any) => {
+  const handleData = (data: VerseState) => {
     if (data.id) {
       setVerseData(prevState => ({
         ...prevState,
@@ -74,37 +77,42 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
         verse: data?.verse ?? prevState.verse,
         verse_reference: data?.verse_reference ?? prevState.verse_reference,
         video_link: data?.video_link ?? prevState.video_link,
+        thumbnail: data?.thumbnail ?? prevState.thumbnail,
       }));
-    } else {
-      setScreenText('No Data Found');
     }
   };
 
   const {mutate: todaysVerseMutate} = useMutation({
     mutationKey: MutationKeys.todaysVerseMutationKey,
     mutationFn: async () => await GetScriptureOfTheDay(),
-    onMutate: () => AppLoaderRef.current?.start(),
+    onMutate: () => {
+      AppLoaderRef.current?.start(), setIsLoading(true);
+    },
     onError: error => {
       commonErrorHandler(error);
     },
     onSuccess(data) {
       handleData(data?.data?.payload);
     },
-    onSettled: () => AppLoaderRef.current?.stop(),
+    onSettled: () => {
+      AppLoaderRef.current?.stop();
+      setIsLoading(false);
+      setOnFirstLoad(false);
+    },
   });
 
   useEffect(() => {
     todaysVerseMutate();
   }, []);
 
-  const handleLink = useCallback((link: any) => {
+  const handleLink = useCallback((link: string) => {
     Linking.openURL(link);
   }, []);
 
   useEffect(() => {
     const verseEvent = DeviceEventEmitter.addListener('trackLike', data => {
-      console.log(data,verseData.id)
-      console.log('verse off the day')
+      console.log(data, verseData.id);
+      console.log('verse off the day');
       if (data.id == verseData.id) {
         todaysVerseMutate();
       }
@@ -113,6 +121,10 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
       verseEvent.remove();
     };
   }, []);
+
+  if (isLoading && onFirstLoad) {
+    return null;
+  }
 
   return (
     <ScrollView
@@ -169,16 +181,16 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
             <TouchableOpacity
               onPress={handleLink.bind(null, verseData.video_link)}
               style={{borderRadius: 15.4}}>
-              <Image
-                source={CustomImages.videoImage}
-                style={styles.videoStyle}
-                resizeMode="cover"
+              <CustomImageHandler
+                sourceImage={verseData.thumbnail}
+                placeholderImage={CustomImages.videoImage}
+                imageStyle={styles.videoStyle}
               />
             </TouchableOpacity>
           </View>
         </>
       ) : (
-        <NoDataFound title={ScreenText} />
+        <NoDataFound />
       )}
     </ScrollView>
   );
@@ -209,6 +221,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     borderRadius: 15.4,
+    resizeMode:'cover'
   },
   container: {
     flex: 1,

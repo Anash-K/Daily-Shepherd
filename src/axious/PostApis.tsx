@@ -2,7 +2,6 @@ import AxiosInstance from './AxiousInstance';
 
 export const LoginApi = async (data: any) => {
   try {
-    
     const response = await AxiosInstance.post('login', data);
     return response;
   } catch (error) {
@@ -49,11 +48,27 @@ export const UpdateProfile = async (data: any) => {
   }
 };
 
-export const AddToFavorite = async ({id} : {id: string}) =>{
+export const AddToFavorite = async ({id}: {id: string}) => {
   try {
-    const response =  await AxiosInstance.post(`/scriptures/${id}/favorite`);
+    const response = await AxiosInstance.post(`/scriptures/${id}/favorite`);
     return response;
   } catch (error) {
     throw error;
   }
+};
+
+interface AddCommentType {
+  id: string;
+  comment: string;
 }
+
+export const AddComment = async ({id, comment}: AddCommentType) => {
+  try {
+    const response = await AxiosInstance.post(`/scriptures/${id}/comments`, {
+      comment: comment,
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

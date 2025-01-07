@@ -25,27 +25,28 @@ const Favorites: React.FC<ScreenProps<'Favorites'>> = ({navigation}) => {
       verseId: id, // Pass only the verse ID
     });
   };
-  const [ScreenText, setScreenText] = useState('please wait...');
+  const [isLoading, setIsLoading] = useState(false);
   const [verseData, setVerseData] = useState<VerseBoxDetailsType[]>([]);
 
   const {mutate: getFavoriteVerse} = useMutation({
     mutationKey: MutationKeys.FavoriteVerseMutationKey,
-    onMutate: () => AppLoaderRef.current?.start(),
+    onMutate: () => {
+      AppLoaderRef.current?.start(), setIsLoading(true);
+    },
     mutationFn: async () => await GetFavoriteScripture(),
     onSuccess(data) {
       console.log(data?.payload?.data, 'favorite data');
       if (data?.payload?.data[0]?.date) {
         setVerseData(data?.payload?.data);
-      } else {
-        setScreenText('No Data Found');
       }
     },
     onError(error) {
       console.log(error, 'error');
-      setScreenText('No Data Found');
       ErrorHandler(error);
     },
-    onSettled: () => AppLoaderRef.current?.stop(),
+    onSettled: () => {
+      AppLoaderRef.current?.stop(), setIsLoading(false);
+    },
   });
 
   useEffect(() => {
@@ -60,6 +61,10 @@ const Favorites: React.FC<ScreenProps<'Favorites'>> = ({navigation}) => {
       verseEvent.remove();
     };
   }, []);
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>
@@ -81,7 +86,7 @@ const Favorites: React.FC<ScreenProps<'Favorites'>> = ({navigation}) => {
           showsVerticalScrollIndicator={false}
         />
       ) : (
-        <NoDataFound title={ScreenText} />
+        <NoDataFound />
       )}
     </View>
   );

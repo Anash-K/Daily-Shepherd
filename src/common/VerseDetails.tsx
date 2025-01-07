@@ -22,6 +22,7 @@ import {MutationKeys} from '../utils/MutationKeys';
 import {VerseState} from '../types/CommonTypes';
 import NoDataFound from '../utils/NoDataFound';
 import {formatDate} from '../utils/currentDateIntlFormat';
+import CustomImageHandler from '../utils/CustomImageHandler';
 
 const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
   route,
@@ -39,11 +40,13 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
     verse: '',
     verse_reference: '',
     video_link: '',
+    thumbnail:''
   };
 
   const {verseId} = route.params;
   const [verseData, setVerseData] = useState<VerseState>(initialVerseState);
-  const [ScreenText, setScreenText] = useState('please wait...');
+  const [isLoading, setIsLoading] = useState(false);
+  const [onFirstLoad, setOnFirstLoad] = useState(true);
   // const verseData = Data.filter((verseData: any) => verseData.id === verseId);
 
   useLayoutEffect(() => {
@@ -62,20 +65,23 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
   const {mutate: GetScriptureData} = useMutation({
     mutationKey: MutationKeys.VerseDetailsKey,
     mutationFn: async () => await GetScriptureDetails({id: verseId}),
-    onMutate: () => AppLoaderRef.current?.start(),
+    onMutate: () => {
+      AppLoaderRef.current?.start();
+       setIsLoading(true);
+    },
     onSuccess(data) {
       if (data?.payload?.verse) {
         setVerseData(data?.payload);
-      } else {
-        setScreenText('No Details Available...');
       }
     },
     onError(error) {
       console.log(error);
-      setScreenText('No Details Available...');
       ErrorHandler(error);
     },
-    onSettled: () => AppLoaderRef.current?.stop(),
+    onSettled: () => {
+      AppLoaderRef.current?.stop(); 
+      setIsLoading(false);
+    },
   });
 
   useEffect(() => {
@@ -91,6 +97,10 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
   const handleLink = useCallback((link: any) => {
     Linking.openURL(link);
   }, []);
+
+  if (isLoading && onFirstLoad) {
+    return null;
+  }
 
   return (
     <ScrollView
@@ -123,15 +133,15 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
           {/* Video Section */}
           <View style={styles.videoBox}>
             <Text style={styles.videoHeading}>Watch Video</Text>
-            <Image
-              source={CustomImages.videoImage}
-              style={styles.videoStyle}
-              resizeMode="contain"
+            <CustomImageHandler
+              sourceImage={verseData.thumbnail}
+              placeholderImage={CustomImages.videoImage}
+              imageStyle={styles.videoStyle}
             />
           </View>
         </View>
       ) : (
-        <NoDataFound title={ScreenText} />
+        <NoDataFound />
       )}
     </ScrollView>
   );
@@ -160,6 +170,8 @@ const styles = StyleSheet.create({
   videoStyle: {
     width: '100%',
     height: 200,
+    borderRadius: 15.4,
+    resizeMode: 'contain',
   },
   container: {
     flex: 1,

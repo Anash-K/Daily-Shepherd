@@ -2,7 +2,7 @@ import messaging from '@react-native-firebase/messaging';
 import {PermissionsAndroid, Platform} from 'react-native';
 
 const getFCMTokenAndroid = async () => {
-  let fcmToken = 'dummy';
+  let fcmToken = null;
   try {
     await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
@@ -14,7 +14,7 @@ const getFCMTokenAndroid = async () => {
 };
 
 const getFCMTokenIOS = async () => {
-  let fcmToken = 'dummy';
+  let fcmToken = null;
 
   try {
     const authStatus = await messaging().requestPermission();
@@ -30,7 +30,7 @@ const getFCMTokenIOS = async () => {
 };
 
 export const getFCMToken = async () => {
-  let fcmToken = 'dummy';
+  let fcmToken = null;
   Platform.OS === 'ios'
     ? (fcmToken = await getFCMTokenIOS())
     : (fcmToken = await getFCMTokenAndroid());

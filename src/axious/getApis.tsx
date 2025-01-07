@@ -37,3 +37,21 @@ export const GetFavoriteScripture = async () => {
     throw error; // Re-throw the error for upstream handling
   }
 };
+
+export const GetPodcast = async ({keyword}: {keyword: string}) => {
+  try {
+    const response = await AxiosInstance.get(`podcasts-list/?text=${keyword}`);
+    return response?.data?.payload;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const GetVerseComments = async ({verseId}: {verseId: string}) => {
+  try {
+    const response = await AxiosInstance.get(`scriptures/${verseId}/comments`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

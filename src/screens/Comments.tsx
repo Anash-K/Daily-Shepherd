@@ -10,14 +10,73 @@ import {
 } from 'react-native';
 import {DemoCommentData} from '../utils/demoComments';
 import CommentBox from '../common/CommentBox';
-import React from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {ScreenParams, ScreenProps} from '../navigation/Stack';
 import CustomImages from '../assets/customImages';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import CustomFont from '../assets/customFonts';
+import {useMutation} from 'react-query';
+import {MutationKeys} from '../utils/MutationKeys';
+import {GetVerseComments} from '../axious/getApis';
+import {AppLoaderRef} from '../../App';
+import {ErrorHandler} from '../utils/ErrorHandler';
+import NoComments from '../common/NoComments';
+import {AddComment} from '../axious/PostApis';
 
-const Comments: React.FC<ScreenProps<'Comments'>> = () => {
+const Comments: React.FC<ScreenProps<'Comments'>> = ({route}) => {
   const {bottom} = useSafeAreaInsets();
+  const {verseId} = route.params;
+
+  const [inputComment, setInputComment] = useState('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [onFirstLoad, setOnFirstLoad] = useState<boolean>(true);
+  const [comment, setComment] = useState([]);
+
+  const {mutate: getCommentsData} = useMutation({
+    mutationKey: MutationKeys.VerseCommentKey,
+    mutationFn: async () => await GetVerseComments({verseId}),
+    onMutate: () => {
+      AppLoaderRef.current?.start();
+      setIsLoading(true);
+    },
+    onSuccess(data) {
+      console.log(data);
+      setComment(data?.payload?.data);
+    },
+    onError(error) {
+      console.log(error);
+      ErrorHandler(error);
+    },
+    onSettled: () => {
+      AppLoaderRef.current?.stop();
+      setIsLoading(false);
+      setOnFirstLoad(false);
+    },
+  });
+
+  const {} = useMutation({
+    mutationKey: MutationKeys.AddCommentKey,
+    mutationFn: async () =>
+      await AddComment({id: verseId, comment: inputComment}),
+  });
+
+  useEffect(() => {
+    if (verseId) {
+      getCommentsData();
+    }
+  }, [verseId]);
+
+  useEffect(() => {
+    console.log(comment, 'comment');
+  }, [comment]);
+
+  const handleChange = useCallback((val: string) => {
+    setInputComment(val);
+  }, []);
+
+  if (isLoading && onFirstLoad) {
+    return null;
+  }
 
   return (
     <KeyboardAvoidingView
@@ -26,14 +85,18 @@ const Comments: React.FC<ScreenProps<'Comments'>> = () => {
       contentContainerStyle={{flexGrow: 1}}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 20}>
       <View style={styles.container}>
-        <View style={styles.listContainer}>
-          <FlatList
-            data={DemoCommentData}
-            renderItem={({item}) => <CommentBox {...item} />}
-            keyExtractor={item => item.id.toString()}
-            showsVerticalScrollIndicator={false}
-          />
-        </View>
+        {comment.length > 0 ? (
+          <View style={styles.listContainer}>
+            {/* <FlatList
+              data={comment}
+              renderItem={({item}) => <CommentBox {...item} />}
+              keyExtractor={item => item.id.toString()}
+              showsVerticalScrollIndicator={false}
+            /> */}
+          </View>
+        ) : (
+          <NoComments />
+        )}
 
         <View
           style={[
@@ -50,6 +113,7 @@ const Comments: React.FC<ScreenProps<'Comments'>> = () => {
               style={styles.textInput}
               placeholder="Write a comment..."
               placeholderTextColor="#A0A0A0"
+              onChangeText={handleChange}
             />
             <TouchableOpacity style={styles.sendButton}>
               <Image source={CustomImages.rightArrow} style={styles.sendIcon} />

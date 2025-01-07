@@ -65,6 +65,8 @@ const CustomImages = {
   loginTopBg: require('./images/loginBackGround.png'),
   appleLogo: require('./images/AppleLogo.png'),
   googleLogo: require('./images/GoogleLogo.png'),
+  noDataFound: require('./images/noDataFound.png'),
+  podcastPlaceHolder: require('./images/podcastPlaceholder.png'),
 };
 
 export default CustomImages;

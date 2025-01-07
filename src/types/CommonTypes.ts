@@ -24,4 +24,14 @@ export interface VerseState {
   verse: string;
   verse_reference: string;
   video_link: string;
+  thumbnail:string
+};
+
+export interface PodcastState{
+    host: string;
+    id: string;
+    link: string;
+    title: string;
+    description:string;
+    thumbnail:string
 }

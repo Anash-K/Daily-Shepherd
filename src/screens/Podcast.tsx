@@ -8,79 +8,91 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import ScreenWrapper from '../common/ScreenWrapper';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
-import React from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {ScreenProps} from '../navigation/Stack';
-import { useMutation } from 'react-query';
-
-export const Data = [
-  {
-    id: 1,
-    imageSrc: CustomImages.podcast1,
-    name: 'Ascension Catholic Media',
-    details: 'The Bible in a Year (with Fr. Mike Schmitz)',
-  },
-  {
-    id: 2,
-    imageSrc: CustomImages.podcast2,
-    name: 'LifeAudio',
-    details: 'How to Study the Bible - Bible Study Made Simple',
-  },
-  {
-    id: 3,
-    imageSrc: CustomImages.podcast3,
-    name: 'Dr. Melody Stevens',
-    details: 'The Bible In A Year Podcast with Dr. Melody...',
-  },
-  {
-    id: 4,
-    imageSrc: CustomImages.podcast4,
-    name: 'LifeAudio',
-    details: 'Faith Over Fear',
-  },
-  {
-    id: 5,
-    imageSrc: CustomImages.podcast5,
-    name: 'Podcast 5',
-    details: 'Details for Podcast 5',
-  },
-  {
-    id: 6,
-    imageSrc: CustomImages.podcast6,
-    name: 'Podcast 6',
-    details: 'Details for Podcast 6',
-  },
-  {
-    id: 7,
-    imageSrc: CustomImages.podcast7,
-    name: 'Podcast 7',
-    details: 'Details for Podcast 7',
-  },
-];
+import {useMutation} from 'react-query';
+import {AppLoaderRef} from '../../App';
+import {GetPodcast} from '../axious/getApis';
+import {ErrorHandler} from '../utils/ErrorHandler';
+import {PodcastState} from '../types/CommonTypes';
+import NoDataFound from '../utils/NoDataFound';
+import CustomImageHandler from '../utils/CustomImageHandler';
 
 const Podcast: React.FC<ScreenProps<'Podcast'>> = ({navigation}) => {
-  const handleDetails = (id: any) => {
-    
-    navigation.navigate('PodCastDetails',{
-      DataId:id
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [onFirstLoad, setOnFirstLoad] = useState<boolean>(true);
+  const [podcastData, setPodcastData] = useState<PodcastState[]>([]);
+  const [searchKeyword, setSearchKeyword] = useState<string>('');
+  const [debounceQuery, setDebounceQuery] = useState<string>('');
+
+  const handleDetails = (DataChunk: PodcastState) => {
+    navigation.navigate('PodCastDetails', {
+      Data: DataChunk,
     });
   };
 
-  const {} = useMutation({
-    
-  })
+  const {mutate: getPodcastData} = useMutation({
+    onMutate: () => {
+      AppLoaderRef.current?.start();
+      setIsLoading(true);
+    },
+    mutationFn: async () => await GetPodcast({keyword: searchKeyword}),
+    onSuccess(data) {
+      setPodcastData(data?.data);
+    },
+    onError(error) {
+      console.log(error, 'Error');
+      ErrorHandler(error);
+    },
+    onSettled: () => {
+      AppLoaderRef.current?.stop();
+      setIsLoading(false);
+      setOnFirstLoad(false);
+    },
+  });
 
-  const renderPodcastItem = ({item}: any) => (
+  //debouncer to optimize search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebounceQuery(searchKeyword);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchKeyword]);
+
+  useEffect(() => {
+    getPodcastData();
+  }, [debounceQuery]);
+
+  useEffect(() => {
+    getPodcastData();
+  }, []);
+
+  const handleChange = useCallback((val: string) => {
+    setSearchKeyword(val);
+  }, []);
+
+  const renderPodcastItem = ({item}: {item: PodcastState}) => (
     <TouchableOpacity
       style={styles.podcastItem}
-      onPress={handleDetails.bind(this, item.id)}>
-      <Image source={item.imageSrc} style={styles.podcastImage} />
-      <Text style={styles.podcastName}>{item.name}</Text>
-      <Text style={styles.podcastDetails}>{item.details}</Text>
+      onPress={handleDetails.bind(this, item)}>
+      <CustomImageHandler
+        sourceImage={item.thumbnail}
+        placeholderImage={CustomImages.podcastPlaceHolder}
+        imageStyle={styles.podcastImage}
+      />
+      <Text style={styles.podcastName}>{item.title}</Text>
+      <Text style={styles.podcastDetails}>{item.host}</Text>
     </TouchableOpacity>
   );
+
+  if (isLoading && onFirstLoad) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>
@@ -94,21 +106,29 @@ const Podcast: React.FC<ScreenProps<'Podcast'>> = ({navigation}) => {
           placeholder="Search by topic, scripture, or keyword…"
           placeholderTextColor={'rgba(250, 250, 250, 0.5)'}
           style={styles.searchInput}
+          onChangeText={handleChange}
         />
       </View>
-      <FlatList
-        data={Data}
-        renderItem={renderPodcastItem}
-        keyExtractor={(item, index) => `podcast-${index}`}
-        numColumns={2}
-        contentContainerStyle={{
-          justifyContent: 'space-between',
-        }}
-        columnWrapperStyle={{
-          justifyContent: 'space-between', // Adds space between columns
-          marginBottom: 16, // Optional: adds space between rows
-        }}
-      />
+      {podcastData[0]?.host ? (
+        <>
+          <FlatList
+            data={podcastData}
+            renderItem={renderPodcastItem}
+            keyExtractor={item => item.id}
+            numColumns={2}
+            contentContainerStyle={{
+              justifyContent: 'space-between',
+            }}
+            columnWrapperStyle={{
+              justifyContent: 'space-between',
+              marginBottom: 16,
+            }}
+            showsVerticalScrollIndicator={false}
+          />
+        </>
+      ) : (
+        <NoDataFound />
+      )}
     </View>
   );
 };
@@ -118,9 +138,9 @@ export default Podcast;
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    paddingBottom: 30,
-    marginBottom: 60,
-    paddingTop:0
+    paddingTop: 0,
+    paddingBottom: 0,
+    flex: 1,
   },
   searchBox: {
     flexDirection: 'row',

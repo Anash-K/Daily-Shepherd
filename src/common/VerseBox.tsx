@@ -33,12 +33,14 @@ interface VerseBoxProps {
 
 const VerseBox: React.FC<VerseBoxProps> = memo(
   ({id, date, reference, verse, commentNumber, OnPressDetails, liked}) => {
-
     const navigation =
       useNavigation<ScreenProps<'VerseOfTheDay'>['navigation']>();
+    const [isLiked, setIsLiked] = useState(liked);
 
-    const handleComments = () => {
-      navigation.navigate('Comments');
+    const handleComments = (id: string) => {
+      navigation.navigate('Comments', {
+        verseId: id,
+      });
     };
 
     const handleAction = useCallback(({message}: {message: string}) => {
@@ -48,9 +50,11 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
         title: 'Favorites',
       });
       if (message === 'Added to favorites.') {
+        setIsLiked(true);
         DeviceEventEmitter.emit('trackLike', {id: id, isLiked: true});
       }
       if (message === 'Removed from favorites.') {
+        setIsLiked(false);
         DeviceEventEmitter.emit('trackLike', {id: id, isLiked: false});
       }
     }, []);
@@ -113,14 +117,16 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
             <TouchableOpacity style={styles.like} onPress={handleLike}>
               <Image
                 source={
-                  liked
+                  isLiked
                     ? CustomImages.likedIcon // Replace with your "liked" icon
                     : CustomImages.unLikedIcon // Replace with your "unliked" icon
                 }
                 style={styles.likedIcon}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.comment} onPress={handleComments}>
+            <TouchableOpacity
+              style={styles.comment}
+              onPress={handleComments.bind(this, id)}>
               <Image
                 source={CustomImages.commentIcon}
                 style={styles.commentIcon}
@@ -153,6 +159,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     padding: 16,
     borderRadius: 20,
+    width: '100%',
   },
   actionsBox: {
     flexDirection: 'row',

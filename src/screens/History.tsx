@@ -19,11 +19,14 @@ import {AppLoaderRef} from '../../App';
 import {ErrorHandler} from '../utils/ErrorHandler';
 import {GetHistory} from '../axious/getApis';
 import {VerseBoxDetailsType} from '../types/CommonTypes';
+import NoDataFound from '../utils/NoDataFound';
 
 const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
   const [search, setSearch] = React.useState<string>('');
+  const [debounceQuery, setDebounceQuery] = useState<string>('');
   const [history, setHistory] = React.useState<VerseBoxDetailsType[]>([]);
-  const [ScreenText, setScreenText] = useState('please wait...');
+  const [isLoading, setIsLoading] = useState(false);
+  const [onFirstLoad, setOnFirstLoad] = useState(true);
   const handleDetails = (id: any) => {
     navigation.navigate('VerseDetails', {
       verseId: id, // Pass only the verse ID
@@ -32,33 +35,44 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
 
   const {mutate: getHistoryData} = useMutation({
     mutationKey: MutationKeys.historyMutationKey,
-    onMutate: () => AppLoaderRef.current?.start(),
+    onMutate: () => {
+      AppLoaderRef.current?.start();
+      setIsLoading(true);
+    },
     mutationFn: async () => await GetHistory(search),
     onSuccess(data) {
       console.log(data?.data?.payload?.data);
-      if (data?.data?.payload?.data?.length > 0) {
-        setHistory(data?.data?.payload?.data);
-      } else {
-        setScreenText('No Data Found');
-      }
+      setHistory(data?.data?.payload?.data);
     },
     onError(error) {
       console.log(error);
-      setScreenText('No Data Found');
       ErrorHandler(error);
     },
-    onSettled: () => AppLoaderRef.current?.stop(),
+    onSettled: () => {
+      AppLoaderRef.current?.stop();
+      setIsLoading(false);
+      setOnFirstLoad(false);
+    },
   });
 
   useEffect(() => {
-    getHistoryData();
+    const handler = setTimeout(() => {
+      setDebounceQuery(search);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
   }, [search]);
 
+  useEffect(() => {
+    getHistoryData();
+  }, [debounceQuery]);
 
   useEffect(() => {
     const verseEvent = DeviceEventEmitter.addListener('trackLike', data => {
       getHistoryData();
-      console.log('enent trigger on history')
+      console.log('enent trigger on history');
     });
 
     return () => {
@@ -69,6 +83,10 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
   const handleSearch = useCallback((val: string) => {
     setSearch(val);
   }, []);
+
+  if (isLoading && onFirstLoad) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>
@@ -100,16 +118,12 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
               OnPressDetails={handleDetails.bind(null, item.id)}
             />
           )}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={item => item.id}
           showsVerticalScrollIndicator={false}
-          bounces={false}
           overScrollMode="never"
         />
       ) : (
-        <View
-          style={{flexGrow: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Text style={styles.noHistory}>{ScreenText}</Text>
-        </View>
+        <NoDataFound />
       )}
     </View>
   );
