@@ -26,26 +26,27 @@ const Favorites: React.FC<ScreenProps<'Favorites'>> = ({navigation}) => {
     });
   };
   const [isLoading, setIsLoading] = useState(false);
+  const [onFirstLoad, setOnFirstLoad] = useState(true);
   const [verseData, setVerseData] = useState<VerseBoxDetailsType[]>([]);
 
   const {mutate: getFavoriteVerse} = useMutation({
     mutationKey: MutationKeys.FavoriteVerseMutationKey,
     onMutate: () => {
-      AppLoaderRef.current?.start(), setIsLoading(true);
+      AppLoaderRef.current?.start();
+      setIsLoading(true);
     },
     mutationFn: async () => await GetFavoriteScripture(),
     onSuccess(data) {
-      console.log(data?.payload?.data, 'favorite data');
-      if (data?.payload?.data[0]?.date) {
-        setVerseData(data?.payload?.data);
-      }
+      setVerseData(data?.payload?.data);
     },
     onError(error) {
       console.log(error, 'error');
       ErrorHandler(error);
     },
     onSettled: () => {
-      AppLoaderRef.current?.stop(), setIsLoading(false);
+      AppLoaderRef.current?.stop();
+      setIsLoading(false);
+      setOnFirstLoad(false);
     },
   });
 
@@ -62,7 +63,7 @@ const Favorites: React.FC<ScreenProps<'Favorites'>> = ({navigation}) => {
     };
   }, []);
 
-  if (isLoading) {
+  if (isLoading && onFirstLoad) {
     return null;
   }
 

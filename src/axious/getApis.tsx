@@ -38,7 +38,7 @@ export const GetFavoriteScripture = async () => {
   }
 };
 
-export const GetPodcast = async ({keyword}: {keyword: string}) => {
+export const GetPodcast = async (keyword: string) => {
   try {
     const response = await AxiosInstance.get(`podcasts-list/?text=${keyword}`);
     return response?.data?.payload;

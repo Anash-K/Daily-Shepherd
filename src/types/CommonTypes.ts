@@ -35,3 +35,18 @@ export interface PodcastState{
     description:string;
     thumbnail:string
 }
+
+export interface CommentUser {
+  email: string;
+  id: string;
+  name: string;
+  notification_time: string | null;
+  profile: string;
+}
+
+export interface CommentBoxType {
+  comment: string;
+  created_at: string;
+  id: string;
+  user: CommentUser;
+}

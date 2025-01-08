@@ -32,7 +32,7 @@ const PodCastDetails: React.FC<ScreenProps<'PodCastDetails'>> = ({
   return (
     <ScrollView
       bounces={false}
-      overScrollMode="never"
+      // overScrollMode="never"
       style={[
         styles.container,
         {
@@ -40,7 +40,7 @@ const PodCastDetails: React.FC<ScreenProps<'PodCastDetails'>> = ({
           marginBottom: Platform.select({ios: insets.bottom}),
         },
       ]}
-      contentContainerStyle={{paddingBottom: 30, flex: 1}}
+      contentContainerStyle={{paddingBottom: 30, flexGrow: 1}}
       showsVerticalScrollIndicator={false}>
       {Data.host ? (
         <>
@@ -75,7 +75,7 @@ const PodCastDetails: React.FC<ScreenProps<'PodCastDetails'>> = ({
           <View style={styles.TabBox}>
             <Text style={styles.TabText}>Description</Text>
           </View>
-          <View style={{rowGap: 1}}>
+          <View style={{rowGap: 1,}}>
             <Text style={[styles.textColor]}>{Data.description}</Text>
           </View>
         </>
@@ -135,6 +135,8 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 16,
+    marginBottom:10,
+    flex: 1,
   },
   topHeader: {
     flexDirection: 'row',

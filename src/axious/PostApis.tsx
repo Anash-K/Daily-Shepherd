@@ -72,3 +72,12 @@ export const AddComment = async ({id, comment}: AddCommentType) => {
     throw error;
   }
 };
+
+export const ReportComment = async ({commentId}: {commentId: string}) => {
+  try {
+    const response = await AxiosInstance.post(`/comments/${commentId}/report`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(32, 33, 38, 1)',
     borderRadius: 15,
     padding: 16,
-    paddingBottom: Platform.select({android: 10, ios: 16}),
+    paddingBottom: Platform.select({android: 16, ios: 16}),
     // marginTop: 16,
     marginBottom: 40,
     width: '100%',
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19.2,
     color: 'rgba(250, 250, 250, 0.75)',
-    marginBottom: Platform.select({android: 5, ios: 12}),
+    marginBottom: Platform.select({android: 12, ios: 12}),
   },
   videoStyle: {
     width: '100%',

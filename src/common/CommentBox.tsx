@@ -1,4 +1,4 @@
-import {useCallback, useState} from 'react';
+import React, {memo, useCallback, useState} from 'react';
 import {
   Image,
   Pressable,
@@ -10,79 +10,136 @@ import {
 import {Menu, MenuItem} from 'react-native-material-menu';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
+import {formatDate, TimeAgo} from '../utils/currentDateIntlFormat';
+import {CommentBoxType} from '../types/CommonTypes';
+import {useMutation} from 'react-query';
+import {MutationKeys} from '../utils/MutationKeys';
+import {ReportComment} from '../axious/PostApis';
+import {AppLoaderRef} from '../../App';
+import {CustomToaster} from '../utils/AlertNotification';
+import {ALERT_TYPE} from 'react-native-alert-notification';
+import {ErrorHandler} from '../utils/ErrorHandler';
+import {useSelector} from 'react-redux';
+import CustomImageHandler from '../utils/CustomImageHandler';
 
-const CommentBox = (data: any) => {
-  const [isVisible, setIsVisible] = useState(false);
+const CommentBox: React.FC<CommentBoxType> = memo(
+  ({comment, created_at, id, user}) => {
+    const userData = useSelector((state: any) => state.auth);
 
-  const toggleMenu = useCallback(() => {
-    setIsVisible(prev => !prev);
-  }, []);
+    const [isVisible, setIsVisible] = useState(false);
 
-  const closeMenu = useCallback(() => {
-    setIsVisible(false);
-  }, []);
+    const toggleMenu = useCallback(() => {
+      setIsVisible(prev => !prev);
+    }, []);
 
-  const CustomAction = () => {
+    const closeMenu = useCallback(() => {
+      setIsVisible(false);
+    }, []);
+
+    const CustomAction = () => {
+      return (
+        <View style={styles.commentAction}>
+          <Image source={CustomImages.warningIcon} style={styles.warningIcon} />
+          <Text style={styles.menuItemText}>Report</Text>
+        </View>
+      );
+    };
+
+    const handleReportResponse = useCallback((data: any) => {
+      if (data?.status == 200) {
+        CustomToaster({
+          type: ALERT_TYPE.SUCCESS,
+          message: 'Comment Reported',
+        });
+      } else {
+        CustomToaster({
+          type: ALERT_TYPE.DANGER,
+          message: 'Failed to Report',
+        });
+      }
+    }, []);
+
+    const {mutate: reportComment} = useMutation({
+      mutationKey: MutationKeys.ReportKey,
+      mutationFn: async () => await ReportComment({commentId: id}),
+      onMutate: () => AppLoaderRef.current?.start(),
+      onSuccess(data) {
+        handleReportResponse(data);
+      },
+      onError(error) {
+        console.log(error);
+        ErrorHandler(error);
+      },
+      onSettled: () => {
+        AppLoaderRef.current?.stop();
+        closeMenu();
+      },
+    });
+
+    console.log(userData.email, 'email', user.email);
+    console.log(user.email !== userData.email);
+
     return (
-      <View style={{flexDirection: 'row', columnGap: 10, alignItems: 'center'}}>
-        <Image source={CustomImages.warningIcon} style={styles.warningIcon} />
-        <Text style={styles.menuItemText}>Report</Text>
+      <View style={styles.container}>
+        {/* Profile Picture */}
+        <CustomImageHandler
+          sourceImage={user.profile}
+          placeholderImage={CustomImages.profilePic}
+          imageStyle={styles.profilePic}
+        />
+        {/* <Image source={CustomImages.demoComment} style={styles.profilePic} /> */}
+
+        <View style={styles.contentBox}>
+          {/* Comment Header */}
+          <View style={styles.topHeading}>
+            <View style={styles.userInfo}>
+              <Text style={styles.nameText}>{user.name}</Text>
+              <Text style={styles.time}>{TimeAgo({date: created_at})}</Text>
+            </View>
+
+            {/* More Options Menu */}
+            <View style={styles.optionMenu}>
+              <Menu
+                visible={isVisible}
+                onRequestClose={closeMenu}
+                style={styles.menuStyle}>
+                <MenuItem
+                  onPress={() => reportComment()}
+                  style={styles.menuItem}
+                  pressColor={'transparent'}>
+                  <CustomAction />
+                </MenuItem>
+              </Menu>
+            </View>
+
+            {user.email !== userData.email && (
+              <Pressable onPress={toggleMenu} style={[styles.detailButton]}>
+                <Image
+                  source={CustomImages.moreIcon}
+                  style={styles.moreIcon}
+                  resizeMode="contain"
+                />
+              </Pressable>
+            )}
+          </View>
+
+          {/* Comment Content */}
+          <Text style={styles.contentText}>{comment}</Text>
+        </View>
       </View>
     );
-  };
-
-  return (
-    <View style={styles.container}>
-      {/* Profile Picture */}
-      <Image source={CustomImages.demoComment} style={styles.profilePic} />
-
-      <View style={styles.contentBox}>
-        {/* Comment Header */}
-        <View style={styles.topHeading}>
-          <View style={styles.userInfo}>
-            <Text style={styles.nameText}>{data.name}</Text>
-            <Text style={styles.time}>{data.time}</Text>
-          </View>
-
-          {/* More Options Menu */}
-          <View
-            style={{position: 'absolute', top: 16, paddingTop: 10, right: 5}}>
-            <Menu
-              visible={isVisible}
-              onRequestClose={closeMenu}
-              style={styles.menuStyle}
-               >
-              <MenuItem
-                onPress={() => {
-                  closeMenu();
-                }}
-                style={styles.menuItem} pressColor={'transparent'}>
-                <CustomAction />
-              </MenuItem>
-            </Menu>
-          </View>
-
-          <Pressable
-            onPress={toggleMenu}
-            style={[styles.detailButton]}>
-            <Image
-              source={CustomImages.moreIcon}
-              style={styles.moreIcon}
-              resizeMode="contain"
-            />
-          </Pressable>
-        </View>
-
-        {/* Comment Content */}
-        <Text style={styles.contentText}>{data.content}</Text>
-      </View>
-    </View>
-  );
-};
+  },
+);
 
 export default CommentBox;
 
 const styles = StyleSheet.create({
+  commentAction: {
+    flexDirection: 'row',
+    columnGap: 10,
+    alignItems: 'center',
+  },
+  optionMenu: {position: 'absolute', top: 16, paddingTop: 10, right: 5},
   menuStyle: {
     backgroundColor: 'rgba(32, 33, 38, 1)',
     borderRadius: 8,

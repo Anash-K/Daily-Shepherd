@@ -1,3 +1,6 @@
+import {Text} from 'react-native-paper';
+import moment from 'moment';
+
 export const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
@@ -18,4 +21,41 @@ export const DateComparison = (date: string | Date) => {
   }
 
   return displayDate;
+};
+
+interface TimeAgoProps {
+  date: string; // ISO date string
+}
+
+export const TimeAgo: React.FC<TimeAgoProps> = ({date}) => {
+  if (!date) return 'Invalid date';
+
+  // Convert the date into a relative time format
+  const now = moment();
+  const target = moment(date);
+  const diffInSeconds = now.diff(target, 'seconds');
+
+  let formattedDate = '';
+  if (diffInSeconds < 60) {
+    // Less than a minute
+    formattedDate = `${diffInSeconds}s ago`;
+  } else if (diffInSeconds < 3600) {
+    // Less than an hour
+    const diffInMinutes = now.diff(target, 'minutes');
+    formattedDate = `${diffInMinutes}m ago`;
+  } else if (diffInSeconds < 86400) {
+    // Less than a day
+    const diffInHours = now.diff(target, 'hours');
+    formattedDate = `${diffInHours}h ago`;
+  } else if (diffInSeconds < 604800) {
+    // Less than a week
+    const diffInDays = now.diff(target, 'days');
+    formattedDate = `${diffInDays}d ago`;
+  } else {
+    // More than a week
+    const diffInWeeks = now.diff(target, 'weeks');
+    formattedDate = `${diffInWeeks}w ago`;
+  }
+
+  return formattedDate;
 };

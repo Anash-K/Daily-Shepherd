@@ -19,6 +19,7 @@ import {ErrorHandler} from '../utils/ErrorHandler';
 import {PodcastState} from '../types/CommonTypes';
 import NoDataFound from '../utils/NoDataFound';
 import CustomImageHandler from '../utils/CustomImageHandler';
+import {MutationKeys} from '../utils/MutationKeys';
 
 const Podcast: React.FC<ScreenProps<'Podcast'>> = ({navigation}) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -27,18 +28,19 @@ const Podcast: React.FC<ScreenProps<'Podcast'>> = ({navigation}) => {
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [debounceQuery, setDebounceQuery] = useState<string>('');
 
-  const handleDetails = (DataChunk: PodcastState) => {
+  const handleDetails = useCallback((DataChunk: PodcastState) => {
     navigation.navigate('PodCastDetails', {
       Data: DataChunk,
     });
-  };
+  }, []);
 
   const {mutate: getPodcastData} = useMutation({
+    mutationKey: MutationKeys.PodcastKey,
     onMutate: () => {
       AppLoaderRef.current?.start();
       setIsLoading(true);
     },
-    mutationFn: async () => await GetPodcast({keyword: searchKeyword}),
+    mutationFn: async () => await GetPodcast(searchKeyword),
     onSuccess(data) {
       setPodcastData(data?.data);
     },
@@ -67,10 +69,6 @@ const Podcast: React.FC<ScreenProps<'Podcast'>> = ({navigation}) => {
   useEffect(() => {
     getPodcastData();
   }, [debounceQuery]);
-
-  useEffect(() => {
-    getPodcastData();
-  }, []);
 
   const handleChange = useCallback((val: string) => {
     setSearchKeyword(val);
@@ -109,7 +107,7 @@ const Podcast: React.FC<ScreenProps<'Podcast'>> = ({navigation}) => {
           onChangeText={handleChange}
         />
       </View>
-      {podcastData[0]?.host ? (
+      {podcastData?.length > 0 ? (
         <>
           <FlatList
             data={podcastData}

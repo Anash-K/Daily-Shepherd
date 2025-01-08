@@ -36,6 +36,8 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
     const navigation =
       useNavigation<ScreenProps<'VerseOfTheDay'>['navigation']>();
     const [isLiked, setIsLiked] = useState(liked);
+    console.log(liked,"liked")
+    console.log(isLiked,"isliked")
 
     const handleComments = (id: string) => {
       navigation.navigate('Comments', {
@@ -73,10 +75,10 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
       onSettled: () => AppLoaderRef.current?.stop(),
     });
 
-    const handleLike = () => {
+    const handleLike = useCallback(() => {
       // setIsLiked(prev => !prev);
       addVerseToFavorite();
-    };
+    },[]);
 
     // Usage
 

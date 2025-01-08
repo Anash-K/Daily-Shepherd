@@ -23,7 +23,7 @@ import {useMutation} from 'react-query';
 import {MutationKeys} from '../utils/MutationKeys';
 import NoDataFound from '../utils/NoDataFound';
 import CustomImageHandler from '../utils/CustomImageHandler';
-import { VerseState } from '../types/CommonTypes';
+import {VerseState} from '../types/CommonTypes';
 
 const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
   const initialVerseState = {
@@ -61,26 +61,26 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
     ErrorHandler(error);
   }, []);
 
-  const handleData = (data: VerseState) => {
+  const handleData = useCallback((data: VerseState) => {
+    console.log(data.is_favorite, 'data verse det');
     if (data.id) {
       setVerseData(prevState => ({
         ...prevState,
-        comment_count: data?.comment_count ?? prevState.comment_count,
-        context_chapter: data?.context_chapter ?? prevState.context_chapter,
-        context_chapter_link:
-          data?.context_chapter_link ?? prevState.context_chapter_link,
-        date: data?.date ?? prevState.date,
-        id: data?.id ?? prevState.id,
-        is_favorite: data?.is_favorite ?? prevState.is_favorite,
-        reflection: data?.reflection ?? prevState.reflection,
-        reflection_link: data?.reflection_link ?? prevState.reflection_link,
-        verse: data?.verse ?? prevState.verse,
-        verse_reference: data?.verse_reference ?? prevState.verse_reference,
-        video_link: data?.video_link ?? prevState.video_link,
-        thumbnail: data?.thumbnail ?? prevState.thumbnail,
+        comment_count: data?.comment_count,
+        context_chapter: data?.context_chapter,
+        context_chapter_link: data?.context_chapter_link,
+        date: data?.date,
+        id: data?.id,
+        is_favorite: data?.is_favorite,
+        reflection: data?.reflection,
+        reflection_link: data?.reflection_link,
+        verse: data?.verse,
+        verse_reference: data?.verse_reference,
+        video_link: data?.video_link,
+        thumbnail: data?.thumbnail,
       }));
     }
-  };
+  }, []);
 
   const {mutate: todaysVerseMutate} = useMutation({
     mutationKey: MutationKeys.todaysVerseMutationKey,
@@ -111,9 +111,9 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
 
   useEffect(() => {
     const verseEvent = DeviceEventEmitter.addListener('trackLike', data => {
-      console.log(data, verseData.id);
       console.log('verse off the day');
-      if (data.id == verseData.id) {
+      if (data?.id && data?.id == verseData?.id) {
+        console.log('entered');
         todaysVerseMutate();
       }
     });
@@ -157,12 +157,12 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
       {verseData.id ? (
         <>
           <VerseBox
-            id={verseData.id}
+            id={verseData?.id}
             date={'Verse of the day'}
-            liked={verseData.is_favorite}
-            commentNumber={verseData.comment_count}
-            reference={verseData.verse_reference}
-            verse={verseData.verse}
+            liked={verseData?.is_favorite}
+            commentNumber={verseData?.comment_count}
+            reference={verseData?.verse_reference}
+            verse={verseData?.verse}
             OnPressDetails={handlePress}
           />
 
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     borderRadius: 15.4,
-    resizeMode:'cover'
+    resizeMode: 'cover',
   },
   container: {
     flex: 1,

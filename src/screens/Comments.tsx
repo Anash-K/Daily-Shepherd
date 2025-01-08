@@ -7,11 +7,12 @@ import {
   TouchableOpacity,
   Platform,
   KeyboardAvoidingView,
+  DeviceEventEmitter,
+  Keyboard,
 } from 'react-native';
-import {DemoCommentData} from '../utils/demoComments';
 import CommentBox from '../common/CommentBox';
 import React, {useCallback, useEffect, useState} from 'react';
-import {ScreenParams, ScreenProps} from '../navigation/Stack';
+import {ScreenProps} from '../navigation/Stack';
 import CustomImages from '../assets/customImages';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import CustomFont from '../assets/customFonts';
@@ -22,6 +23,9 @@ import {AppLoaderRef} from '../../App';
 import {ErrorHandler} from '../utils/ErrorHandler';
 import NoComments from '../common/NoComments';
 import {AddComment} from '../axious/PostApis';
+import {CommentBoxType} from '../types/CommonTypes';
+import {CustomToaster} from '../utils/AlertNotification';
+import {ALERT_TYPE} from 'react-native-alert-notification';
 
 const Comments: React.FC<ScreenProps<'Comments'>> = ({route}) => {
   const {bottom} = useSafeAreaInsets();
@@ -40,7 +44,7 @@ const Comments: React.FC<ScreenProps<'Comments'>> = ({route}) => {
       setIsLoading(true);
     },
     onSuccess(data) {
-      console.log(data);
+      console.log(data?.payload?.data);
       setComment(data?.payload?.data);
     },
     onError(error) {
@@ -54,25 +58,54 @@ const Comments: React.FC<ScreenProps<'Comments'>> = ({route}) => {
     },
   });
 
-  const {} = useMutation({
-    mutationKey: MutationKeys.AddCommentKey,
-    mutationFn: async () =>
-      await AddComment({id: verseId, comment: inputComment}),
-  });
-
   useEffect(() => {
     if (verseId) {
       getCommentsData();
     }
   }, [verseId]);
 
-  useEffect(() => {
-    console.log(comment, 'comment');
-  }, [comment]);
-
   const handleChange = useCallback((val: string) => {
     setInputComment(val);
   }, []);
+
+  const handleCommentUpdate = useCallback((data: any) => {
+    if (data.status == 200) {
+      setInputComment('');
+      CustomToaster({
+        type: ALERT_TYPE.SUCCESS,
+        message: 'Comment added successfully',
+      });
+      DeviceEventEmitter.emit('trackLike');
+      getCommentsData();
+    } else {
+      CustomToaster({
+        type: ALERT_TYPE.DANGER,
+        message: 'SomeThing Went Wrong',
+      });
+    }
+  }, []);
+
+  const {mutate: addNewComment} = useMutation({
+    mutationKey: MutationKeys.NewCommentKey,
+    mutationFn: async () =>
+      await AddComment({id: verseId, comment: inputComment}),
+    onMutate: () => AppLoaderRef.current?.start(),
+    onSuccess(data) {
+      handleCommentUpdate(data);
+    },
+    onError(error) {
+      console.log(error);
+      ErrorHandler(error);
+    },
+    onSettled: () => AppLoaderRef.current?.stop(),
+  });
+
+  const handleAddNewComment = useCallback(() => {
+    if (inputComment && verseId) {
+      Keyboard.dismiss();
+      addNewComment();
+    }
+  }, [inputComment, verseId]);
 
   if (isLoading && onFirstLoad) {
     return null;
@@ -83,16 +116,23 @@ const Comments: React.FC<ScreenProps<'Comments'>> = ({route}) => {
       behavior="padding"
       style={{flex: 1}}
       contentContainerStyle={{flexGrow: 1}}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 20}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 20}>
       <View style={styles.container}>
         {comment.length > 0 ? (
           <View style={styles.listContainer}>
-            {/* <FlatList
+            <FlatList
               data={comment}
-              renderItem={({item}) => <CommentBox {...item} />}
-              keyExtractor={item => item.id.toString()}
+              renderItem={({item}: {item: CommentBoxType}) => (
+                <CommentBox
+                  comment={item.comment}
+                  id={item.id}
+                  created_at={item.created_at}
+                  user={item.user}
+                />
+              )}
+              keyExtractor={item => item.id}
               showsVerticalScrollIndicator={false}
-            /> */}
+            />
           </View>
         ) : (
           <NoComments />
@@ -114,8 +154,11 @@ const Comments: React.FC<ScreenProps<'Comments'>> = ({route}) => {
               placeholder="Write a comment..."
               placeholderTextColor="#A0A0A0"
               onChangeText={handleChange}
+              value={inputComment}
             />
-            <TouchableOpacity style={styles.sendButton}>
+            <TouchableOpacity
+              style={styles.sendButton}
+              onPress={handleAddNewComment}>
               <Image source={CustomImages.rightArrow} style={styles.sendIcon} />
             </TouchableOpacity>
           </View>
@@ -152,6 +195,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flexGrow: 1,
+    marginBottom:120
   },
   inputContainer: {
     flexDirection: 'row',
