@@ -1,10 +1,10 @@
 import {ALERT_TYPE} from 'react-native-alert-notification';
-import {ErrorToaster} from './AlertNotification';
+import {CustomToaster} from './AlertNotification';
 
 export const formErrorHandler = (data: any) => {
   const ers = Object.getOwnPropertyNames(data);
   if (ers?.length) {
-    ErrorToaster({ type: ALERT_TYPE.DANGER, message: data[ers[0]]?.message });
+    CustomToaster({type: ALERT_TYPE.DANGER, message: data});
   }
 };
 
@@ -135,22 +135,21 @@ export const httpStatusCodes: httpErrorCodesType = {
 };
 
 export const ErrorHandler = (Error: ErrorType | any) => {
-  console.log(Error,"erropr")
   if (Error?.data?.message && Error?.data?.message?.trim()?.length !== 0) {
-    ErrorToaster({type: ALERT_TYPE.DANGER, message: Error?.data.message});
+    CustomToaster({type: ALERT_TYPE.DANGER, message: Error?.data.message});
   } else if (Error?.status && httpStatusCodes[Error.status]) {
-    ErrorToaster({
+    CustomToaster({
       type: ALERT_TYPE.DANGER,
       message: httpStatusCodes[Error.status],
     });
   } else if (Error?.code) {
-    ErrorToaster({
+    CustomToaster({
       type: ALERT_TYPE.DANGER,
-      message: firebaseErrorCodes[Error.code] ?? 'Something went wrong',
+      message: firebaseErrorCodes[Error.code] ?? 'something went wrong',
     });
   } else if (Error?.message && Error?.message?.trim()?.length !== 0) {
-    ErrorToaster({type: ALERT_TYPE.DANGER, message: Error?.message});
+    CustomToaster({type: ALERT_TYPE.DANGER, message: Error?.message});
   } else {
-    ErrorToaster({type: ALERT_TYPE.DANGER, message: 'Something went wrong'});
+    CustomToaster({type: ALERT_TYPE.DANGER, message: 'Something went wrong'});
   }
 };

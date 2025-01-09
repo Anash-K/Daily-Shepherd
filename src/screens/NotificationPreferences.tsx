@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   Text,
   View,
@@ -16,31 +16,79 @@ import {loginSuccess, updateIsOldUser} from '../store/reducers/AuthReducer';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {StackParams} from '../navigation/MainStack';
 import {ScreenProps} from '../navigation/Stack';
+import DatePicker from 'react-native-date-picker';
+import moment from 'moment';
+import {useMutation} from 'react-query';
+import {MutationKeys} from '../utils/MutationKeys';
+import {SetNotificationTime} from '../axious/PostApis';
+import {AppLoaderRef} from '../../App';
+import {ErrorHandler} from '../utils/ErrorHandler';
+import {CustomToaster} from '../utils/AlertNotification';
+import {ALERT_TYPE} from 'react-native-alert-notification';
 
 const NotificationPreferences: React.FC<
   ScreenProps<'NotificationPreferences'>
 > = ({navigation}) => {
   // State to track each switch independently
-  const [toggleStates, setToggleStates] = useState<Record<string, boolean>>({
-    toggle1: false,
-    toggle2: false,
-    toggle3: false,
+  const [toggleStates, setToggleStates] = useState<boolean>(false);
+  const [isPickerVisible, setPickerVisibility] = useState(false);
+  const [timer, setTimer] = useState(() => {
+    const date = new Date(); // Get the current date
+    date.setHours(10, 30, 0, 0); // Set the time to 10:30
+    return date;
   });
 
   const dispatch = useDispatch();
 
   // Handler to update the state for a specific toggle
-  const toggleSwitch = (key: string): void => {
-    setToggleStates(prevState => ({
-      ...prevState,
-      [key]: !prevState[key],
-    }));
-  };
+  const toggleSwitch = useCallback(() => {
+    setToggleStates(prevState => !prevState);
+  }, []);
 
-  const handlePress = () => {
+  const handleSkip = useCallback(() => {
     dispatch(updateIsOldUser(true));
     navigation.navigate('BottomStack');
+  }, []);
+
+  const timerFormatter = useCallback((time: Date) => {
+    return moment(time).format('HH:mm:ss');
+  }, []);
+
+  const {mutate: setVerseTimer} = useMutation({
+    mutationKey: MutationKeys.NotificationKey,
+    mutationFn: async () =>
+      await SetNotificationTime({time: timerFormatter(timer)}),
+    onMutate: () => AppLoaderRef.current?.start(),
+    onSuccess(data) {
+      if (data?.status == 200) {
+        CustomToaster({
+          type: ALERT_TYPE.SUCCESS,
+          message: data?.data?.message,
+        });
+        setTimeout(() => {
+          handleSkip();
+        }, 500);
+      }
+    },
+    onError(error) {
+      console.log(error);
+      ErrorHandler(error);
+    },
+    onSettled: () => AppLoaderRef.current?.stop(),
+  });
+
+  const showPicker = useCallback(() => setPickerVisibility(true), []);
+  const hidePicker = useCallback(() => setPickerVisibility(false), []);
+
+  const handleConfirm = (date: Date) => {
+    setTimer(date); // Update the timer state as a Date object
+    console.log(moment(date).format('HH:mm:ss'));
+    hidePicker();
   };
+
+  const handleSetTimer = useCallback(() => {
+    setVerseTimer();
+  }, []);
 
   const insets = useSafeAreaInsets();
 
@@ -60,18 +108,20 @@ const NotificationPreferences: React.FC<
         <View style={styles.preference}>
           <View>
             <Text style={styles.text}>Verse only</Text>
-            <TouchableOpacity style={styles.timer}>
+            <TouchableOpacity style={styles.timer} onPress={showPicker}>
               <Image
                 source={CustomImages.timerIcon}
                 resizeMode="contain"
                 style={styles.timerIcon}
               />
-              <Text style={styles.timerText}>10:30</Text>
+              <Text style={styles.timerText}>
+                {moment(timer).format('HH:mm')}
+              </Text>
             </TouchableOpacity>
           </View>
 
           <ToggleSwitch
-            isOn={toggleStates.toggle1}
+            isOn={toggleStates}
             onColor="rgba(24, 23, 28, 1)"
             offColor="rgba(24, 23, 28, 1)"
             size="small"
@@ -83,7 +133,7 @@ const NotificationPreferences: React.FC<
             thumbOffStyle={styles.thumbStyleOff}
             thumbOnStyle={styles.thumbStyleOn}
             icon={
-              toggleStates.toggle1 ? (
+              toggleStates ? (
                 <Image
                   source={CustomImages.rightIcon}
                   style={styles.toggleIcon}
@@ -91,7 +141,7 @@ const NotificationPreferences: React.FC<
                 />
               ) : null
             }
-            onToggle={() => toggleSwitch('toggle1')}
+            onToggle={toggleSwitch}
           />
         </View>
 
@@ -154,7 +204,7 @@ const NotificationPreferences: React.FC<
       <View style={{flexDirection: 'row', columnGap: 12}}>
         <CustomButton
           text="Skip"
-          onPress={handlePress}
+          onPress={handleSkip}
           buttonStyle={{
             flex: 1,
             backgroundColor: 'transparent',
@@ -165,10 +215,19 @@ const NotificationPreferences: React.FC<
         />
         <CustomButton
           text="Save"
-          onPress={handlePress}
+          onPress={handleSetTimer}
           buttonStyle={{flex: 1}}
         />
       </View>
+      <DatePicker
+        modal
+        open={isPickerVisible}
+        date={timer}
+        mode="time"
+        minuteInterval={30} // Set 30-minute intervals
+        onConfirm={handleConfirm}
+        onCancel={hidePicker}
+      />
     </View>
   );
 };

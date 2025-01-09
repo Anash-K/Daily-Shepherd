@@ -2,6 +2,7 @@ import {
   DeviceEventEmitter,
   FlatList,
   Image,
+  Keyboard,
   Platform,
   StyleSheet,
   Text,
@@ -41,11 +42,9 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
     },
     mutationFn: async () => await GetHistory(search),
     onSuccess(data) {
-      console.log(data?.data?.payload?.data);
       setHistory(data?.data?.payload?.data);
     },
     onError(error) {
-      console.log(error);
       ErrorHandler(error);
     },
     onSettled: () => {
@@ -66,13 +65,13 @@ const History: React.FC<ScreenProps<'History'>> = ({navigation}) => {
   }, [search]);
 
   useEffect(() => {
+    Keyboard.dismiss();
     getHistoryData();
   }, [debounceQuery]);
 
   useEffect(() => {
     const verseEvent = DeviceEventEmitter.addListener('trackLike', data => {
       getHistoryData();
-      console.log('enent trigger on history');
     });
 
     return () => {

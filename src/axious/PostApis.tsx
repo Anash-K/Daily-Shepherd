@@ -81,3 +81,15 @@ export const ReportComment = async ({commentId}: {commentId: string}) => {
     throw error;
   }
 };
+
+export const SetNotificationTime = async ({time}: {time: string}) => {
+  try {
+    const response = await AxiosInstance.post(`update-notification-time`, {
+      notification_time: time,
+      _method: 'patch',
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

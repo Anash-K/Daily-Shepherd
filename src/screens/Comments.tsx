@@ -44,11 +44,9 @@ const Comments: React.FC<ScreenProps<'Comments'>> = ({route}) => {
       setIsLoading(true);
     },
     onSuccess(data) {
-      console.log(data?.payload?.data);
       setComment(data?.payload?.data);
     },
     onError(error) {
-      console.log(error);
       ErrorHandler(error);
     },
     onSettled: () => {
@@ -94,7 +92,6 @@ const Comments: React.FC<ScreenProps<'Comments'>> = ({route}) => {
       handleCommentUpdate(data);
     },
     onError(error) {
-      console.log(error);
       ErrorHandler(error);
     },
     onSettled: () => AppLoaderRef.current?.stop(),

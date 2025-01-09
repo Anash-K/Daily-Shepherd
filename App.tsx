@@ -1,6 +1,5 @@
 import React, {useEffect} from 'react';
 import {Platform, StyleSheet, View} from 'react-native';
-import {useSelector} from 'react-redux';
 import BootSplash from 'react-native-bootsplash';
 import {QueryClient, QueryClientProvider, onlineManager} from 'react-query';
 import NetInfo, {NetInfoSubscription} from '@react-native-community/netinfo';
@@ -8,6 +7,8 @@ import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {Loader as LoaderType} from './src/types/CommonTypes';
 import RootScreen from './src/navigation/RootScreen';
 import Loader from './src/utils/Loader';
+import messaging from '@react-native-firebase/messaging';
+import {notificationListener} from './src/utils/NotificationHanlder';
 
 const queryClient = new QueryClient();
 
@@ -26,21 +27,23 @@ GoogleSignin.configure({
 export const AppLoaderRef = React.createRef<LoaderType>();
 
 function App(): React.JSX.Element {
-
   useEffect(() => {
-    // Manage online status with NetInfo and react-query's onlineManager
-    const unsubscribe = onlineManager.setEventListener(setOnline => {
-      const netInfoUnsubscribe = NetInfo.addEventListener(state => {
-        setOnline(state?.isInternetReachable ?? false);
-      });
-
-      // Return the cleanup function for NetInfo
-      return netInfoUnsubscribe;
+    messaging()?.onNotificationOpenedApp(async (remoteMessage: any) => {
+      console.log('Notification opened', remoteMessage);
+      // onNotificationClick(remoteMessage?.data);
     });
 
-    // Cleanup for onlineManager event listener
+    const unsubscribe = onlineManager?.setEventListener(setOnline => {
+      return NetInfo?.addEventListener(state => {
+        setOnline(!!state?.isInternetReachable);
+      });
+    });
+
+    notificationListener();
+
     return () => {
       unsubscribe;
+      notificationListener();
     };
   }, []);
 

@@ -67,7 +67,6 @@ const CommentBox: React.FC<CommentBoxType> = memo(
         handleReportResponse(data);
       },
       onError(error) {
-        console.log(error);
         ErrorHandler(error);
       },
       onSettled: () => {
@@ -75,9 +74,6 @@ const CommentBox: React.FC<CommentBoxType> = memo(
         closeMenu();
       },
     });
-
-    console.log(userData.email, 'email', user.email);
-    console.log(user.email !== userData.email);
 
     return (
       <View style={styles.container}>

@@ -44,7 +44,7 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
 }) => {
   const userData = useSelector((state: any) => state.auth);
 
-  console.log(userData.token,"token")
+  console.log(userData.token, 'token');
 
   const nameValidation = {
     text: userData.name ? userData.name : '',
@@ -91,7 +91,7 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
         setPermissionModalVisible(true);
       }
     } catch (error) {
-      console.error('Permission error:', error);
+      ErrorHandler(error);
     }
   }, []);
 
@@ -235,7 +235,7 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
 
     try {
       const response = await UpdateProfile(data);
-
+      console.log(response, 'profile response');
       // Check if response is valid and status is success
       if (response && response?.status === 200) {
         lastSubmittedImageRef.current = profileImage;

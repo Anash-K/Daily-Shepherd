@@ -60,8 +60,6 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
 
   const userData = useSelector((state: any) => state.auth);
 
-
-
   const dispatch = useDispatch();
   const [profileImage, setProfileImage] = useState<string | null>(
     userData.profile ? userData.profile : null,
@@ -81,7 +79,6 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
   const handleNav = useCallback((title: any) => {
     navigation.navigate(title);
   }, []);
-
 
   useEffect(() => {
     setProfileImage(userData.profile);
@@ -167,12 +164,11 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
         handleSuccessNotification();
         dispatch(logout());
       } else {
-        console.error('Logout failed', response.data);
+        ErrorHandler(response.data);
       }
     } catch (error) {
-      console.error('Error during logout:', error);
+      ErrorHandler(error);
     } finally {
-    
       setIsLogoutVisible(false);
       AppLoaderRef.current?.stop();
       ButtonRef.current = false;
@@ -209,7 +205,6 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
         });
       }
     } catch (error) {
-      console.error('Error during account deletion:', error);
       ErrorHandler(error);
     } finally {
       ButtonRef.current = false;
@@ -219,7 +214,6 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
 
   return (
     <ScrollView style={styles.container}>
-      
       <View style={styles.topHeader}>
         <CustomImageHandler
           placeholderImage={CustomImages.profilePic}

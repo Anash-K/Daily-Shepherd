@@ -8,5 +8,6 @@ export const MutationKeys = {
   AddCommentKey:'addVerse-comment',
   PodcastKey:'verse-podcast',
   NewCommentKey:'verse-newComment',
-  ReportKey:'verse-report'
+  ReportKey:'verse-report',
+  NotificationKey:'verse-notification',
 };

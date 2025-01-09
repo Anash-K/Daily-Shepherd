@@ -96,7 +96,7 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
         setPermissionModalVisible(true);
       }
     } catch (error) {
-      console.error('Permission error:', error);
+      ErrorHandler(error);
     }
   }, []);
 
@@ -246,7 +246,7 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
   
     try {
       const response = await UpdateProfile(data);
-
+     
       // Check if response is valid and status is success
       if (response && response?.status === 200) {
         lastSubmittedImageRef.current = profileImage;

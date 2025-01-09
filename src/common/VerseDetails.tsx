@@ -75,7 +75,7 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
       }
     },
     onError(error) {
-      console.log(error);
+   
       ErrorHandler(error);
     },
     onSettled: () => {
@@ -105,7 +105,8 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
   return (
     <ScrollView
       style={[styles.container, {marginBottom: insets.bottom}]}
-      contentContainerStyle={styles.contentStyle}>
+      contentContainerStyle={styles.contentStyle} 
+      showsVerticalScrollIndicator={false}>
       {verseData.verse ? (
         <View style={styles.innerContainer}>
           {/* Verse Box */}

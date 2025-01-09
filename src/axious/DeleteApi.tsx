@@ -5,7 +5,6 @@ export const DeleteAccount = async () => {
     const response = await AxiosInstance.delete('delete-account');
     return response;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };

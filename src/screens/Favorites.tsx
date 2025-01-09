@@ -40,7 +40,6 @@ const Favorites: React.FC<ScreenProps<'Favorites'>> = ({navigation}) => {
       setVerseData(data?.payload?.data);
     },
     onError(error) {
-      console.log(error, 'error');
       ErrorHandler(error);
     },
     onSettled: () => {

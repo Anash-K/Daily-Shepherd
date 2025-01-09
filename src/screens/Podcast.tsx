@@ -1,6 +1,7 @@
 import {
   FlatList,
   Image,
+  Keyboard,
   Platform,
   StyleSheet,
   Text,
@@ -21,6 +22,7 @@ import NoDataFound from '../utils/NoDataFound';
 import CustomImageHandler from '../utils/CustomImageHandler';
 import {MutationKeys} from '../utils/MutationKeys';
 
+
 const Podcast: React.FC<ScreenProps<'Podcast'>> = ({navigation}) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [onFirstLoad, setOnFirstLoad] = useState<boolean>(true);
@@ -40,12 +42,11 @@ const Podcast: React.FC<ScreenProps<'Podcast'>> = ({navigation}) => {
       AppLoaderRef.current?.start();
       setIsLoading(true);
     },
-    mutationFn: async () => await GetPodcast(searchKeyword),
+    mutationFn: async () => await GetPodcast({keyword: searchKeyword}),
     onSuccess(data) {
-      setPodcastData(data?.data);
+      setPodcastData(data?.payload?.data);
     },
     onError(error) {
-      console.log(error, 'Error');
       ErrorHandler(error);
     },
     onSettled: () => {
@@ -67,6 +68,7 @@ const Podcast: React.FC<ScreenProps<'Podcast'>> = ({navigation}) => {
   }, [searchKeyword]);
 
   useEffect(() => {
+    Keyboard.dismiss();
     getPodcastData();
   }, [debounceQuery]);
 

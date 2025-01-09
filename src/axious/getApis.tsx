@@ -23,7 +23,6 @@ export const GetScriptureDetails = async ({id}: {id: string}) => {
     const response = await AxiosInstance.get(`scriptures/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching scripture details:', error);
     throw error; // Re-throw the error for upstream handling
   }
 };
@@ -33,15 +32,14 @@ export const GetFavoriteScripture = async () => {
     const response = await AxiosInstance.get(`favorite-scriptures`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching scripture details:', error);
     throw error; // Re-throw the error for upstream handling
   }
 };
 
-export const GetPodcast = async (keyword: string) => {
+export const GetPodcast = async ({keyword}: {keyword?: string}) => {
   try {
-    const response = await AxiosInstance.get(`podcasts-list/?text=${keyword}`);
-    return response?.data?.payload;
+    let response = await AxiosInstance.get(`podcasts-list?text=${keyword}`);
+    return response.data;
   } catch (error) {
     throw error;
   }
