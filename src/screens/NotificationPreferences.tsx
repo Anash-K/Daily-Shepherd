@@ -29,12 +29,12 @@ import {ALERT_TYPE} from 'react-native-alert-notification';
 const NotificationPreferences: React.FC<
   ScreenProps<'NotificationPreferences'>
 > = ({navigation}) => {
-  // State to track each switch independently
+  
   const [toggleStates, setToggleStates] = useState<boolean>(false);
   const [isPickerVisible, setPickerVisibility] = useState(false);
   const [timer, setTimer] = useState(() => {
-    const date = new Date(); // Get the current date
-    date.setHours(10, 30, 0, 0); // Set the time to 10:30
+    const date = new Date(); 
+    date.setHours(10, 30, 0, 0);
     return date;
   });
 
@@ -63,7 +63,7 @@ const NotificationPreferences: React.FC<
       if (data?.status == 200) {
         CustomToaster({
           type: ALERT_TYPE.SUCCESS,
-          message: data?.data?.message,
+          message: 'Notifications preference updated',
         });
         setTimeout(() => {
           handleSkip();
@@ -81,12 +81,12 @@ const NotificationPreferences: React.FC<
   const hidePicker = useCallback(() => setPickerVisibility(false), []);
 
   const handleConfirm = (date: Date) => {
-    setTimer(date); // Update the timer state as a Date object
-    console.log(moment(date).format('HH:mm:ss'));
+    setTimer(date);
     hidePicker();
   };
 
   const handleSetTimer = useCallback(() => {
+  
     setVerseTimer();
   }, []);
 
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    width: '90%',
+    width: '100%',
     marginVertical: 10,
   },
   toggleIcon: {
