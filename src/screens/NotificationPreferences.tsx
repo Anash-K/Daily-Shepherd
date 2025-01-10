@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Text,
   View,
@@ -6,13 +6,18 @@ import {
   Image,
   TouchableOpacity,
   Platform,
+  Pressable,
 } from 'react-native';
 import CustomFont from '../assets/customFonts';
 import CustomImages from '../assets/customImages';
 import ToggleSwitch from 'toggle-switch-react-native';
 import CustomButton from '../common/CustomButton';
-import {useDispatch} from 'react-redux';
-import {loginSuccess, updateIsOldUser} from '../store/reducers/AuthReducer';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  loginSuccess,
+  updateIsOldUser,
+  updateNotificationTime,
+} from '../store/reducers/AuthReducer';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {StackParams} from '../navigation/MainStack';
 import {ScreenProps} from '../navigation/Stack';
@@ -29,16 +34,26 @@ import {ALERT_TYPE} from 'react-native-alert-notification';
 const NotificationPreferences: React.FC<
   ScreenProps<'NotificationPreferences'>
 > = ({navigation}) => {
-  
+  const userData = useSelector((state: any) => state.auth);
+  console.log(userData, userData.notification_time, 'not time');
   const [toggleStates, setToggleStates] = useState<boolean>(false);
   const [isPickerVisible, setPickerVisibility] = useState(false);
   const [timer, setTimer] = useState(() => {
-    const date = new Date(); 
+    const date = new Date();
     date.setHours(10, 30, 0, 0);
     return date;
   });
+  const previousTimer = useRef<string | null>(null);
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (userData.notification_time) {
+      const parsedTime = moment(userData.notification_time, 'HH:mm').toDate();
+      setTimer(parsedTime);
+      setToggleStates(true);
+    }
+  }, [userData.notification_time]);
 
   // Handler to update the state for a specific toggle
   const toggleSwitch = useCallback(() => {
@@ -57,14 +72,24 @@ const NotificationPreferences: React.FC<
   const {mutate: setVerseTimer} = useMutation({
     mutationKey: MutationKeys.NotificationKey,
     mutationFn: async () =>
-      await SetNotificationTime({time: timerFormatter(timer)}),
+      await SetNotificationTime({
+        time: timerFormatter(timer),
+        isNotification: toggleStates,
+      }),
     onMutate: () => AppLoaderRef.current?.start(),
     onSuccess(data) {
+      console.log(data?.data);
       if (data?.status == 200) {
         CustomToaster({
           type: ALERT_TYPE.SUCCESS,
           message: 'Notifications preference updated',
         });
+        previousTimer.current = data?.data?.notification_time;
+        dispatch(
+          updateNotificationTime({
+            notification_time: data?.data?.notification_time,
+          }),
+        );
         setTimeout(() => {
           handleSkip();
         }, 500);
@@ -84,10 +109,13 @@ const NotificationPreferences: React.FC<
     setTimer(date);
     hidePicker();
   };
-
   const handleSetTimer = useCallback(() => {
-  
-    setVerseTimer();
+    let currentTimer = timerFormatter(timer);
+    if (previousTimer.current != currentTimer) {
+      setVerseTimer(); // Call the API
+    } else {
+      console.log("Timer value hasn't changed, skipping API call");
+    }
   }, []);
 
   const insets = useSafeAreaInsets();
@@ -108,7 +136,10 @@ const NotificationPreferences: React.FC<
         <View style={styles.preference}>
           <View>
             <Text style={styles.text}>Verse only</Text>
-            <TouchableOpacity style={styles.timer} onPress={showPicker}>
+            <Pressable
+              style={({pressed}) => [styles.timer, pressed && {opacity: 0.5}]}
+              disabled={!toggleStates}
+              onPress={showPicker}>
               <Image
                 source={CustomImages.timerIcon}
                 resizeMode="contain"
@@ -117,7 +148,7 @@ const NotificationPreferences: React.FC<
               <Text style={styles.timerText}>
                 {moment(timer).format('HH:mm')}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           <ToggleSwitch
@@ -144,62 +175,6 @@ const NotificationPreferences: React.FC<
             onToggle={toggleSwitch}
           />
         </View>
-
-        {/* Second Toggle */}
-        {/* <View style={styles.preference}>
-          <Text style={styles.text}>Verse with reflection</Text>
-          <ToggleSwitch
-            isOn={toggleStates.toggle2}
-            onColor="rgba(24, 23, 28, 1)"
-            offColor="rgba(24, 23, 28, 1)"
-            size="small"
-            trackOnStyle={{
-              borderColor: 'rgba(32, 201, 151, 1)',
-              borderWidth: 1,
-            }}
-            trackOffStyle={{borderColor: 'rgba(86, 86, 92, 1)', borderWidth: 1}}
-            thumbOffStyle={styles.thumbStyleOff}
-            thumbOnStyle={styles.thumbStyleOn}
-            icon={
-              toggleStates.toggle2 ? (
-                <Image
-                  source={CustomImages.rightIcon}
-                  style={styles.toggleIcon}
-                  resizeMode="contain"
-                />
-              ) : null
-            }
-            onToggle={() => toggleSwitch('toggle2')}
-          />
-        </View> */}
-
-        {/* Third Toggle */}
-        {/* <View style={styles.preference}>
-          <Text style={styles.text}>Verse with teaching</Text>
-          <ToggleSwitch
-            isOn={toggleStates.toggle3}
-            onColor="rgba(24, 23, 28, 1)"
-            offColor="rgba(24, 23, 28, 1)"
-            size="small"
-            trackOnStyle={{
-              borderColor: 'rgba(32, 201, 151, 1)',
-              borderWidth: 1,
-            }}
-            trackOffStyle={{borderColor: 'rgba(86, 86, 92, 1)', borderWidth: 1}}
-            thumbOffStyle={styles.thumbStyleOff}
-            thumbOnStyle={styles.thumbStyleOn}
-            icon={
-              toggleStates.toggle3 ? (
-                <Image
-                  source={CustomImages.rightIcon}
-                  style={styles.toggleIcon}
-                  resizeMode="contain"
-                />
-              ) : null
-            }
-            onToggle={() => toggleSwitch('toggle3')}
-          />
-        </View> */}
       </View>
       <View style={{flexDirection: 'row', columnGap: 12}}>
         <CustomButton

@@ -25,13 +25,12 @@ import {useDispatch, useSelector} from 'react-redux';
 import {ScreenProps} from '../navigation/Stack';
 import {UpdateProfile} from '../axious/PostApis';
 import {ErrorHandler} from '../utils/ErrorHandler';
-import {ALERT_TYPE, Toast} from 'react-native-alert-notification';
+import {ALERT_TYPE} from 'react-native-alert-notification';
 import {getFileNameFromUri, getMimeTypeFromUri} from '../utils/MimeTypePicker';
 import {AppLoaderRef} from '../../App';
 import {CustomToaster} from '../utils/AlertNotification';
 import {updateProfile} from '../store/reducers/AuthReducer';
 import {Text} from 'react-native-paper';
-import Loader from '../utils/Loader';
 import CustomImageHandler from '../utils/CustomImageHandler';
 
 interface buttonRef {
@@ -56,8 +55,18 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
   const [permissionError, setPermissionError] = useState('');
   const [name, setName] = useState(nameValidation);
   const [email, setEmail] = useState(userData.email);
-  const buttonRef = React.createRef<buttonRef>();
+  const buttonRef = useRef<boolean>(false);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    setName({
+      text: userData?.name,
+      error: '',
+      isValid: true,
+    });
+    lastSubmittedImageRef.current = userData.profile;
+    lastSubmittedNameRef.current = userData.name;
+  }, []);
 
   const toggleModal = useCallback(() => {
     setModalVisible(prev => !prev);
@@ -68,6 +77,7 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
   );
   const [isPermissionModalVisible, setPermissionModalVisible] = useState(false);
   const lastSubmittedImageRef = useRef<string | null>(null);
+  const lastSubmittedNameRef = useRef<string | null>(null);
 
   // Request and check for camera permission when the component mounts
   const checkAndRequestPermission = useCallback(async () => {
@@ -195,18 +205,26 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
   const handleBackNav = useCallback(() => {
     setTimeout(() => {
       navigation.goBack();
-    }, 2000);
+    }, 1000);
   }, []);
 
   const handleSubmit = useCallback(async () => {
-    if (buttonRef.current?.start()) {
+    if (buttonRef.current) {
       return;
     }
     if (!name.isValid) {
       return;
     }
 
-    buttonRef.current?.start();
+    if (
+      lastSubmittedImageRef.current === profileImage &&
+      lastSubmittedNameRef.current === name.text
+    ) {
+      handleBackNav();
+      return;
+    }
+
+    buttonRef.current = true;
 
     AppLoaderRef.current?.start();
 
@@ -216,12 +234,6 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
     if (profileImage) {
       ImageType = getMimeTypeFromUri(profileImage);
       ImageName = getFileNameFromUri(profileImage);
-
-      if (lastSubmittedImageRef.current === profileImage) {
-        buttonRef.current?.stop();
-        AppLoaderRef.current?.stop();
-        return;
-      }
     }
 
     const data = {
@@ -235,10 +247,10 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
 
     try {
       const response = await UpdateProfile(data);
-      console.log(response, 'profile response');
       // Check if response is valid and status is success
       if (response && response?.status === 200) {
         lastSubmittedImageRef.current = profileImage;
+        lastSubmittedNameRef.current = name.text;
         dispatch(updateProfile(response?.data?.payload));
         CustomToaster({
           type: ALERT_TYPE.SUCCESS,
@@ -257,7 +269,7 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
     } catch (error) {
       ErrorHandler(error);
     } finally {
-      buttonRef.current?.stop();
+      buttonRef.current = false;
       AppLoaderRef.current?.stop();
     }
   }, [name, profileImage]);
@@ -285,13 +297,6 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
                 placeholderImage={CustomImages.profilePic}
                 imageStyle={styles.profilePicture}
               />
-              {/* <Image
-                source={
-                  profileImage ? {uri: profileImage} : CustomImages.profilePic
-                }
-                style={[styles.profilePicture]}
-                resizeMode="cover"
-              /> */}
               <View style={styles.ActionIconBox}>
                 <Image
                   source={

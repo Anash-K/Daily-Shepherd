@@ -40,7 +40,7 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
     verse: '',
     verse_reference: '',
     video_link: '',
-    thumbnail:''
+    thumbnail: '',
   };
 
   const {verseId} = route.params;
@@ -67,7 +67,7 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
     mutationFn: async () => await GetScriptureDetails({id: verseId}),
     onMutate: () => {
       AppLoaderRef.current?.start();
-       setIsLoading(true);
+      setIsLoading(true);
     },
     onSuccess(data) {
       if (data?.payload?.verse) {
@@ -75,11 +75,10 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
       }
     },
     onError(error) {
-   
       ErrorHandler(error);
     },
     onSettled: () => {
-      AppLoaderRef.current?.stop(); 
+      AppLoaderRef.current?.stop();
       setIsLoading(false);
     },
   });
@@ -105,14 +104,14 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
   return (
     <ScrollView
       style={[styles.container, {marginBottom: insets.bottom}]}
-      contentContainerStyle={styles.contentStyle} 
+      contentContainerStyle={styles.contentStyle}
       showsVerticalScrollIndicator={false}>
       {verseData.verse ? (
         <View style={styles.innerContainer}>
           {/* Verse Box */}
           <VerseBox
             id={verseData.id}
-            date={verseData.date}
+            date={'Verse'}
             liked={verseData.is_favorite}
             commentNumber={verseData.comment_count}
             reference={verseData.verse_reference}
@@ -122,12 +121,12 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
 
           {/* Reflection Boxes */}
           <VerseReflectionBox
-            title={"Today's Reflection"}
+            title={'Reflection'}
             content={verseData.reflection}
             OnPressLink={handleLink.bind(null, verseData.reflection_link)}
           />
           <VerseReflectionBox
-            title={'Context Chapter'}
+            title={'Insights'}
             content={verseData.context_chapter}
             OnPressLink={handleLink.bind(null, verseData.context_chapter_link)}
           />

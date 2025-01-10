@@ -1,4 +1,4 @@
-import React, {memo, useState} from 'react';
+import React, {memo, useCallback, useEffect, useRef, useState} from 'react';
 import {
   Image,
   Modal,
@@ -13,6 +13,20 @@ import CustomButton from '../common/CustomButton';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
 import ToggleSwitch from 'toggle-switch-react-native';
+import {AppLoaderRef} from '../../App';
+import {ErrorHandler} from '../utils/ErrorHandler';
+import {CustomToaster} from '../utils/AlertNotification';
+import {useMutation} from 'react-query';
+import {MutationKeys} from '../utils/MutationKeys';
+import moment from 'moment';
+import {SetNotificationTime} from '../axious/PostApis';
+import {ALERT_TYPE} from 'react-native-alert-notification';
+import DatePicker from 'react-native-date-picker';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  updateNotificationTime,
+  updateProfile,
+} from '../store/reducers/AuthReducer';
 
 interface AppearanceProps {
   isModalVisible: boolean;
@@ -21,11 +35,84 @@ interface AppearanceProps {
 
 const NotificationsModal: React.FC<AppearanceProps> = memo(
   ({isModalVisible, toggleModal}) => {
+    const {notification_time} = useSelector((state: any) => state.auth);
+    console.log(notification_time, 'notification time');
     const [toggleStates, setToggleStates] = useState<boolean>(false);
+    const [isPickerVisible, setPickerVisibility] = useState(false);
+    const previousTimer = useRef<string | null>(null);
+    const [timer, setTimer] = useState(() => {
+      const date = new Date();
+      date.setHours(10, 30, 0, 0);
+      return date;
+    });
+    const dispatcher = useDispatch();
 
-    const toggleSwitch = (): void => {
+    useEffect(() => {
+      if (notification_time) {
+        const parsedTime = moment(notification_time, 'HH:mm').toDate();
+        setTimer(parsedTime);
+        setToggleStates(true);
+      }
+    }, [notification_time]);
+
+    const toggleSwitch = useCallback((): void => {
       setToggleStates(prevState => !prevState);
+    }, []);
+
+    const timerFormatter = useCallback((time: Date) => {
+      return moment(time).format('HH:mm:ss');
+    }, []);
+
+    const {mutate: setVerseTimer} = useMutation({
+      mutationKey: MutationKeys.NotificationKey,
+      mutationFn: async () =>
+        await SetNotificationTime({
+          time: timerFormatter(timer),
+          isNotification: toggleStates,
+        }),
+      onMutate: () => AppLoaderRef.current?.start(),
+      onSuccess(data) {
+        console.log(data?.data);
+        if (data?.status == 200) {
+          CustomToaster({
+            type: ALERT_TYPE.SUCCESS,
+            message: 'Notifications preference updated',
+          });
+          previousTimer.current = data?.data?.notification_time;
+          dispatcher(
+            updateNotificationTime({
+              notification_time: data?.data?.notification_time,
+            }),
+          );
+          setTimeout(() => {
+            toggleModal();
+          }, 500);
+        }
+      },
+      onError(error) {
+        console.log(error);
+        ErrorHandler(error);
+      },
+      onSettled: () => AppLoaderRef.current?.stop(),
+    });
+
+    const showPicker = useCallback(() => setPickerVisibility(true), []);
+    const hidePicker = useCallback(() => setPickerVisibility(false), []);
+
+    const handleConfirm = (date: Date) => {
+      setTimer(date);
+      hidePicker();
     };
+
+    const handleSetTimer = useCallback(() => {
+      let currentTimer = timerFormatter(timer);
+      console.log(currentTimer,previousTimer.current)
+      if (previousTimer.current != currentTimer) {
+        setVerseTimer(); // Call the API
+      } else {
+        console.log("Timer value hasn't changed, skipping API call");
+      }
+    }, []);
 
     return (
       <>
@@ -46,26 +133,33 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
                     resizeMode="contain"
                   />
                 </TouchableOpacity>
-                <View style={{backgroundColor: '#18171C', borderRadius: 15}}>
+                <Pressable
+                  style={{backgroundColor: '#18171C', borderRadius: 15}}>
                   <View
                     style={{borderColor: '#1D1E23', borderBottomWidth: 1.5}}>
                     <Text style={styles.modalTitle}>Notifications</Text>
                   </View>
 
                   {/* First Toggle */}
-                  <TouchableOpacity
-                    style={styles.preference}
-                    onPress={() => toggleSwitch()}>
+                  <View style={styles.preference}>
                     <View>
                       <Text style={styles.text}>Verse only</Text>
-                      <TouchableOpacity style={styles.timer}>
+                      <Pressable
+                        style={({pressed}) => [
+                          styles.timer,
+                          pressed && {opacity: 0.5},
+                        ]}
+                        disabled={!toggleStates}
+                        onPress={showPicker}>
                         <Image
                           source={CustomImages.timerIcon}
                           resizeMode="contain"
                           style={styles.timerIcon}
                         />
-                        <Text style={styles.timerText}>10:30</Text>
-                      </TouchableOpacity>
+                        <Text style={styles.timerText}>
+                          {moment(timer).format('HH:mm')}
+                        </Text>
+                      </Pressable>
                     </View>
 
                     <ToggleSwitch
@@ -92,83 +186,30 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
                           />
                         ) : null
                       }
-                      onToggle={() => toggleSwitch()}
+                      onToggle={toggleSwitch}
                     />
-                  </TouchableOpacity>
-
-                  {/* Second Toggle */}
-                  {/* <View style={styles.preference}>
-                    <Text style={styles.text}>Verse with reflection</Text>
-                    <ToggleSwitch
-                      isOn={toggleStates.toggle2}
-                      onColor="rgba(24, 23, 28, 1)"
-                      offColor="rgba(24, 23, 28, 1)"
-                      size="small"
-                      trackOnStyle={{
-                        borderColor: 'rgba(32, 201, 151, 1)',
-                        borderWidth: 1,
-                      }}
-                      trackOffStyle={{
-                        borderColor: 'rgba(86, 86, 92, 1)',
-                        borderWidth: 1,
-                      }}
-                      thumbOffStyle={styles.thumbStyleOff}
-                      thumbOnStyle={styles.thumbStyleOn}
-                      icon={
-                        toggleStates.toggle2 ? (
-                          <Image
-                            source={CustomImages.rightIcon}
-                            style={styles.toggleIcon}
-                            resizeMode="contain"
-                          />
-                        ) : null
-                      }
-                      onToggle={() => toggleSwitch('toggle2')}
-                    />
-                  </View> */}
-
-                  {/* Third Toggle */}
-                  {/* <View style={styles.preference}>
-                    <Text style={styles.text}>Verse with teaching</Text>
-                    <ToggleSwitch
-                      isOn={toggleStates.toggle3}
-                      onColor="rgba(24, 23, 28, 1)"
-                      offColor="rgba(24, 23, 28, 1)"
-                      size="small"
-                      trackOnStyle={{
-                        borderColor: 'rgba(32, 201, 151, 1)',
-                        borderWidth: 1,
-                      }}
-                      trackOffStyle={{
-                        borderColor: 'rgba(86, 86, 92, 1)',
-                        borderWidth: 1,
-                      }}
-                      thumbOffStyle={styles.thumbStyleOff}
-                      thumbOnStyle={styles.thumbStyleOn}
-                      icon={
-                        toggleStates.toggle3 ? (
-                          <Image
-                            source={CustomImages.rightIcon}
-                            style={styles.toggleIcon}
-                            resizeMode="contain"
-                          />
-                        ) : null
-                      }
-                      onToggle={() => toggleSwitch('toggle3')}
-                    />
-                  </View> */}
+                  </View>
                   <CustomButton
                     text="Save preference"
-                    onPress={toggleModal}
+                    onPress={handleSetTimer}
                     buttonStyle={{
                       marginHorizontal: 16,
                       marginVertical: 16,
                       marginBottom: Platform.select({ios: 40, android: 40}),
                     }}
                   />
-                </View>
+                </Pressable>
               </View>
             </Pressable>
+            <DatePicker
+              modal
+              open={isPickerVisible}
+              date={timer}
+              mode="time"
+              minuteInterval={30} // Set 30-minute intervals
+              onConfirm={handleConfirm}
+              onCancel={hidePicker}
+            />
           </Modal>
         )}
       </>

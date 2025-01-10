@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {Platform, StyleSheet, View} from 'react-native';
 import BootSplash from 'react-native-bootsplash';
 import {QueryClient, QueryClientProvider, onlineManager} from 'react-query';
@@ -27,6 +27,14 @@ GoogleSignin.configure({
 export const AppLoaderRef = React.createRef<LoaderType>();
 
 function App(): React.JSX.Element {
+  const getInitNotification = useCallback(async () => {
+    try {
+      const remoteMessage = await messaging().getInitialNotification();
+      if (remoteMessage) {
+      }
+    } catch (error) {}
+  }, []);
+
   useEffect(() => {
     messaging()?.onNotificationOpenedApp(async (remoteMessage: any) => {
       console.log('Notification opened', remoteMessage);
@@ -39,6 +47,7 @@ function App(): React.JSX.Element {
       });
     });
 
+    getInitNotification();
     notificationListener();
 
     return () => {

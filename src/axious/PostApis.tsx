@@ -82,10 +82,26 @@ export const ReportComment = async ({commentId}: {commentId: string}) => {
   }
 };
 
-export const SetNotificationTime = async ({time}: {time: string}) => {
+interface SetNotificationTimeInterface {
+  time: string;
+  isNotification: boolean;
+}
+
+export const SetNotificationTime = async ({
+  time,
+  isNotification,
+}: SetNotificationTimeInterface) => {
+  let notificationTime;
+  if (isNotification) {
+    notificationTime = time;
+  } else {
+    notificationTime = null;
+  };
+  console.log(notificationTime,'notification time')
+
   try {
     const response = await AxiosInstance.post(`update-notification-time`, {
-      notification_time: time,
+      notification_time: notificationTime,
       _method: 'patch',
     });
     return response;

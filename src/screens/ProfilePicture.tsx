@@ -67,6 +67,7 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
 
   const [isPermissionModalVisible, setPermissionModalVisible] = useState(false);
   const lastSubmittedImageRef = useRef<string | null>(null);
+  const lastSubmittedNameRef = useRef<string | null>(null);
 
   const handleConfirm = () => {};
 
@@ -204,7 +205,6 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
   const insets = useSafeAreaInsets();
 
   const handleSubmit = useCallback(async () => {
-   
     if (buttonRef?.current) {
       return;
     }
@@ -212,10 +212,16 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
     if (!name.text) {
       return;
     }
-  
-    buttonRef.current = true;
 
-   
+    if (
+      lastSubmittedImageRef.current === profileImage &&
+      lastSubmittedNameRef.current === name.text
+    ) {
+      handleNextNav();
+      return;
+    }
+
+    buttonRef.current = true;
 
     AppLoaderRef.current?.start();
 
@@ -225,15 +231,7 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
     if (profileImage) {
       ImageType = getMimeTypeFromUri(profileImage);
       ImageName = getFileNameFromUri(profileImage);
-
-      if (lastSubmittedImageRef.current === profileImage) {
-        buttonRef.current = false;
-        AppLoaderRef.current?.stop();
-        return;
-      }
     }
-
-   
 
     const data = {
       name: name.text,
@@ -243,13 +241,14 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
         name: ImageName,
       },
     };
-  
+
     try {
       const response = await UpdateProfile(data);
-     
+
       // Check if response is valid and status is success
       if (response && response?.status === 200) {
         lastSubmittedImageRef.current = profileImage;
+        lastSubmittedNameRef.current = name.text;
         dispatch(updateProfile(response?.data?.payload));
         CustomToaster({
           type: ALERT_TYPE.SUCCESS,
@@ -275,8 +274,6 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
     }
   }, [name, profileImage]);
 
-
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
@@ -293,7 +290,6 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
               }),
             },
           ]}>
-          
           <View style={{flexGrow: 1}}>
             <Pressable style={styles.imageBox} onPress={toggleModal}>
               <CustomImageHandler

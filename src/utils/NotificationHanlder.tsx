@@ -13,19 +13,26 @@ import notifee, {
 
 export const requestUserPermission = async () => {
   if (Platform.OS === 'android') {
-    PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+   const requestUserPermission =  PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
     );
+    const authStatus = await messaging().requestPermission();
+    const enabled = authStatus === messaging.AuthorizationStatus.AUTHORIZED || authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    if(enabled){
+      console.log('Authorization status',authStatus);
+    }
+
   } else {
     messaging().requestPermission();
   }
 };
 
-export const getToken = async () => {
-  await messaging().registerDeviceForRemoteMessages();
-  const token = await messaging().getToken();
-  return token;
-};
+// export const getToken = async () => {
+//   await messaging().registerDeviceForRemoteMessages();
+//   const token = await messaging().getToken();
+//   return token;
+// };
 
 export const displayNotification = async (remoteMessage: any) => {
   const channel = await notifee?.createChannel({
