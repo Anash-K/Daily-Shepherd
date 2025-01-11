@@ -109,14 +109,12 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
 
   useEffect(() => {
     const verseEvent = DeviceEventEmitter.addListener('trackLike', data => {
-      console.log(data.isLiked,"event triggered");
-      
-      if (data?.id && data?.id == verseData?.id) {
-        console.log(data.isLiked);
-        setVerseData(prev => {
-          return {...prev, is_favorite: data?.isLiked};
-        });
-      }
+      console.log('event triggered');
+
+      // if (data?.id && data?.id == verseData?.id) {
+      console.log('event entered state');
+      todaysVerseMutate();
+      // }
     });
     return () => {
       verseEvent.remove();
@@ -130,7 +128,8 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
   return (
     <ScrollView
       style={[styles.container, {marginTop: insets.top}]}
-      contentContainerStyle={{flexGrow: 1}}>
+      contentContainerStyle={{flexGrow: 1}}
+      showsVerticalScrollIndicator={false}>
       <View style={styles.headContainer}>
         <View style={styles.leftBox}>
           <Image
@@ -165,15 +164,16 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
             reference={verseData?.verse_reference}
             verse={verseData?.verse}
             OnPressDetails={handlePress}
+            versePressable={false}
           />
 
           <VerseReflectionBox
-            title={'Todays Reflection'}
+            title={"Today's Prayer"}
             content={verseData.reflection}
             OnPressLink={handleLink.bind(null, verseData.reflection_link)}
           />
           <VerseReflectionBox
-            title={'Context Chapter'}
+            title={'Insights'}
             content={verseData.context_chapter}
             OnPressLink={handleLink.bind(null, verseData.context_chapter_link)}
           />
@@ -181,7 +181,14 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
             <Text style={styles.videoHeading}>Watch Video</Text>
             <TouchableOpacity
               onPress={handleLink.bind(null, verseData.video_link)}
-              style={{borderRadius: 15.4}}>
+              style={styles.videoImageContainer}>
+              <View style={styles.videoIcon}>
+                <Image
+                  source={CustomImages.videoPlayIcon}
+                  style={styles.playVideoImage}
+                />
+              </View>
+
               <CustomImageHandler
                 sourceImage={verseData.thumbnail}
                 placeholderImage={CustomImages.videoImage}
@@ -200,6 +207,25 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
 export default VerseOfTheDay;
 
 const styles = StyleSheet.create({
+  videoImageContainer: {borderRadius: 15.4, justifyContent: 'center'},
+  playVideoImage: {
+    width: 14,
+    height: 17.5,
+    marginRight: -5,
+  },
+  videoIcon: {
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    paddingHorizontal: 13,
+    paddingVertical: 9,
+    borderRadius: 31,
+    borderWidth: 1,
+    borderColor: '#333333',
+    position: 'absolute',
+    zIndex: 1,
+  },
   noDataText: {
     fontSize: 18,
     color: '#FFFFFF',

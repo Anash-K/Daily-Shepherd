@@ -105,6 +105,12 @@ const CommentBox: React.FC<CommentBoxType> = memo(
                   pressColor={'transparent'}>
                   <CustomAction />
                 </MenuItem>
+                {/* <MenuItem
+                  onPress={() => reportComment()}
+                  style={styles.menuItem}
+                  pressColor={'transparent'}>
+                  <CustomAction />
+                </MenuItem> */}
               </Menu>
             </View>
 

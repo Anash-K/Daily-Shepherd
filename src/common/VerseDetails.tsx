@@ -6,6 +6,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import {ScreenProps} from '../navigation/Stack';
@@ -117,6 +118,7 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
             reference={verseData.verse_reference}
             verse={verseData.verse}
             OnPressDetails={handleDetails}
+            versePressable={false}
           />
 
           {/* Reflection Boxes */}
@@ -133,11 +135,22 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
           {/* Video Section */}
           <View style={styles.videoBox}>
             <Text style={styles.videoHeading}>Watch Video</Text>
-            <CustomImageHandler
-              sourceImage={verseData.thumbnail}
-              placeholderImage={CustomImages.videoImage}
-              imageStyle={styles.videoStyle}
-            />
+            <TouchableOpacity
+              onPress={handleLink.bind(null, verseData.video_link)}
+              style={styles.videoImageContainer}>
+              <View style={styles.videoIcon}>
+                <Image
+                  source={CustomImages.videoPlayIcon}
+                  style={styles.playVideoImage}
+                />
+              </View>
+
+              <CustomImageHandler
+                sourceImage={verseData.thumbnail}
+                placeholderImage={CustomImages.videoImage}
+                imageStyle={styles.videoStyle}
+              />
+            </TouchableOpacity>
           </View>
         </View>
       ) : (
@@ -149,6 +162,25 @@ const VerseDetails: React.FC<ScreenProps<'VerseDetails'>> = ({
 export default VerseDetails;
 
 const styles = StyleSheet.create({
+  videoImageContainer: {borderRadius: 15.4, justifyContent: 'center'},
+  playVideoImage: {
+    width: 14,
+    height: 17.5,
+    marginRight: -5,
+  },
+  videoIcon: {
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    paddingHorizontal: 13,
+    paddingVertical: 9,
+    borderRadius: 31,
+    borderWidth: 1,
+    borderColor: '#333333',
+    position: 'absolute',
+    zIndex: 1,
+  },
   contentStyle: {flexGrow: 1},
   innerContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
   videoBox: {

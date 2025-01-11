@@ -289,7 +289,8 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
                 android: 25,
               }),
             },
-          ]}>
+          ]}
+          showsVerticalScrollIndicator={false}>
           <View style={{flexGrow: 1}}>
             <Pressable style={styles.imageBox} onPress={toggleModal}>
               <CustomImageHandler

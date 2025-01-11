@@ -79,7 +79,7 @@ const Favorites: React.FC<ScreenProps<'Favorites'>> = ({navigation}) => {
               reference={item.verse_reference}
               verse={item.verse}
               commentNumber={item.comment_count}
-              OnPressDetails={handleDetails.bind(null, item.date)}
+              OnPressDetails={handleDetails.bind(null, item.id)}
             />
           )}
           keyExtractor={item => item.id.toString()}

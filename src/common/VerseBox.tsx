@@ -2,6 +2,7 @@ import {
   DeviceEventEmitter,
   Image,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -29,18 +30,27 @@ interface VerseBoxProps {
   commentNumber: number;
   liked: boolean;
   OnPressDetails?: () => void;
+  versePressable?: boolean;
 }
 
 const VerseBox: React.FC<VerseBoxProps> = memo(
-  ({id, date, reference, verse, commentNumber, OnPressDetails, liked}) => {
+  ({
+    id,
+    date,
+    reference,
+    verse,
+    commentNumber,
+    OnPressDetails,
+    liked,
+    versePressable = true,
+  }) => {
     const navigation =
       useNavigation<ScreenProps<'VerseOfTheDay'>['navigation']>();
     const [isLiked, setIsLiked] = useState(liked);
 
-    useEffect(() =>{
-      setIsLiked(liked)
-    },[liked])
-    
+    useEffect(() => {
+      setIsLiked(liked);
+    }, [liked]);
 
     const handleComments = (id: string) => {
       navigation.navigate('Comments', {
@@ -80,7 +90,7 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
     const handleLike = useCallback(() => {
       // setIsLiked(prev => !prev);
       addVerseToFavorite();
-    },[]);
+    }, []);
 
     // Usage
 
@@ -98,7 +108,12 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
     }
 
     return (
-      <TouchableOpacity style={styles.container} onPress={OnPressDetails}>
+      <Pressable
+        style={({pressed}) => [
+          styles.container,
+          versePressable && pressed && {opacity: 0.5},
+        ]}
+        onPress={OnPressDetails}>
         <View style={styles.verseHeader}>
           <View style={styles.titleBox}>
             <Text style={styles.title}>{displayDate}</Text>
@@ -142,7 +157,7 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
             <Image source={CustomImages.shareIcon} style={styles.likedIcon} />
           </TouchableOpacity>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   },
 );

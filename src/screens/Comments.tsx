@@ -92,6 +92,7 @@ const Comments: React.FC<ScreenProps<'Comments'>> = ({route}) => {
       handleCommentUpdate(data);
     },
     onError(error) {
+      console.error(error)
       ErrorHandler(error);
     },
     onSettled: () => AppLoaderRef.current?.stop(),

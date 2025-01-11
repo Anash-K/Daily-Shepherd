@@ -10,31 +10,30 @@ import notifee, {
   AndroidStyle,
   AndroidVisibility,
 } from '@notifee/react-native';
+import {getFCMToken} from './FCM';
 
 export const requestUserPermission = async () => {
   if (Platform.OS === 'android') {
-   const requestUserPermission =  PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+    const requestUserPermission = PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
     );
     const authStatus = await messaging().requestPermission();
-    const enabled = authStatus === messaging.AuthorizationStatus.AUTHORIZED || authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-    if(enabled){
-      console.log('Authorization status',authStatus);
+    if (enabled) {
+      console.log('Authorization status', authStatus);
+      const token = getFCMToken();
+      console.log('token', token);
     }
-
   } else {
     messaging().requestPermission();
   }
 };
 
-// export const getToken = async () => {
-//   await messaging().registerDeviceForRemoteMessages();
-//   const token = await messaging().getToken();
-//   return token;
-// };
-
 export const displayNotification = async (remoteMessage: any) => {
+  console.log(remoteMessage,"remote message");
   const channel = await notifee?.createChannel({
     id: 'default_channel_id',
     name: 'Default Channel',
@@ -42,8 +41,8 @@ export const displayNotification = async (remoteMessage: any) => {
   });
 
   await notifee?.displayNotification({
-    title: `${remoteMessage.notification.title}`,
-    body: `${remoteMessage.notification.body}`,
+    title: remoteMessage.notification.title || 'Default Title',
+    body: remoteMessage.notification.body || 'Default Body',
     data: remoteMessage?.data,
     android: {
       channelId: channel,

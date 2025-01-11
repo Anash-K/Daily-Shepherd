@@ -213,7 +213,7 @@ const Profile: React.FC<ScreenProps<'Profile'>> = ({navigation}) => {
   }, [dispatch]);
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.topHeader}>
         <CustomImageHandler
           placeholderImage={CustomImages.profilePic}

@@ -247,7 +247,7 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
       style={[
         styles.container,
         {paddingBottom: Platform.select({ios: bottom, android: 20})},
-      ]}>
+      ]} showsVerticalScrollIndicator={false}>
       <View style={{flex: 1}}>
         <ImageBackground
           source={CustomImages.loginTopBg}

@@ -34,5 +34,6 @@ export const getFCMToken = async () => {
   Platform.OS === 'ios'
     ? (fcmToken = await getFCMTokenIOS())
     : (fcmToken = await getFCMTokenAndroid());
+    console.log(fcmToken,"fcmtoke");
   return fcmToken;
 };

@@ -84,10 +84,10 @@ const NotificationPreferences: React.FC<
           type: ALERT_TYPE.SUCCESS,
           message: 'Notifications preference updated',
         });
-        previousTimer.current = data?.data?.notification_time;
+        previousTimer.current = data?.data?.payload?.notification_time;
         dispatch(
           updateNotificationTime({
-            notification_time: data?.data?.notification_time,
+            notification_time: data?.data?.payload?.notification_time,
           }),
         );
         setTimeout(() => {
@@ -114,9 +114,9 @@ const NotificationPreferences: React.FC<
     if (previousTimer.current != currentTimer) {
       setVerseTimer(); // Call the API
     } else {
-      console.log("Timer value hasn't changed, skipping API call");
+      handleSkip();
     }
-  }, []);
+  }, [timer]);
 
   const insets = useSafeAreaInsets();
 

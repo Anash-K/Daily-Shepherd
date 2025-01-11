@@ -78,10 +78,11 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
             type: ALERT_TYPE.SUCCESS,
             message: 'Notifications preference updated',
           });
-          previousTimer.current = data?.data?.notification_time;
+          previousTimer.current = data?.data?.payload?.notification_time;
+          console.log(data?.data, 'notification');
           dispatcher(
             updateNotificationTime({
-              notification_time: data?.data?.notification_time,
+              notification_time: data?.data?.payload?.notification_time,
             }),
           );
           setTimeout(() => {
@@ -106,13 +107,13 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
 
     const handleSetTimer = useCallback(() => {
       let currentTimer = timerFormatter(timer);
-      console.log(currentTimer,previousTimer.current)
+      console.log(currentTimer, previousTimer.current);
       if (previousTimer.current != currentTimer) {
         setVerseTimer(); // Call the API
       } else {
-        console.log("Timer value hasn't changed, skipping API call");
+        toggleModal();
       }
-    }, []);
+    }, [timer]);
 
     return (
       <>

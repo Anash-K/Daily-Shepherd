@@ -67,6 +67,7 @@ const CustomImages = {
   googleLogo: require('./images/GoogleLogo.png'),
   noDataFound: require('./images/noDataFound.png'),
   podcastPlaceHolder: require('./images/podcastPlaceholder.png'),
+  videoPlayIcon: require('./images/playiconVideo.png'),
 };
 
 export default CustomImages;

@@ -209,7 +209,7 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
       return;
     }
 
-    if (!name.text) {
+    if (!name.text || !name.isValid) {
       return;
     }
 
@@ -289,7 +289,7 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
                 android: 25,
               }),
             },
-          ]}>
+          ]} showsVerticalScrollIndicator={false}>
           <View style={{flexGrow: 1}}>
             <Pressable style={styles.imageBox} onPress={toggleModal}>
               <CustomImageHandler
