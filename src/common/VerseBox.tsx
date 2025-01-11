@@ -21,6 +21,7 @@ import {AppLoaderRef} from '../../App';
 import {ErrorHandler} from '../utils/ErrorHandler';
 import {CustomToaster} from '../utils/AlertNotification';
 import {ALERT_TYPE} from 'react-native-alert-notification';
+import Tts from 'react-native-tts';
 
 interface VerseBoxProps {
   id: string;
@@ -46,7 +47,29 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
   }) => {
     const navigation =
       useNavigation<ScreenProps<'VerseOfTheDay'>['navigation']>();
-    const [isLiked, setIsLiked] = useState(liked);
+    const [isLiked, setIsLiked] = useState<boolean>(liked);
+    const [isPlaying, setIsPlaying] = useState<boolean>(false);
+
+    const handleSpeak = (text: string) => {
+      setIsPlaying(true);
+      Tts.speak(text);
+    };
+
+    const stopSpeaking = () => {
+      setIsPlaying(false);
+      Tts.stop();
+    };
+
+    useEffect(() => {
+      const onTtsFinish = Tts.addEventListener('tts-finish', () => {
+        setIsPlaying(false); // Update state when audio finishes
+      });
+
+      // Cleanup event listener
+      return () => {
+        onTtsFinish.remove();
+      };
+    }, []);
 
     useEffect(() => {
       setIsLiked(liked);
@@ -120,12 +143,22 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
             <Text style={styles.reference}>{reference}</Text>
           </View>
 
-          <TouchableOpacity style={styles.listenButton}>
+          <TouchableOpacity
+            style={styles.listenButton}
+            onPress={() => {
+              if (isPlaying) {
+                stopSpeaking(); // Stop the TTS if it's currently playing
+              } else {
+                handleSpeak(verse); // Start TTS if it's not playing
+              }
+            }}>
             <Image
               source={CustomImages.speakerIcon}
               style={styles.speakerIcon}
             />
-            <Text style={styles.listenText}>Listen</Text>
+            <Text style={styles.listenText}>
+              {isPlaying ? 'Stop' : 'Listen'}
+            </Text>
           </TouchableOpacity>
         </View>
 
