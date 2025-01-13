@@ -109,10 +109,7 @@ const VerseOfTheDay: React.FC<ScreenProps<'VerseOfTheDay'>> = () => {
 
   useEffect(() => {
     const verseEvent = DeviceEventEmitter.addListener('trackLike', data => {
-      console.log('event triggered');
 
-      // if (data?.id && data?.id == verseData?.id) {
-      console.log('event entered state');
       todaysVerseMutate();
       // }
     });

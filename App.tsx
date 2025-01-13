@@ -22,7 +22,7 @@ GoogleSignin.configure({
   offlineAccess: false,
 });
 
-// console.error = () => {};
+console.error = () => {};
 
 export const AppLoaderRef = React.createRef<LoaderType>();
 
@@ -37,7 +37,6 @@ function App(): React.JSX.Element {
 
   useEffect(() => {
     messaging()?.onNotificationOpenedApp(async (remoteMessage: any) => {
-      console.log('Notification opened', remoteMessage);
       // onNotificationClick(remoteMessage?.data);
     });
 

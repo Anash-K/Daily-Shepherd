@@ -46,6 +46,8 @@
 	<string>The app requires access to the camera to capture photos or videos.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>The app requires access to your photo library to select images or videos.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+<string>Your description for why you need speech recognition access</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Urbanist-Bold.ttf</string>
@@ -74,5 +76,8 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>aps-environment</key>
+    <string>development</string>
+
 </dict>
 </plist>

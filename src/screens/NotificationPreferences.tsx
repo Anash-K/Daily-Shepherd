@@ -35,7 +35,6 @@ const NotificationPreferences: React.FC<
   ScreenProps<'NotificationPreferences'>
 > = ({navigation}) => {
   const userData = useSelector((state: any) => state.auth);
-  console.log(userData, userData.notification_time, 'not time');
   const [toggleStates, setToggleStates] = useState<boolean>(false);
   const [isPickerVisible, setPickerVisibility] = useState(false);
   const [timer, setTimer] = useState(() => {
@@ -65,31 +64,47 @@ const NotificationPreferences: React.FC<
     navigation.navigate('BottomStack');
   }, []);
 
-  const timerFormatter = useCallback((time: Date) => {
-    return moment(time).format('HH:mm:ss');
+  const timerFormatter = useCallback((time: Date | string) => {
+    return moment
+      .utc(time, 'HH:mm:ss') // Parse as UTC time
+      .local() // Convert to local time
+      .format('HH:mm'); // Format in local time
+  }, []);
+
+  const timerUTCFormatter = useCallback((time: Date) => {
+    return moment.utc(time).format('HH:mm');
   }, []);
 
   const {mutate: setVerseTimer} = useMutation({
     mutationKey: MutationKeys.NotificationKey,
     mutationFn: async () =>
       await SetNotificationTime({
-        time: timerFormatter(timer),
+        time: timerUTCFormatter(timer),
         isNotification: toggleStates,
       }),
     onMutate: () => AppLoaderRef.current?.start(),
     onSuccess(data) {
-      console.log(data?.data);
+      let localTime = timerFormatter(data?.data?.payload?.notification_time);
       if (data?.status == 200) {
         CustomToaster({
           type: ALERT_TYPE.SUCCESS,
           message: 'Notifications preference updated',
         });
-        previousTimer.current = data?.data?.payload?.notification_time;
-        dispatch(
-          updateNotificationTime({
-            notification_time: data?.data?.payload?.notification_time,
-          }),
-        );
+        if (data?.data?.payload?.notification_time) {
+          previousTimer.current = localTime;
+          dispatch(
+            updateNotificationTime({
+              notification_time: localTime,
+            }),
+          );
+        } else {
+          dispatch(
+            updateNotificationTime({
+              notification_time: null,
+            }),
+          );
+        }
+
         setTimeout(() => {
           handleSkip();
         }, 500);

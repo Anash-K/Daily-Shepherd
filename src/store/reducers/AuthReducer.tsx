@@ -29,7 +29,6 @@ const authSlice = createSlice({
     },
     updateProfile: (state, action) => {
       const {name, profile, notification_time} = action.payload;
-      console.log(action.payload);
       if (name) {
         state.name = name;
       }

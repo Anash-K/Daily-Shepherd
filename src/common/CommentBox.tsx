@@ -1,5 +1,6 @@
 import React, {memo, useCallback, useState} from 'react';
 import {
+  DeviceEventEmitter,
   Image,
   Pressable,
   StyleSheet,
@@ -21,6 +22,7 @@ import {ALERT_TYPE} from 'react-native-alert-notification';
 import {ErrorHandler} from '../utils/ErrorHandler';
 import {useSelector} from 'react-redux';
 import CustomImageHandler from '../utils/CustomImageHandler';
+import {DeleteComment} from '../axious/DeleteApi';
 
 const CommentBox: React.FC<CommentBoxType> = memo(
   ({comment, created_at, id, user}) => {
@@ -36,16 +38,17 @@ const CommentBox: React.FC<CommentBoxType> = memo(
       setIsVisible(false);
     }, []);
 
-    const CustomAction = () => {
+    const CustomAction = ({commentText}: {commentText: string}) => {
       return (
         <View style={styles.commentAction}>
           <Image source={CustomImages.warningIcon} style={styles.warningIcon} />
-          <Text style={styles.menuItemText}>Report</Text>
+          <Text style={styles.menuItemText}>{commentText}</Text>
         </View>
       );
     };
 
     const handleReportResponse = useCallback((data: any) => {
+      console.log(data)
       if (data?.status == 200) {
         CustomToaster({
           type: ALERT_TYPE.SUCCESS,
@@ -61,9 +64,14 @@ const CommentBox: React.FC<CommentBoxType> = memo(
 
     const {mutate: reportComment} = useMutation({
       mutationKey: MutationKeys.ReportKey,
-      mutationFn: async () => await ReportComment({commentId: id}),
+      mutationFn: async () => {
+        let api = isUser ? DeleteComment : ReportComment;
+        await api({commentId: id});
+      },
       onMutate: () => AppLoaderRef.current?.start(),
       onSuccess(data) {
+        console.log(data,"data is hjere")
+        DeviceEventEmitter.emit('trackLike');
         handleReportResponse(data);
       },
       onError(error) {
@@ -74,6 +82,15 @@ const CommentBox: React.FC<CommentBoxType> = memo(
         closeMenu();
       },
     });
+
+    console.log(id)
+
+    let isUser = user.email == userData.email;
+
+    const handleAction = useCallback(() => {
+      // Call reportComment as a function to trigger the mutation
+      reportComment();
+    }, [reportComment]);
 
     return (
       <View style={styles.container}>
@@ -100,29 +117,21 @@ const CommentBox: React.FC<CommentBoxType> = memo(
                 onRequestClose={closeMenu}
                 style={styles.menuStyle}>
                 <MenuItem
-                  onPress={() => reportComment()}
+                  onPress={handleAction}
                   style={styles.menuItem}
                   pressColor={'transparent'}>
-                  <CustomAction />
+                  <CustomAction commentText={isUser ? 'Delete' : 'Report'} />
                 </MenuItem>
-                {/* <MenuItem
-                  onPress={() => reportComment()}
-                  style={styles.menuItem}
-                  pressColor={'transparent'}>
-                  <CustomAction />
-                </MenuItem> */}
               </Menu>
             </View>
 
-            {user.email !== userData.email && (
-              <Pressable onPress={toggleMenu} style={[styles.detailButton]}>
-                <Image
-                  source={CustomImages.moreIcon}
-                  style={styles.moreIcon}
-                  resizeMode="contain"
-                />
-              </Pressable>
-            )}
+            <Pressable onPress={toggleMenu} style={[styles.detailButton]}>
+              <Image
+                source={CustomImages.moreIcon}
+                style={styles.moreIcon}
+                resizeMode="contain"
+              />
+            </Pressable>
           </View>
 
           {/* Comment Content */}
@@ -162,6 +171,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19.2,
     color: 'rgba(250, 250, 250, 1)',
+    textAlign: 'center',
   },
   container: {
     borderBottomWidth: 1,

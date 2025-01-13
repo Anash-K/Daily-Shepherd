@@ -23,9 +23,7 @@ export const requestUserPermission = async () => {
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
     if (enabled) {
-      console.log('Authorization status', authStatus);
       const token = getFCMToken();
-      console.log('token', token);
     }
   } else {
     messaging().requestPermission();
@@ -33,7 +31,6 @@ export const requestUserPermission = async () => {
 };
 
 export const displayNotification = async (remoteMessage: any) => {
-  console.log(remoteMessage,"remote message");
   const channel = await notifee?.createChannel({
     id: 'default_channel_id',
     name: 'Default Channel',
@@ -60,9 +57,9 @@ export const displayNotification = async (remoteMessage: any) => {
 export const notificationListener = async () => {
   if (Platform.OS === 'ios') {
     messaging().onMessage(remoteMessage => {
-      if (AppState.currentState.match(/inactive|background/)) {
+      // if (AppState.currentState.match(/inactive|background|active/)) {
         displayNotification(remoteMessage);
-      }
+      // }
     });
   } else {
     messaging().onMessage(remoteMessage => {

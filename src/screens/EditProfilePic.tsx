@@ -43,8 +43,7 @@ const EditProfilePic: React.FC<ScreenProps<'EditProfilePic'>> = ({
 }) => {
   const userData = useSelector((state: any) => state.auth);
 
-  console.log(userData.token, 'token');
-
+console.log(userData.token)
   const nameValidation = {
     text: userData.name ? userData.name : '',
     error: '',

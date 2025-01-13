@@ -13,7 +13,7 @@ import CustomFont from '../assets/customFonts';
 import {memo, useCallback, useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {ScreenProps} from '../navigation/Stack';
-import {DateComparison, formatDate} from '../utils/currentDateIntlFormat';
+import {DateComparison} from '../utils/currentDateIntlFormat';
 import {useMutation} from 'react-query';
 import {MutationKeys} from '../utils/MutationKeys';
 import {AddToFavorite} from '../axious/PostApis';
@@ -50,30 +50,43 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
     const [isLiked, setIsLiked] = useState<boolean>(liked);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
-    const handleSpeak = (text: string) => {
-      setIsPlaying(true);
-      Tts.speak(text);
-    };
-
-    const stopSpeaking = () => {
-      setIsPlaying(false);
-      Tts.stop();
-    };
-
-    useEffect(() => {
-      const onTtsFinish = Tts.addEventListener('tts-finish', () => {
-        setIsPlaying(false); // Update state when audio finishes
-      });
-
-      // Cleanup event listener
-      return () => {
-        onTtsFinish.remove();
-      };
-    }, []);
-
     useEffect(() => {
       setIsLiked(liked);
     }, [liked]);
+
+    const handleSpeak = (text: string) => {
+      // if (Platform.OS === 'android') {
+      setIsPlaying(true);
+      Tts.speak(text);
+      // }
+    };
+
+    const stopSpeaking = () => {
+      // if (Platform.OS === 'android') {
+      if (isPlaying) {
+        Tts?.stop(true);
+      }
+      setIsPlaying(false);
+      // }
+    };
+
+    useEffect(() => {
+      // Listen for TTS finish event
+      const onFinish = Tts.addListener('tts-finish', () => {
+        setIsPlaying(false);
+      });
+
+      // Optional: Listen for progress updates
+      const onProgress = Tts.addListener('tts-progress', event => {
+        // console.log('TTS Progress:', event);
+      });
+
+      // Cleanup
+      return () => {
+        onFinish.remove();
+        onProgress.remove();
+      };
+    }, []);
 
     const handleComments = (id: string) => {
       navigation.navigate('Comments', {
@@ -147,9 +160,9 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
             style={styles.listenButton}
             onPress={() => {
               if (isPlaying) {
-                stopSpeaking(); // Stop the TTS if it's currently playing
+                stopSpeaking();
               } else {
-                handleSpeak(verse); // Start TTS if it's not playing
+                handleSpeak(verse);
               }
             }}>
             <Image

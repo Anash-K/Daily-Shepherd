@@ -36,7 +36,6 @@ interface AppearanceProps {
 const NotificationsModal: React.FC<AppearanceProps> = memo(
   ({isModalVisible, toggleModal}) => {
     const {notification_time} = useSelector((state: any) => state.auth);
-    console.log(notification_time, 'notification time');
     const [toggleStates, setToggleStates] = useState<boolean>(false);
     const [isPickerVisible, setPickerVisibility] = useState(false);
     const previousTimer = useRef<string | null>(null);
@@ -49,7 +48,7 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
 
     useEffect(() => {
       if (notification_time) {
-        const parsedTime = moment(notification_time, 'HH:mm').toDate();
+        const parsedTime = moment(notification_time, 'HH:mm').toDate(); // Convert to JavaScript Date
         setTimer(parsedTime);
         setToggleStates(true);
       }
@@ -59,32 +58,48 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
       setToggleStates(prevState => !prevState);
     }, []);
 
-    const timerFormatter = useCallback((time: Date) => {
-      return moment(time).format('HH:mm:ss');
+    const timerFormatter = useCallback((time: Date | string) => {
+      return moment
+        .utc(time, 'HH:mm:ss') // Parse as UTC time
+        .local() // Convert to local time
+        .format('HH:mm'); // Format in local time
+    }, []);
+
+    const timerUTCFormatter = useCallback((time: Date) => {
+      return moment.utc(time).format('HH:mm');
     }, []);
 
     const {mutate: setVerseTimer} = useMutation({
       mutationKey: MutationKeys.NotificationKey,
       mutationFn: async () =>
         await SetNotificationTime({
-          time: timerFormatter(timer),
+          time: timerUTCFormatter(timer),
           isNotification: toggleStates,
         }),
       onMutate: () => AppLoaderRef.current?.start(),
       onSuccess(data) {
-        console.log(data?.data);
+        let localTime = timerFormatter(data?.data?.payload?.notification_time);
+        console.log(data?.data?.payload);
         if (data?.status == 200) {
           CustomToaster({
             type: ALERT_TYPE.SUCCESS,
             message: 'Notifications preference updated',
           });
-          previousTimer.current = data?.data?.payload?.notification_time;
-          console.log(data?.data, 'notification');
-          dispatcher(
-            updateNotificationTime({
-              notification_time: data?.data?.payload?.notification_time,
-            }),
-          );
+          if (data?.data?.payload?.notification_time) {
+            previousTimer.current = localTime;
+            dispatcher(
+              updateNotificationTime({
+                notification_time: localTime,
+              }),
+            );
+          }else{
+            dispatcher(
+              updateNotificationTime({
+                notification_time: null,
+              }),
+            );
+          }
+
           setTimeout(() => {
             toggleModal();
           }, 500);
@@ -104,15 +119,23 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
       setTimer(date);
       hidePicker();
     };
+    console.log(notification_time);
+
+  //  useEffect(() =>{
+  //   dispatcher(
+  //     updateNotificationTime({
+  //       notification_time: null,
+  //     }),
+  //   );
+  //  },[]);
 
     const handleSetTimer = useCallback(() => {
       let currentTimer = timerFormatter(timer);
-      console.log(currentTimer, previousTimer.current);
-      if (previousTimer.current != currentTimer) {
-        setVerseTimer(); // Call the API
-      } else {
-        toggleModal();
-      }
+      // if (previousTimer.current != currentTimer) {
+      setVerseTimer(); // Call the API
+      // } else {
+      // toggleModal();
+      // }
     }, [timer]);
 
     return (

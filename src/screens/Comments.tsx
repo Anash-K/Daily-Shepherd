@@ -92,7 +92,7 @@ const Comments: React.FC<ScreenProps<'Comments'>> = ({route}) => {
       handleCommentUpdate(data);
     },
     onError(error) {
-      console.error(error)
+      console.error(error);
       ErrorHandler(error);
     },
     onSettled: () => AppLoaderRef.current?.stop(),
@@ -104,6 +104,15 @@ const Comments: React.FC<ScreenProps<'Comments'>> = ({route}) => {
       addNewComment();
     }
   }, [inputComment, verseId]);
+
+  useEffect(() => {
+    const commentEvent = DeviceEventEmitter.addListener('trackLike', data => {
+      getCommentsData();
+    });
+    return () => {
+      commentEvent.remove();
+    };
+  }, []);
 
   if (isLoading && onFirstLoad) {
     return null;
@@ -193,7 +202,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flexGrow: 1,
-    marginBottom:120
+    marginBottom: 120,
   },
   inputContainer: {
     flexDirection: 'row',

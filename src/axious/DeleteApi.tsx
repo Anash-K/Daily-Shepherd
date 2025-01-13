@@ -8,3 +8,12 @@ export const DeleteAccount = async () => {
     throw error;
   }
 };
+
+export const DeleteComment = async({commentId} :{commentId : string }) =>{
+  try {
+    const response =  await AxiosInstance.delete(`comments/${commentId}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+} 
