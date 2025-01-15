@@ -2,6 +2,7 @@ import React, {memo, useCallback, useState} from 'react';
 import {
   DeviceEventEmitter,
   Image,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -47,32 +48,13 @@ const CommentBox: React.FC<CommentBoxType> = memo(
       );
     };
 
-    const handleReportResponse = useCallback((data: any) => {
-      console.log(data)
-      if (data?.status == 200) {
-        CustomToaster({
-          type: ALERT_TYPE.SUCCESS,
-          message: 'Comment Reported',
-        });
-      } else {
-        CustomToaster({
-          type: ALERT_TYPE.DANGER,
-          message: 'Failed to Report',
-        });
-      }
-    }, []);
-
     const {mutate: reportComment} = useMutation({
       mutationKey: MutationKeys.ReportKey,
-      mutationFn: async () => {
-        let api = isUser ? DeleteComment : ReportComment;
-        await api({commentId: id});
-      },
+      mutationFn: async () => await ReportComment({commentId: id}),
       onMutate: () => AppLoaderRef.current?.start(),
       onSuccess(data) {
-        console.log(data,"data is hjere")
-        DeviceEventEmitter.emit('trackLike');
         handleReportResponse(data);
+        // DeviceEventEmitter.emit('trackLike');
       },
       onError(error) {
         ErrorHandler(error);
@@ -83,14 +65,47 @@ const CommentBox: React.FC<CommentBoxType> = memo(
       },
     });
 
-    console.log(id)
+    const {mutate: callCommentDelete} = useMutation({
+      mutationKey: MutationKeys.DeleteCommentKey,
+      mutationFn: async () => await DeleteComment({commentId: id}),
+      onMutate: () => AppLoaderRef.current?.start(),
+      onSuccess(data) {
+        handleReportResponse(data);
+        // DeviceEventEmitter.emit('trackLike');
+      },
+      onError(error) {
+        ErrorHandler(error);
+      },
+      onSettled: () => {
+        AppLoaderRef.current?.stop();
+        closeMenu();
+      },
+    });
 
     let isUser = user.email == userData.email;
 
+    const handleReportResponse = useCallback((data: any) => {
+      if (data?.status == 200) {
+        CustomToaster({
+          type: ALERT_TYPE.SUCCESS,
+          message: isUser ? 'Comment deleted' : 'Comment reported',
+        });
+      } else {
+        CustomToaster({
+          type: ALERT_TYPE.DANGER,
+          message: isUser ? 'Fail to delete' : 'Fail to report',
+        });
+      }
+    }, []);
+
     const handleAction = useCallback(() => {
       // Call reportComment as a function to trigger the mutation
-      reportComment();
-    }, [reportComment]);
+      if (isUser) {
+        callCommentDelete();
+      } else {
+        reportComment();
+      }
+    }, [reportComment, DeleteComment]);
 
     return (
       <View style={styles.container}>
@@ -100,8 +115,6 @@ const CommentBox: React.FC<CommentBoxType> = memo(
           placeholderImage={CustomImages.profilePic}
           imageStyle={styles.profilePic}
         />
-        {/* <Image source={CustomImages.demoComment} style={styles.profilePic} /> */}
-
         <View style={styles.contentBox}>
           {/* Comment Header */}
           <View style={styles.topHeading}>
@@ -156,6 +169,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     shadowColor: 'rgba(0, 0, 0, 0.5)',
     shadowOffset: {width: 4, height: 2},
+
     // maxWidth: 117,
   },
   menuItem: {
@@ -165,6 +179,8 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: 'rgba(250, 250, 250, 0.15)',
     height: 35,
+    justifyContent: Platform.select({ios:'center'}),
+    alignItems: Platform.select({ios:'center'}),
   },
   menuItemText: {
     fontFamily: CustomFont.Urbanist400,
@@ -172,6 +188,7 @@ const styles = StyleSheet.create({
     lineHeight: 19.2,
     color: 'rgba(250, 250, 250, 1)',
     textAlign: 'center',
+    marginTop: Platform.select({ios:2}),
   },
   container: {
     borderBottomWidth: 1,
@@ -214,6 +231,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 15,
     tintColor: 'rgba(250, 250, 250, 1)',
+    marginTop: Platform.select({ios:3}),
   },
   profilePic: {
     width: 28,

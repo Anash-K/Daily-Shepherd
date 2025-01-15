@@ -10,4 +10,5 @@ export const MutationKeys = {
   NewCommentKey:'verse-newComment',
   ReportKey:'verse-report',
   NotificationKey:'verse-notification',
+  DeleteCommentKey:'verseComment-Delete'
 };

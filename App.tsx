@@ -8,7 +8,10 @@ import {Loader as LoaderType} from './src/types/CommonTypes';
 import RootScreen from './src/navigation/RootScreen';
 import Loader from './src/utils/Loader';
 import messaging from '@react-native-firebase/messaging';
-import {notificationListener, requestUserPermission} from './src/utils/NotificationHanlder';
+import {
+  notificationListener,
+  requestUserPermission,
+} from './src/utils/NotificationHanlder';
 
 const queryClient = new QueryClient();
 
@@ -22,7 +25,7 @@ GoogleSignin.configure({
   offlineAccess: false,
 });
 
-console.error = () => {};
+// console.error = () => {};
 
 export const AppLoaderRef = React.createRef<LoaderType>();
 
@@ -55,9 +58,9 @@ function App(): React.JSX.Element {
     };
   }, []);
 
-  useEffect(() =>{
+  useEffect(() => {
     requestUserPermission();
-  },[]);
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {

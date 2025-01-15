@@ -27,6 +27,7 @@ import {
   updateNotificationTime,
   updateProfile,
 } from '../store/reducers/AuthReducer';
+import { timerFormatter } from '../utils/currentDateIntlFormat';
 
 interface AppearanceProps {
   isModalVisible: boolean;
@@ -58,12 +59,7 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
       setToggleStates(prevState => !prevState);
     }, []);
 
-    const timerFormatter = useCallback((time: Date | string) => {
-      return moment
-        .utc(time, 'HH:mm:ss') // Parse as UTC time
-        .local() // Convert to local time
-        .format('HH:mm'); // Format in local time
-    }, []);
+
 
     const timerUTCFormatter = useCallback((time: Date) => {
       return moment.utc(time).format('HH:mm');
@@ -79,7 +75,6 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
       onMutate: () => AppLoaderRef.current?.start(),
       onSuccess(data) {
         let localTime = timerFormatter(data?.data?.payload?.notification_time);
-        console.log(data?.data?.payload);
         if (data?.status == 200) {
           CustomToaster({
             type: ALERT_TYPE.SUCCESS,
@@ -119,15 +114,6 @@ const NotificationsModal: React.FC<AppearanceProps> = memo(
       setTimer(date);
       hidePicker();
     };
-    console.log(notification_time);
-
-  //  useEffect(() =>{
-  //   dispatcher(
-  //     updateNotificationTime({
-  //       notification_time: null,
-  //     }),
-  //   );
-  //  },[]);
 
     const handleSetTimer = useCallback(() => {
       let currentTimer = timerFormatter(timer);

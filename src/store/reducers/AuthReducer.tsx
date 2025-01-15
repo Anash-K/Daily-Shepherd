@@ -1,6 +1,16 @@
 import {createSlice} from '@reduxjs/toolkit';
+import {timerFormatter} from '../../utils/currentDateIntlFormat';
 
-const initialState = {
+interface AuthState {
+  token: string | null;
+  email: string | null;
+  name: string;
+  profile: any; // You can replace `any` with a more specific type if needed
+  oldUser: boolean;
+  notification_time: string | null;
+}
+
+const initialState: AuthState = {
   token: null, // Store token
   email: null, // Store email
   name: '', // Store name
@@ -15,11 +25,18 @@ const authSlice = createSlice({
   reducers: {
     loginSuccess: (state, action) => {
       const {token, email, name, profile, notification_time} = action.payload;
+      let notifyTime;
+      if (notification_time) {
+        notifyTime = timerFormatter(notification_time);
+      } else {
+        notifyTime = null;
+      }
+
       state.token = token;
       state.email = email;
       state.name = name;
       state.profile = profile;
-      state.notification_time = notification_time;
+      state.notification_time = notifyTime;
     },
     logout: state => {
       state.token = null;
@@ -29,6 +46,8 @@ const authSlice = createSlice({
     },
     updateProfile: (state, action) => {
       const {name, profile, notification_time} = action.payload;
+      console.log(notification_time, 'updateProfile');
+
       if (name) {
         state.name = name;
       }
@@ -42,10 +61,15 @@ const authSlice = createSlice({
     },
     updateNotificationTime: (state, action) => {
       state.notification_time = action.payload.notification_time;
-    },    
+    },
   },
 });
 
-export const {loginSuccess, logout, updateProfile, updateIsOldUser,updateNotificationTime} =
-  authSlice.actions;
+export const {
+  loginSuccess,
+  logout,
+  updateProfile,
+  updateIsOldUser,
+  updateNotificationTime,
+} = authSlice.actions;
 export default authSlice.reducer;

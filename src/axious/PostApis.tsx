@@ -97,7 +97,6 @@ export const SetNotificationTime = async ({
   } else {
     notificationTime = '';
   };
-  console.log(notificationTime,'notification time',isNotification)
 
   try {
     const response = await AxiosInstance.post(`update-notification-time`, {

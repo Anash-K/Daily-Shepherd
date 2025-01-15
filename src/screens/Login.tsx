@@ -221,7 +221,7 @@ const Login: React.FC<AuthStackProps<'Login'>> = ({navigation}) => {
             dispatch(updateIsOldUser(true));
           } else {
             dispatch(updateIsOldUser(false));
-          }
+          };
 
           setTimeout(() => {
             dispatch(loginSuccess(data.payload));

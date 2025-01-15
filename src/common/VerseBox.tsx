@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import CustomImages from '../assets/customImages';
 import CustomFont from '../assets/customFonts';
-import {memo, useCallback, useEffect, useState} from 'react';
-import {useNavigation} from '@react-navigation/native';
+import React, {memo, useCallback, useEffect, useState} from 'react';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {ScreenProps} from '../navigation/Stack';
 import {DateComparison} from '../utils/currentDateIntlFormat';
 import {useMutation} from 'react-query';
@@ -55,38 +55,53 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
     }, [liked]);
 
     const handleSpeak = (text: string) => {
-      // if (Platform.OS === 'android') {
+      if (Platform.OS === 'ios') {
+        Tts.setIgnoreSilentSwitch('ignore');
+      }
       setIsPlaying(true);
-      Tts.speak(text);
-      // }
+      Tts.speak(text, {
+        androidParams: {
+          KEY_PARAM_PAN: -1,
+          KEY_PARAM_VOLUME: 0.5,
+          KEY_PARAM_STREAM: 'STREAM_MUSIC',
+        },
+        rate: 0.5,
+        iosVoiceId: 'com.apple.ttsbundle.Samantha-compact',
+      });
     };
 
-    const stopSpeaking = () => {
-      // if (Platform.OS === 'android') {
+    const stopSpeaking = async () => {
       if (isPlaying) {
-        Tts?.stop(true);
+        console.log('Stopping TTS');
+        Tts.stop();
+        setIsPlaying(false);
       }
-      setIsPlaying(false);
-      // }
     };
 
     useEffect(() => {
-      // Listen for TTS finish event
       const onFinish = Tts.addListener('tts-finish', () => {
         setIsPlaying(false);
       });
 
-      // Optional: Listen for progress updates
-      const onProgress = Tts.addListener('tts-progress', event => {
-        // console.log('TTS Progress:', event);
-      });
-
-      // Cleanup
+      // Cleanup on unmount to stop speech and remove event listener
       return () => {
-        onFinish.remove();
-        onProgress.remove();
+        stopSpeaking(); // Stop speech when component unmounts
+        onFinish.remove(); // Remove the listener to avoid memory leaks
       };
-    }, []);
+    }, [isPlaying]);
+
+    useFocusEffect(
+      React.useCallback(() => {
+        stopSpeaking();
+
+        // Stop speaking when the screen is unfocused or navigated away
+        return () => {
+          Tts.stop();
+          setIsPlaying(false);
+          stopSpeaking(); // Stop speech when leaving the screen
+        };
+      }, []),
+    );
 
     const handleComments = (id: string) => {
       navigation.navigate('Comments', {

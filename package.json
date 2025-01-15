@@ -50,7 +50,7 @@
     "react-native-reanimated": "^3.16.5",
     "react-native-safe-area-context": "^5.0.0",
     "react-native-screens": "^4.3.0",
-    "react-native-tts": "^4.1.1",
+    "react-native-tts": "^4.1.0",
     "react-native-video": "^6.8.2",
     "react-query": "^3.39.3",
     "react-redux": "^9.2.0",

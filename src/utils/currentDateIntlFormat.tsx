@@ -1,5 +1,6 @@
 import {Text} from 'react-native-paper';
 import moment from 'moment';
+import { useCallback } from 'react';
 
 export const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat('en-US', {
@@ -58,4 +59,11 @@ export const TimeAgo: React.FC<TimeAgoProps> = ({date}) => {
   }
 
   return formattedDate;
+};
+
+export const timerFormatter = (time: Date | string) => {
+  return moment
+    .utc(time, 'HH:mm:ss') // Parse as UTC time
+    .local() // Convert to local time
+    .format('HH:mm'); // Format in local time
 };

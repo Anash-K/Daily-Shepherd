@@ -73,7 +73,7 @@ const Comments: React.FC<ScreenProps<'Comments'>> = ({route}) => {
         type: ALERT_TYPE.SUCCESS,
         message: 'Comment added successfully',
       });
-      DeviceEventEmitter.emit('trackLike');
+      // DeviceEventEmitter.emit('trackLike');
       getCommentsData();
     } else {
       CustomToaster({
@@ -105,14 +105,16 @@ const Comments: React.FC<ScreenProps<'Comments'>> = ({route}) => {
     }
   }, [inputComment, verseId]);
 
-  useEffect(() => {
-    const commentEvent = DeviceEventEmitter.addListener('trackLike', data => {
-      getCommentsData();
-    });
-    return () => {
-      commentEvent.remove();
-    };
-  }, []);
+  // useEffect(() => {
+  //   const commentEvent = DeviceEventEmitter.addListener('trackLike', () => {
+  //     if(verseId){
+  //       getCommentsData();
+  //     }
+  //   });
+  //   return () => {
+  //     commentEvent.remove(); // Clean up to prevent memory leaks
+  //   };
+  // }, []);  
 
   if (isLoading && onFirstLoad) {
     return null;
