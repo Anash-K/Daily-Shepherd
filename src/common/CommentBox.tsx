@@ -54,7 +54,7 @@ const CommentBox: React.FC<CommentBoxType> = memo(
       onMutate: () => AppLoaderRef.current?.start(),
       onSuccess(data) {
         handleReportResponse(data);
-        // DeviceEventEmitter.emit('trackLike');
+        DeviceEventEmitter.emit('trackLike');
       },
       onError(error) {
         ErrorHandler(error);
@@ -71,7 +71,7 @@ const CommentBox: React.FC<CommentBoxType> = memo(
       onMutate: () => AppLoaderRef.current?.start(),
       onSuccess(data) {
         handleReportResponse(data);
-        // DeviceEventEmitter.emit('trackLike');
+        DeviceEventEmitter.emit('trackLike');
       },
       onError(error) {
         ErrorHandler(error);
@@ -179,8 +179,8 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: 'rgba(250, 250, 250, 0.15)',
     height: 35,
-    justifyContent: Platform.select({ios:'center'}),
-    alignItems: Platform.select({ios:'center'}),
+    // justifyContent: Platform.select({ios:'center'}),
+    // alignItems: Platform.select({ios:'center'}),
   },
   menuItemText: {
     fontFamily: CustomFont.Urbanist400,
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     lineHeight: 19.2,
     color: 'rgba(250, 250, 250, 1)',
     textAlign: 'center',
-    marginTop: Platform.select({ios:2}),
+    // marginTop: Platform.select({ios:2}),
   },
   container: {
     borderBottomWidth: 1,
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 15,
     tintColor: 'rgba(250, 250, 250, 1)',
-    marginTop: Platform.select({ios:3}),
+    // marginTop: Platform.select({ios:3}),
   },
   profilePic: {
     width: 28,

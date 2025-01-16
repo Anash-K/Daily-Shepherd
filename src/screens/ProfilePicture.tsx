@@ -278,7 +278,8 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
         style={{flex: 1}}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}>
+        behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+        keyboardVerticalOffset={60}>
         <ScrollView
           contentContainerStyle={{flexGrow: 1}}
           style={[
@@ -289,7 +290,8 @@ const ProfilePicture: React.FC<ScreenProps<'ProfilePicture'>> = ({
                 android: 25,
               }),
             },
-          ]} showsVerticalScrollIndicator={false}>
+          ]}
+          showsVerticalScrollIndicator={false}>
           <View style={{flexGrow: 1}}>
             <Pressable style={styles.imageBox} onPress={toggleModal}>
               <CustomImageHandler
@@ -423,6 +425,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+
   },
   title: {
     fontFamily: CustomFont.Urbanist600,
