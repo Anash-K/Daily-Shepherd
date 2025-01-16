@@ -70,9 +70,8 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
       });
     };
 
-    const stopSpeaking =  () => {
+    const stopSpeaking = () => {
       if (isPlaying) {
-        console.log('Stopping TTS');
         Tts.stop();
         setIsPlaying(false);
       }
@@ -90,18 +89,20 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
       };
     }, [isPlaying]);
 
-    // useFocusEffect(
-    //   React.useCallback(() => {
-    //     stopSpeaking();
+    if (Platform.OS == 'android') {
+      useFocusEffect(
+        React.useCallback(() => {
+          stopSpeaking();
 
-    //     // Stop speaking when the screen is unfocused or navigated away
-    //     return () => {
-    //       Tts.stop();
-    //       setIsPlaying(false);
-    //       stopSpeaking(); // Stop speech when leaving the screen
-    //     };
-    //   }, []),
-    // );
+          // Stop speaking when the screen is unfocused or navigated away
+          return () => {
+            Tts.stop();
+            setIsPlaying(false);
+            stopSpeaking(); // Stop speech when leaving the screen
+          };
+        }, []),
+      );
+    }
 
     const handleComments = (id: string) => {
       navigation.navigate('Comments', {
@@ -143,6 +144,16 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
       addVerseToFavorite();
     }, []);
 
+    const handleLiestnerAction = useCallback(() => {
+      if (Platform.OS === 'android') {
+        if (isPlaying) {
+          stopSpeaking();
+        } else {
+          handleSpeak(verse);
+        }
+      }
+    }, [isPlaying, verse]);
+
     // Usage
 
     let displayDate;
@@ -173,13 +184,7 @@ const VerseBox: React.FC<VerseBoxProps> = memo(
 
           <TouchableOpacity
             style={styles.listenButton}
-            onPress={() => {
-              if (isPlaying) {
-                stopSpeaking();
-              } else {
-                handleSpeak(verse);
-              }
-            }}>
+            onPress={handleLiestnerAction}>
             <Image
               source={CustomImages.speakerIcon}
               style={styles.speakerIcon}

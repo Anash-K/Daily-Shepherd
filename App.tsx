@@ -25,7 +25,7 @@ GoogleSignin.configure({
   offlineAccess: false,
 });
 
-// console.error = () => {};
+console.error = () => {};
 
 export const AppLoaderRef = React.createRef<LoaderType>();
 
